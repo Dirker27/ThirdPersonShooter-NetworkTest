@@ -32,3 +32,27 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 }
 
+void ATPSCharacter::GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const
+{
+	Location = GetMesh()->GetSocketLocation(EyeSocketName);
+	Rotation = GetMesh()->GetSocketRotation(EyeSocketName);
+}
+
+void ATPSCharacter::FellOutOfWorld(const class UDamageType& dmgType) {
+	OnFellOutOfWorld();
+}
+
+float ATPSCharacter::GetBaseSpeedForCharacterState(const ETPSCharacterState CharacterState) const
+{
+	switch (CharacterState) {
+	case Casual:
+		return 200;
+	case Combat:
+		return 300;
+	case Injured:
+		return 100;
+	case Incapacitated:
+	default:
+		return 0;
+	}
+}
