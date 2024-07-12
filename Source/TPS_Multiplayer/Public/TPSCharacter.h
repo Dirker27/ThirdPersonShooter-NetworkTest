@@ -35,10 +35,24 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName EyeSocketName;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isCrouching;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isBoosting;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isAiming;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isFiring;
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnFellOutOfWorld();
 
-	// CANNOT REFERENCE BP ENUMS FROM C++
 	UFUNCTION(BlueprintCallable)
 	float GetBaseSpeedForCharacterState(const ETPSCharacterState CharacterState) const;
+
+	UFUNCTION(BlueprintCallable)
+	AActor* LineTrace(const UObject* WorldContextObject);
 };
