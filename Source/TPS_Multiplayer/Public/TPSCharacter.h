@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+//#include "EnhancedInput/Public/EnhancedInputPlatformSettings.h"
+
 #include "TPSLocomotionState.h"
 #include "TPSCharacterState.h"
 
@@ -55,4 +57,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AActor* LineTrace(const UObject* WorldContextObject);
+
+
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enhanced Input")
+	//UInputMappingContext* defaultInputMappingContext;
 };
