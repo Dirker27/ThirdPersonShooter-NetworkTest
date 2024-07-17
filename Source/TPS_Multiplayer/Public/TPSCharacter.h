@@ -58,8 +58,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AActor* LineTrace(const UObject* WorldContextObject);
 
-
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enhanced Input")
-	//UInputMappingContext* defaultInputMappingContext;
+	UFUNCTION(BlueprintCallable)
+	void UpdateInputContextToState();
 };
