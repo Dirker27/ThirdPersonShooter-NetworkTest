@@ -3,6 +3,7 @@
 
 #include "TPSCharacter.h"
 #include <Kismet/KismetSystemLibrary.h>
+//#include "EnhancedInputSubsystems.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
@@ -82,4 +83,19 @@ AActor* ATPSCharacter::LineTrace(const UObject* WorldContextObject) {
 	}
 
 	return hitActor;
+}
+
+void ATPSCharacter::UpdateInputContextToState() {
+
+
+	/*if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			if (!InputMapping.IsNull())
+			{
+				InputSystem->AddMappingContext(InputMapping.LoadSynchronous(), Priority);
+			}
+		}
+	}*/
 }
