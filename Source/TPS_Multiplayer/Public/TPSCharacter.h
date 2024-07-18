@@ -37,6 +37,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName EyeSocketName;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CurrentHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MaxHealth;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float CurrentMaxWalkSpeed;
 
@@ -77,10 +83,10 @@ public:
 	ETPSLocomotionState EvaluateLocomotionStateForCurrentInput();
 
 	UFUNCTION(BlueprintCallable)
-	void ApplyLocomotionState(const ETPSLocomotionState LocomotionState);
+	void ApplyCharacterState(const ETPSCharacterState CharacterState);
 
 	UFUNCTION(BlueprintCallable)
-	void ApplyCharacterState(const ETPSCharacterState CharacterState);
+	void ApplyLocomotionState(const ETPSLocomotionState LocomotionState);
 
 	// TODO: static?
 	UFUNCTION(BlueprintCallable, BlueprintPure)

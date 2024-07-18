@@ -132,7 +132,8 @@ void ATPSCharacter::ApplyCharacterAttributesForCurrentState()
 
 ETPSLocomotionState ATPSCharacter::EvaluateLocomotionStateForCurrentInput()
 {
-	// Non-Combat (restricted states)
+	//- Non-Combat (restricted states) -----------------------------------=
+	//
 	if (CurrentCharacterState != Combat) {
 		
 		switch (CurrentLocomotionState) {
@@ -170,7 +171,8 @@ ETPSLocomotionState ATPSCharacter::EvaluateLocomotionStateForCurrentInput()
 		return CurrentLocomotionState;
 	}
 
-	// Combat (all states available)
+	//- Combat (all states available) ---------------------------------------=
+	//
 	switch (CurrentLocomotionState) {
 	case Standing:
 		if (isCrouchInputReceived) {
