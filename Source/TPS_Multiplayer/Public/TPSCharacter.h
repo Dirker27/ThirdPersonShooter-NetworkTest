@@ -19,6 +19,7 @@ public:
 	// Sets default values for this character's properties
 	ATPSCharacter();
 
+	// UE Override Hooks
 	void GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const override;
 	void FellOutOfWorld(const class UDamageType& dmgType) override;
 
@@ -36,11 +37,31 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName EyeSocketName;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float CurrentMaxWalkSpeed;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool isCrouching;
+	TEnumAsByte<ETPSCharacterState> CurrentCharacterState;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<ETPSCharacterState> PreviousCharacterState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<ETPSLocomotionState> CurrentLocomotionState;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<ETPSLocomotionState> PreviousLocomotionState;
+
+	// True if Crouching OR Prone.
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsCrouching() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isBoosting;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isCrouchInputReceived;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isProneInputReceived;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isAiming;
@@ -51,12 +72,36 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnFellOutOfWorld();
 
+
 	UFUNCTION(BlueprintCallable)
+	ETPSLocomotionState EvaluateLocomotionStateForCurrentInput();
+
+	UFUNCTION(BlueprintCallable)
+	void ApplyLocomotionState(const ETPSLocomotionState LocomotionState);
+
+	UFUNCTION(BlueprintCallable)
+	void ApplyCharacterState(const ETPSCharacterState CharacterState);
+
+	// TODO: static?
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetBaseSpeedForCharacterState(const ETPSCharacterState CharacterState) const;
 
-	UFUNCTION(BlueprintCallable)
-	AActor* LineTrace(const UObject* WorldContextObject);
+	// TODO: static?
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetSpeedModifierForLocomotionState(const ETPSLocomotionState LocomotionState) const;
 
 	UFUNCTION(BlueprintCallable)
-	void UpdateInputContextToState();
+	float UpdateCharacterSpeedForCurrentState();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateInputContextForCurrentState();
+
+	UFUNCTION(BlueprintCallable)
+	void ApplyCharacterAttributesForCurrentState();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsActionActive() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	AActor* LineTrace(const UObject* WorldContextObject);
 };

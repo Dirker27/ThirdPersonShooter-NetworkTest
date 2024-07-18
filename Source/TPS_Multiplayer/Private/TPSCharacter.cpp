@@ -3,7 +3,7 @@
 
 #include "TPSCharacter.h"
 #include <Kismet/KismetSystemLibrary.h>
-//#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputSubsystems.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
@@ -24,7 +24,6 @@ void ATPSCharacter::BeginPlay()
 void ATPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -44,6 +43,23 @@ void ATPSCharacter::FellOutOfWorld(const class UDamageType& dmgType) {
 	OnFellOutOfWorld();
 }
 
+bool ATPSCharacter::IsCrouching() const
+{
+	return (CurrentLocomotionState == Crouching || CurrentLocomotionState == Prone);
+}
+
+void ATPSCharacter::ApplyLocomotionState(const ETPSLocomotionState LocomotionState)
+{
+	PreviousLocomotionState = CurrentLocomotionState;
+	CurrentLocomotionState = LocomotionState;
+}
+
+void ATPSCharacter::ApplyCharacterState(const ETPSCharacterState CharacterState)
+{
+	PreviousCharacterState = CurrentCharacterState;
+	CurrentCharacterState = CharacterState;
+}
+
 float ATPSCharacter::GetBaseSpeedForCharacterState(const ETPSCharacterState CharacterState) const
 {
 	switch (CharacterState) {
@@ -58,6 +74,166 @@ float ATPSCharacter::GetBaseSpeedForCharacterState(const ETPSCharacterState Char
 		return 0;
 	}
 }
+
+float ATPSCharacter::GetSpeedModifierForLocomotionState(const ETPSLocomotionState LocomotionState) const
+{
+	switch (LocomotionState) {
+	case Standing:
+		return 1.0;
+	case Crouching:
+		return 0.5;
+	case Prone:
+		return 0.1;
+	case Sprinting:
+		return 2.0;
+	case Ragdoll:
+	default:
+		return 0;
+	}
+}
+
+float ATPSCharacter::UpdateCharacterSpeedForCurrentState()
+{
+	float baseSpeed = GetBaseSpeedForCharacterState(CurrentCharacterState);
+	float locomotionStateModifier = GetSpeedModifierForLocomotionState(CurrentLocomotionState);
+
+	CurrentMaxWalkSpeed = baseSpeed * locomotionStateModifier;
+
+	// TODO: Apply to CharacterMovement
+
+	return CurrentMaxWalkSpeed;
+}
+
+
+
+void ATPSCharacter::UpdateInputContextForCurrentState()
+{
+	/*player = GetPlayer()
+	if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			if (!InputMapping.IsNull())
+			{
+				InputSystem->AddMappingContext(InputMapping.LoadSynchronous(), Priority);
+			}
+		}
+	}*/
+}
+
+
+void ATPSCharacter::ApplyCharacterAttributesForCurrentState()
+{
+	UpdateCharacterSpeedForCurrentState();
+	UpdateInputContextForCurrentState();	
+}
+
+
+
+ETPSLocomotionState ATPSCharacter::EvaluateLocomotionStateForCurrentInput()
+{
+	// Non-Combat (restricted states)
+	if (CurrentCharacterState != Combat) {
+		
+		switch (CurrentLocomotionState) {
+		case Standing:
+			if (isCrouchInputReceived) {
+				ApplyLocomotionState(Crouching);
+			}
+			else if (isBoosting) {
+				ApplyLocomotionState(Sprinting);
+			}
+			break;
+
+		case Crouching:
+			if (!isCrouchInputReceived) {
+				ApplyLocomotionState(Standing);
+			}
+			break;
+
+		case Prone:
+			ApplyLocomotionState(Crouching);
+			break;
+		case Sprinting:
+			if (!isBoosting || IsActionActive()) {
+				ApplyLocomotionState(Standing);
+			}
+			else if (isCrouchInputReceived) {
+				ApplyLocomotionState(Crouching);
+			}
+			break;
+		default:
+			ApplyLocomotionState(Standing);
+			break;
+		}
+
+		return CurrentLocomotionState;
+	}
+
+	// Combat (all states available)
+	switch (CurrentLocomotionState) {
+	case Standing:
+		if (isCrouchInputReceived) {
+			ApplyLocomotionState(Crouching);
+		}
+		else if (isProneInputReceived) {
+			ApplyLocomotionState(Prone);
+		}
+		else if (isBoosting) {
+			ApplyLocomotionState(Sprinting);
+		}
+		break;
+
+	case Crouching:
+		if (!isCrouchInputReceived) {
+			ApplyLocomotionState(Standing);
+		}
+		else if (isProneInputReceived) {
+			ApplyLocomotionState(Prone);
+		}
+		break;
+
+	case Prone:
+		if (!isProneInputReceived) {
+			if (isCrouchInputReceived) {
+				ApplyLocomotionState(Crouching);
+				break;
+			}
+			ApplyLocomotionState(Standing);
+		}
+		break;
+
+	case Sprinting:
+		if (!isBoosting || IsActionActive()) {
+			ApplyLocomotionState(Standing);
+		}
+		else if (isCrouchInputReceived) {
+			ApplyLocomotionState(Crouching);
+		}
+		else if (isProneInputReceived) {
+			ApplyLocomotionState(Prone);
+		}
+		break;
+
+	default:
+		ApplyLocomotionState(Standing);
+		break;
+	}
+
+	return CurrentLocomotionState;
+}
+
+bool ATPSCharacter::IsActionActive() const {
+	return isAiming;
+}
+
+
+
+
+
+
+
+
 
 AActor* ATPSCharacter::LineTrace(const UObject* WorldContextObject) {
 	AActor* hitActor = NULL;
@@ -83,19 +259,4 @@ AActor* ATPSCharacter::LineTrace(const UObject* WorldContextObject) {
 	}
 
 	return hitActor;
-}
-
-void ATPSCharacter::UpdateInputContextToState() {
-
-
-	/*if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
-		{
-			if (!InputMapping.IsNull())
-			{
-				InputSystem->AddMappingContext(InputMapping.LoadSynchronous(), Priority);
-			}
-		}
-	}*/
 }
