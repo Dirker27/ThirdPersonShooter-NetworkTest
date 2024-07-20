@@ -226,7 +226,7 @@ ETPSLocomotionState ATPSCharacter::EvaluateLocomotionStateForCurrentInput()
 }
 
 bool ATPSCharacter::IsActionActive() const {
-	return isAiming;
+	return isAiming || isFiring;
 }
 
 

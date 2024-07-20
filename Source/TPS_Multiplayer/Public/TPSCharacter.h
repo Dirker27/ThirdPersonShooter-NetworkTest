@@ -110,4 +110,38 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AActor* LineTrace(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FString CharacterStateToString(ETPSCharacterState state) {
+		switch (state) {
+		case Casual:
+			return "Casual";
+		case Combat:
+			return "Combat";
+		case Injured:
+			return "Injured";
+		case Incapacitated:
+			return "Incapacitated";
+		default:
+			return "UNSUPPORTED";
+		}
+	};
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FString LocomotionStateToString(ETPSLocomotionState state) {
+		switch (state) {
+		case Standing:
+			return "Standing";
+		case Crouching:
+			return "Crouching";
+		case Prone:
+			return "Prone";
+		case Sprinting:
+			return "Sprinting";
+		case Ragdoll:
+			return "Ragdoll";
+		default:
+			return "UNSUPPORTED";
+		}
+	}
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+//#include "string.h"
+
 #include "CoreMinimal.h"
 #include "UObject/ObjectMacros.h"
 
@@ -14,4 +16,3 @@ enum ETPSCharacterState : int
     Incapacitated = 3,
     Mounted = 4
 };
-
