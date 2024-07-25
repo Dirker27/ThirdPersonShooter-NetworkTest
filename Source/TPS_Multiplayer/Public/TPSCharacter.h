@@ -7,6 +7,7 @@
 
 #include "TPSLocomotionState.h"
 #include "TPSCharacterState.h"
+#include "TPSCharacterBodyType.h"
 
 #include "TPSCharacter.generated.h"
 
@@ -19,14 +20,22 @@ public:
 	// Sets default values for this character's properties
 	ATPSCharacter();
 
-	// UE Override Hooks
-	void GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const override;
-	void FellOutOfWorld(const class UDamageType& dmgType) override;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FString CharacterStateToFString(ETPSCharacterState state) {
+		return FString(ETPSCharacterStateToString(state));
+	};
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FString LocomotionStateToFString(ETPSLocomotionState state) {
+		return FString(ETPSLocomotionStateToString(state));
+	}
+
+// UE Implementables
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+// UE Implementabes
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -34,6 +43,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// Overrides
+	void GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const override;
+	void FellOutOfWorld(const class UDamageType& dmgType) override;
+
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName EyeSocketName;
 
@@ -45,6 +59,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float CurrentMaxWalkSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<ETPSCharacterBodyType> CharacterBodyType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<ETPSCharacterState> CurrentCharacterState;
@@ -88,13 +105,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ApplyLocomotionState(const ETPSLocomotionState LocomotionState);
 
-	// TODO: static?
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	float GetBaseSpeedForCharacterState(const ETPSCharacterState CharacterState) const;
+	float GetBaseSpeedForCharacterState(const ETPSCharacterState CharacterState);
 
-	// TODO: static?
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	float GetSpeedModifierForLocomotionState(const ETPSLocomotionState LocomotionState) const;
+	float GetSpeedModifierForLocomotionState(const ETPSLocomotionState LocomotionState);
 
 	UFUNCTION(BlueprintCallable)
 	float UpdateCharacterSpeedForCurrentState();
@@ -110,38 +125,4 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AActor* LineTrace(const UObject* WorldContextObject);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static FString CharacterStateToString(ETPSCharacterState state) {
-		switch (state) {
-		case Casual:
-			return "Casual";
-		case Combat:
-			return "Combat";
-		case Injured:
-			return "Injured";
-		case Incapacitated:
-			return "Incapacitated";
-		default:
-			return "UNSUPPORTED";
-		}
-	};
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static FString LocomotionStateToString(ETPSLocomotionState state) {
-		switch (state) {
-		case Standing:
-			return "Standing";
-		case Crouching:
-			return "Crouching";
-		case Prone:
-			return "Prone";
-		case Sprinting:
-			return "Sprinting";
-		case Ragdoll:
-			return "Ragdoll";
-		default:
-			return "UNSUPPORTED";
-		}
-	}
 };

@@ -17,3 +17,32 @@ enum ETPSLocomotionState : int
     Ragdoll = 4
 };
 
+
+static std::unordered_map<char*, ETPSLocomotionState> ETPSLocomotionStateMap {
+    { "Standing", Standing },
+    { "Crouching", Crouching },
+    { "Prone", Prone },
+    { "Sprinting", Sprinting },
+    { "Ragdoll", Ragdoll }
+};
+
+static const ETPSLocomotionState ETPSLocomotionStateFromString(char* state) {
+    return ETPSLocomotionStateMap[state];
+}
+
+static const char* ETPSLocomotionStateToString(const ETPSLocomotionState state) {
+	switch (state) {
+	case Standing:
+		return "Standing";
+	case Crouching:
+		return "Crouching";
+	case Prone:
+		return "Prone";
+	case Sprinting:
+		return "Sprinting";
+	case Ragdoll:
+		return "Ragdoll";
+	default:
+		return "UNSUPPORTED";
+	}
+}

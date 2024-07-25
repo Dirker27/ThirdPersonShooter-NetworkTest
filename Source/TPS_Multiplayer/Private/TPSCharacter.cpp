@@ -60,7 +60,10 @@ void ATPSCharacter::ApplyCharacterState(const ETPSCharacterState CharacterState)
 	CurrentCharacterState = CharacterState;
 }
 
-float ATPSCharacter::GetBaseSpeedForCharacterState(const ETPSCharacterState CharacterState) const
+/**
+ * https://www.notion.so/Game-Design-Document-GDD-670fda60cfeb41a089970b8fd240acaa?pvs=4#c31b4f8df636457b9783b951d60ecf03
+ */
+float ATPSCharacter::GetBaseSpeedForCharacterState(const ETPSCharacterState CharacterState)
 {
 	switch (CharacterState) {
 	case Casual:
@@ -75,7 +78,10 @@ float ATPSCharacter::GetBaseSpeedForCharacterState(const ETPSCharacterState Char
 	}
 }
 
-float ATPSCharacter::GetSpeedModifierForLocomotionState(const ETPSLocomotionState LocomotionState) const
+/**
+ * https://www.notion.so/Game-Design-Document-GDD-670fda60cfeb41a089970b8fd240acaa?pvs=4#c31b4f8df636457b9783b951d60ecf03 
+ */
+float ATPSCharacter::GetSpeedModifierForLocomotionState(const ETPSLocomotionState LocomotionState)
 {
 	switch (LocomotionState) {
 	case Standing:
@@ -129,7 +135,7 @@ void ATPSCharacter::ApplyCharacterAttributesForCurrentState()
 }
 
 
-
+// TODO: Make this follow a state-driven design pattern
 ETPSLocomotionState ATPSCharacter::EvaluateLocomotionStateForCurrentInput()
 {
 	//- Non-Combat (restricted states) -----------------------------------=
