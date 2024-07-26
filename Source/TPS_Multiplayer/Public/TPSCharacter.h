@@ -51,6 +51,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName EyeSocketName;
 
+	UPROPERTY(BlueprintReadOnly)
+	bool IsDebugEnabled = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CurrentHealth;
 

@@ -15,6 +15,8 @@ class TPS_MULTIPLAYER_API ATPSGameMode : public AGameMode
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(BlueprintReadOnly)
+	bool IsDebugEnabled = false;
 
 	UFUNCTION(BlueprintCallable)
 	bool RequestRespawn();
