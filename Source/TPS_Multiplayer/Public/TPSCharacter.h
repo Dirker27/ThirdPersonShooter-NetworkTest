@@ -8,6 +8,7 @@
 #include "TPSLocomotionState.h"
 #include "TPSCharacterState.h"
 #include "TPSCharacterBodyType.h"
+#include "TPSWeaponType.h"
 
 #include "TPSCharacter.generated.h"
 
@@ -75,6 +76,9 @@ public:
 	TEnumAsByte<ETPSLocomotionState> CurrentLocomotionState;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<ETPSLocomotionState> PreviousLocomotionState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<ETPSWeaponType> EquippedWeaponType;
 
 	// True if Crouching OR Prone.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
