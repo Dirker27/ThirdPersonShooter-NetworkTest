@@ -583,7 +583,7 @@ void ATPSCharacter::OnMovementAttributeChanged(const FOnAttributeChangeData& dat
 	}
 
 	MovementSpeedModifier = data.NewValue;
-	//ShouldNotify = true;
+	ShouldNotify = true;
 }
 
 void ATPSCharacter::SyncAttributesFromGAS() {
