@@ -48,7 +48,8 @@ public:
 	// Respawn
 	UFUNCTION(BlueprintCallable)
 	bool RequestRespawn();
-	void PerformRespawn(ATPSPlayerController playerController);
+	UFUNCTION(BlueprintCallable)
+	void PerformRespawn(ATPSPlayerController* playerController);
 
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)

@@ -1,13 +1,29 @@
-// (C) ToasterCat Studios 2024
+// (C) ToasterCat Studios 2025
 
 
 #include "Player/TPSPlayerController.h"
 
 #include "Character/TPSPlayerCharacter.h"
+#include "Game/TPSGameMode.h"
 #include "Util/TPSFunctionLibrary.h"
 
 //~ ====================================================================== ~//
-//- CONSOLE CONFIGURATION
+//- BEHAVIOR OPERATIONS
+//~ ====================================================================== ~//
+
+void ATPSPlayerController::RequestRespawn()
+{
+	AGameModeBase* m = GetWorld()->GetAuthGameMode(); // null if not Server
+	ATPSGameMode* mode = Cast<ATPSGameMode>(m);
+	if (IsValid(mode))
+	{
+		mode->RequestRespawn();
+	}
+}
+
+
+//~ ====================================================================== ~//
+//- CONSOLE COMMANDS AND CONFIGURATION
 //~ ====================================================================== ~//
 
 static TAutoConsoleVariable<int32> CVarLocalPlayerDebugMode(

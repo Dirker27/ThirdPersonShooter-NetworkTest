@@ -66,7 +66,7 @@ bool ATPSGameMode::RequestRespawn() {
 	return true;
 }
 
-void ATPSGameMode::PerformRespawn(ATPSPlayerController playerController) {
+void ATPSGameMode::PerformRespawn(ATPSPlayerController* playerController) {
 	// TODO
 }
 
