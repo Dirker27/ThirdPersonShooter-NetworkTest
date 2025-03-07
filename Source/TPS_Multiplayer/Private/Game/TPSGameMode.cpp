@@ -62,12 +62,14 @@ ATPSGameMode::~ATPSGameMode() { }
 //- Operations
 //~ ====================================================================== ~//
 
-bool ATPSGameMode::RequestRespawn() {
+bool ATPSGameMode::RequestRespawn(ATPSPlayerController* playercontroller) {
 	return true;
 }
 
 void ATPSGameMode::PerformRespawn(ATPSPlayerController* playerController) {
-	// TODO
+	ATPSCharacter* p = SpawnPlayer();
+
+	playerController->Possess(p);
 }
 
 
@@ -86,24 +88,27 @@ void ATPSGameMode::DebugGlobal() {
 }
 
 
-void ATPSGameMode::TPS_SpawnNewPlayerCharacter()
+ATPSCharacter* ATPSGameMode::TPS_SpawnNewPlayerCharacter()
 {
+	ATPSCharacter* spawnedCharacter = nullptr;
 	if (IsValid(PlayerCharacterTemplate))
 	{
 		APlayerStart* spawnPoint = FindSpawnPoint();
 		if (IsValid(spawnPoint))
 		{
-			GetWorld()->SpawnActor<ATPSPlayerCharacter>(PlayerCharacterTemplate,
+			spawnedCharacter = GetWorld()->SpawnActor<ATPSPlayerCharacter>(PlayerCharacterTemplate,
 				spawnPoint->GetTransform().GetLocation(), spawnPoint->GetTransform().Rotator());
 		}
 		else
 		{
-			GetWorld()->SpawnActor<ATPSPlayerCharacter>(PlayerCharacterTemplate);
+			spawnedCharacter = GetWorld()->SpawnActor<ATPSPlayerCharacter>(PlayerCharacterTemplate);
 		}
 	}
+
+	return spawnedCharacter;
 }
-void ATPSGameMode::SpawnPlayer() {
-	TPS_SpawnNewPlayerCharacter();
+ATPSCharacter* ATPSGameMode::SpawnPlayer() {
+	return TPS_SpawnNewPlayerCharacter();
 }
 void ATPSGameMode::SpawnPlayers(int numPlayers)
 {
@@ -113,24 +118,27 @@ void ATPSGameMode::SpawnPlayers(int numPlayers)
 	}
 }
 
-void ATPSGameMode::TPS_SpawnNewBot()
+ATPSCharacter* ATPSGameMode::TPS_SpawnNewBot()
 {
+	ATPSCharacter* spawnedBot = nullptr;
 	if (IsValid(BotTemplate))
 	{
 		APlayerStart* spawnPoint = FindSpawnPoint();
 		if (IsValid(spawnPoint))
 		{
-			GetWorld()->SpawnActor<ATPSAICharacter>(BotTemplate,
+			spawnedBot = GetWorld()->SpawnActor<ATPSAICharacter>(BotTemplate,
 				spawnPoint->GetTransform().GetLocation(), spawnPoint->GetTransform().Rotator());
 		}
 		else
 		{
-			GetWorld()->SpawnActor<ATPSAICharacter>(BotTemplate);
+			spawnedBot = GetWorld()->SpawnActor<ATPSAICharacter>(BotTemplate);
 		}
 	}
+
+	return spawnedBot;
 }
-void ATPSGameMode::SpawnBot() {
-	TPS_SpawnNewBot();
+ATPSCharacter* ATPSGameMode::SpawnBot() {
+	return TPS_SpawnNewBot();
 }
 void ATPSGameMode::SpawnBots(int numBots)
 {

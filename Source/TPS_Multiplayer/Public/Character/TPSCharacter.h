@@ -347,6 +347,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsActionActive() const;
 
+
+	// Character Death
+	UFUNCTION(BlueprintCallable)
+	void PerformDeath();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDeath();
+
+	// TODO: Perform from the Utility library
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AActor* LineTrace(const UObject* WorldContextObject);
 

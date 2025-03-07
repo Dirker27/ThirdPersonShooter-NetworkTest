@@ -12,6 +12,9 @@
 
 #include "TPSAICharacter.generated.h"
 
+// TODO: Collapse this back into the normal "Character" class.
+//   We shouldn't need to split the AI functionality to its own
+//   class unless we get really involved with minion bots.
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSAICharacter : public ATPSCharacter
 {

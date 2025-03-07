@@ -9,6 +9,7 @@
 #include "UObject/ConstructorHelpers.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/TPSPlayerController.h"
 
 #include "Player/TPSPlayerState.h"
 
@@ -319,10 +320,10 @@ void ATPSCharacter::UpdateInputContextForCurrentState()
 }
 
 
-// TODO: Make this follow a strategy pattern baed on current CharacterState
 ETPSLocomotionState ATPSCharacter::EvaluateLocomotionStateForCurrentInput()
 {
-	// TODO: Transitions based on allowed LocomotionStates for CharacterState
+	// TODO: Make this follow a strategy pattern based on current CharacterState
+	//   Transitions based on allowed LocomotionStates for CharacterState
 
 	// Character State Overrides
 	if (CurrentCharacterState == Incapacitated)
@@ -350,6 +351,18 @@ bool ATPSCharacter::IsActionActive() const {
 		|| IsReloading
 		|| IsInteracting
 		|| IsInMenu;
+}
+
+void ATPSCharacter::PerformDeath()
+{
+	ApplyCharacterState(Incapacitated);
+
+	ATPSPlayerController* controller = Cast<ATPSPlayerController>(GetController());
+	if (IsValid(controller))
+	{
+		controller->OnPawnDeath();
+	}
+	OnDeath();
 }
 
 

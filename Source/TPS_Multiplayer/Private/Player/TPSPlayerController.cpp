@@ -15,11 +15,18 @@ void ATPSPlayerController::RequestRespawn()
 {
 	AGameModeBase* m = GetWorld()->GetAuthGameMode(); // null if not Server
 	ATPSGameMode* mode = Cast<ATPSGameMode>(m);
-	if (IsValid(mode))
+	if (IsValid(mode) && mode->RequestRespawn(this));
 	{
-		mode->RequestRespawn();
+		mode->PerformRespawn(this);
 	}
 }
+
+void ATPSPlayerController::OnPawnDeath()
+{
+	UE_LOG(LogTemp, Log, TEXT("PlayerController requesting respawn..."));
+	RequestRespawn();
+}
+
 
 
 //~ ====================================================================== ~//

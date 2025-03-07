@@ -1,4 +1,4 @@
-// (C) ToasterCat Studios 2024
+// (C) ToasterCat Studios 2025
 
 #pragma once
 
@@ -47,7 +47,7 @@ public:
 
 	// Respawn
 	UFUNCTION(BlueprintCallable)
-	bool RequestRespawn();
+	bool RequestRespawn(ATPSPlayerController* playerController);
 	UFUNCTION(BlueprintCallable)
 	void PerformRespawn(ATPSPlayerController* playerController);
 
@@ -74,17 +74,17 @@ public:
 	// Spawn a new Player Character
 	//   (w/o PlayerController / PlayerState)
 	UFUNCTION(Exec, Category = "Spawn|Player")
-	void TPS_SpawnNewPlayerCharacter();
+	ATPSCharacter* TPS_SpawnNewPlayerCharacter();
 	UFUNCTION(Exec, Category = "Spawn|Player")
-	void SpawnPlayer();
+	ATPSCharacter* SpawnPlayer();
 	UFUNCTION(Exec, Category = "Spawn|Player")
 	void SpawnPlayers(int numPlayersToSpawn);
 
 	// Spawn a new Bot
 	UFUNCTION(Exec, Category = "Spawn|Bot")
-	void TPS_SpawnNewBot();
+	ATPSCharacter* TPS_SpawnNewBot();
 	UFUNCTION(Exec, Category = "Spawn|Bot")
-	void SpawnBot();
+	ATPSCharacter* SpawnBot();
 	UFUNCTION(Exec, Category = "Spawn|Bot")
 	void SpawnBots(int numBotsToSpawn);
 

@@ -15,33 +15,38 @@
 UENUM(BlueprintType)
 enum class EAbilityInput : uint8
 {
-	None = 0,
-	Interact = 1,
+	None,
+	Interact,
 
 	// Locomotion
-	Mantle = 2,
-	Crouch = 3,
-	Boost = 4,
-	UnBoost = 5,
+	Mantle,
+	Crouch,
+	Boost,
+	UnBoost,
 
 	// Primary Actions
-	PrimaryAttack = 6,
-	SecondaryAttack = 7,
-	Aim = 8,
+	PrimaryAttack,
+	SecondaryAttack,
+	Aim,
 
 	// Weapon Handling
-	Reload = 9,
+	Reload,
 
 	// Inventory
-	EquipPrimary = 10,
-	EquipSecondary = 11,
-	EquipTertiary = 12,
-	EquipLethalEquipment = 13,
-	EquipTacticalEquipment = 14,
-	UnEquip = 15,
+	EquipPrimary,
+	EquipSecondary,
+	EquipTertiary,
+	EquipLethalEquipment,
+	EquipTacticalEquipment,
+	UnEquip,
 
-	PauseMenu = 16,
-	InGameMenu = 17
+	PauseMenu,
+	InGameMenu,
+
+	// Debug Abilities
+	StopTime,
+	SlowTime,
+	Respawn
 };
 
 
