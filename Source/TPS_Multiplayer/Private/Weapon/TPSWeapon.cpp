@@ -16,8 +16,8 @@ void ATPSWeapon::BeginPlay()
 {
     Super::BeginPlay();
 
-	SetReplicates(true);
-	SetReplicateMovement(true);
+	//SetReplicates(true);
+	//SetReplicateMovement(true);
 
     CurrentAmmunitionCount = Configuration->AmmunitionCapacity;
 

@@ -9,6 +9,7 @@
 #include "AbilitySystemComponent.h"
 #include "TPSCharacterConfiguration.h"
 #include "TPSCharacterInventory.h"
+#include "TPSCharacterSkinConfiguration.h"
 
 #include "GAS/GASAbilitySet.h"
 #include "Character/TPSLocomotionState.h"
@@ -69,10 +70,20 @@ public:
 	//////////////////////////////////////////////////////
 	// Configuration
 
-	// Character Configuration
-	//   Will be overridden by PlayerState on Possession.
+	// Character Attributes Configuration
+	//   Can be overridden by PlayerState on Possession.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration")
 	TObjectPtr<UTPSCharacterConfiguration> Configuration;
+
+	// Overrides Skin if Character is being controlled locally
+	//   (ie: use higher-res assets for local Player Characters
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Configuration")
+	UTPSCharacterSkinConfiguration* LocalSkinConfiguration;
+
+	// Overrides skin if the character is being controlled remotely
+	//   (ie: use lower-res assets for remote Player Characters)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Configuration")
+	UTPSCharacterSkinConfiguration* RemoteSkinConfiguration;
 
 	//////////////////////////////////////////////////////
 	// Attributes
