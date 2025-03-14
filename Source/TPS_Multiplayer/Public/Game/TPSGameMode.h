@@ -3,11 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/TPSAICharacter.h"
 #include "GameFramework/GameMode.h"
 
 #include "Character/TPSCharacter.h"
-#include "Character/TPSPlayerCharacter.h"
 #include "Player/TPSPlayerController.h"
 #include "Game/TPSGameConfiguration.h"
 #include "GameFramework/PlayerStart.h"
@@ -32,10 +30,10 @@ public:
 	bool IsDebugEnabled = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Game|Configuration")
-	TSubclassOf<ATPSPlayerCharacter> PlayerCharacterTemplate;
+	TSubclassOf<ATPSCharacter> PlayerCharacterTemplate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game|Configuration")
-	TSubclassOf<ATPSAICharacter> BotTemplate;
+	TSubclassOf<ATPSCharacter> BotTemplate;
 
 
 //~ ============================================================= ~//
@@ -47,9 +45,11 @@ public:
 
 	// Respawn
 	UFUNCTION(BlueprintCallable)
-	bool RequestRespawn(ATPSPlayerController* playerController);
+	ATPSCharacter* RequestRespawn(ATPSPlayerController* playerController);
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool CanRespawn(ATPSPlayerController* playerController);
 	UFUNCTION(BlueprintCallable)
-	void PerformRespawn(ATPSPlayerController* playerController);
+	ATPSCharacter* PerformRespawn(ATPSPlayerController* playerController);
 
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -62,17 +62,18 @@ public:
 	////////////////////////////////////////////////////////
 	// Visual Debugging
 
-	UFUNCTION(Exec, Category = "Debug|Visibility")
-	void TPS_ToggleDebugForAllCharacters();
+	// Toggle Debug widget visibility for all custom TPS Objects and Characters.
 	UFUNCTION(Exec, Category = "Debug|Visibility")
 	void DebugGlobal();
+	UFUNCTION(Exec, Category = "Debug|Visibility")
+	void TPS_ToggleDebugForAllCharacters();
 
 
 	////////////////////////////////////////////////////////
 	// Spawn Actors and Bots
 
 	// Spawn a new Player Character
-	//   (w/o PlayerController / PlayerState)
+	//   (w/o attached PlayerController / PlayerState)
 	UFUNCTION(Exec, Category = "Spawn|Player")
 	ATPSCharacter* TPS_SpawnNewPlayerCharacter();
 	UFUNCTION(Exec, Category = "Spawn|Player")
@@ -81,6 +82,7 @@ public:
 	void SpawnPlayers(int numPlayersToSpawn);
 
 	// Spawn a new Bot
+	//   (w/o attached AIController)
 	UFUNCTION(Exec, Category = "Spawn|Bot")
 	ATPSCharacter* TPS_SpawnNewBot();
 	UFUNCTION(Exec, Category = "Spawn|Bot")

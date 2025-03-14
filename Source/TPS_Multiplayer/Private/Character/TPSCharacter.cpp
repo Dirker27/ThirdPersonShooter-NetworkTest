@@ -5,28 +5,46 @@
 #include <Kismet/KismetSystemLibrary.h>
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/TPSPlayerController.h"
 #include "UObject/ConstructorHelpers.h"
 
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Player/TPSPlayerController.h"
-
 #include "Player/TPSPlayerState.h"
+
+
+//~ ============================================================= ~//
+//  INITIALIZATION AND SETUP
+//~ ============================================================= ~//
 
 ATPSCharacter::ATPSCharacter()
 {
  	PrimaryActorTick.bCanEverTick = true;
 
+	//- Sub-Components ------------------------------------=
+	//
 	Configuration = CreateDefaultSubobject<UTPSCharacterConfiguration>(TEXT("DefaultConfiguration"));
-
+	//
 	Inventory = CreateDefaultSubobject<UTPSCharacterInventory>(TEXT("Inventory"));
-
+	//
 	EquipmentManager = CreateDefaultSubobject<UTPSEquipmentManager>(TEXT("EquipmentManager"));
 	EquipmentManager->BindToMesh(GetMesh());
 
+
+	//- Ability System ------------------------------------=
+	//
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+	//
+	StandardAttributes = CreateDefaultSubobject<UStandardAttributeSet>(TEXT("StandardAttributes"));
+	CharacterHealthAttributes = CreateDefaultSubobject<UCharacterHealthAttributeSet>(TEXT("HealthAttributes"));
+	WeaponAttributes = CreateDefaultSubobject<UWeaponAttributeSet>(TEXT("WeaponAttributes"));
+
+
 	//- Default Values ------------------------------------=
 	//
-	// Used for testing and default values.
+	// Used for automated behavior testing
 	//   Will be overridden in Blueprints or in BeginPlay()
 	//
 	CurrentHealth = 100;
@@ -54,13 +72,13 @@ ATPSCharacter::ATPSCharacter()
 void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ATPSCharacter, CurrentHealth);
-	DOREPLIFETIME(ATPSCharacter, CurrentArmor);
+	//DOREPLIFETIME(ATPSCharacter, CurrentHealth);
+	//DOREPLIFETIME(ATPSCharacter, CurrentArmor);
 
 	DOREPLIFETIME(ATPSCharacter, CurrentLocomotionState);
 	DOREPLIFETIME(ATPSCharacter, CurrentCharacterState);
 
-	DOREPLIFETIME(ATPSCharacter, MovementSpeedModifier);
+	//DOREPLIFETIME(ATPSCharacter, MovementSpeedModifier);
 
 	DOREPLIFETIME(ATPSCharacter, IsBoosting);
 	DOREPLIFETIME(ATPSCharacter, IsCrouchInputReceived);
@@ -77,14 +95,24 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	EquipmentManager->BindToOwner(GetAbilitySystemComponent());
 
+	EquipmentManager->BindToOwner(GetAbilitySystemComponent());
 	if (HasAuthority())
 	{
-		// Init
 		EquipmentManager->Initialize();
+
+		SetupInitialAbilitiesAndEffects();
 	}
+
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	SyncAttributesFromGAS();
 }
+
+
+//~ ============================================================= ~//
+//  GAME LOOP
+//~ ============================================================= ~//
+
 
 void ATPSCharacter::Tick(float deltaTime)
 {
@@ -150,12 +178,32 @@ void ATPSCharacter::SyncComponentsFromState()
 	UpdateInputContextForCurrentState();
 }
 
-// AI Enhancement - Detection FOV is rooted to Character's HEAD.
-void ATPSCharacter::GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const
-{
-	Location = GetMesh()->GetSocketLocation(EyeSocketName);
-	Rotation = GetMesh()->GetSocketRotation(EyeSocketName);
+
+//~ ============================================================= ~//
+//  CONTROLLER POSSESSION
+//   - Link w/ PlayerState's ASC
+//~ ============================================================= ~//
+
+void ATPSCharacter::PossessedBy(AController* NewController) { // server
+	Super::PossessedBy(NewController);
+
+	// Initialize GAS
+	//BindToPlayerAbilitySystem();
+	//SetupInitialAbilitiesAndEffects();
+	SyncAttributesFromGAS();
 }
+void ATPSCharacter::OnRep_PlayerState() { // client
+	Super::OnRep_PlayerState();
+
+	// Initialize GAS
+	//BindToPlayerAbilitySystem();
+	SyncAttributesFromGAS();
+}
+
+
+//~ ============================================================= ~//
+//  SYNTHETIC GETTERS
+//~ ============================================================= ~//
 
 bool ATPSCharacter::IsAlive() const
 {
@@ -360,7 +408,7 @@ void ATPSCharacter::PerformDeath()
 	ATPSPlayerController* controller = Cast<ATPSPlayerController>(GetController());
 	if (IsValid(controller))
 	{
-		controller->OnPawnDeath();
+		controller->NotifyPawnDeath();
 	}
 	OnDeath();
 }
@@ -462,13 +510,6 @@ void ATPSCharacter::EndFireWeapon() {
 
 void ATPSCharacter::StartEquipWeapon() {
 	IsEquipping = true;
-
-	// Temporary - derives behavior from equipment state
-	if (CurrentCharacterState != Combat)
-	{
-		ApplyCharacterState(Combat);
-	}
-
 	OnEquipWeaponAbilityStart();
 }
 void ATPSCharacter::EndEquipWeapon() {
@@ -480,13 +521,6 @@ void ATPSCharacter::EndEquipWeapon() {
 
 void ATPSCharacter::StartUnEquipWeapon() {
 	IsEquipping = true;
-
-	// Temporary - derives behavior from equipment state
-	if (CurrentCharacterState != Casual)
-	{
-		ApplyCharacterState(Casual);
-	}
-
 	OnUnEquipWeaponAbilityStart();
 }
 void ATPSCharacter::EndUnEquipWeapon() {
@@ -498,24 +532,10 @@ void ATPSCharacter::EndUnEquipWeapon() {
 
 void ATPSCharacter::StartReloadWeapon() {
 	IsReloading = true;
-
-	/*ATPSWeapon* weapon = GetEquippedWeapon();
-	if (weapon != nullptr)
-	{
-		weapon->StartReload();
-	}*/
-
 	OnReloadWeaponAbilityStart();
 }
 void ATPSCharacter::EndReloadWeapon() {
 	IsReloading = false;
-
-	/*ATPSWeapon* weapon = GetEquippedWeapon();
-	if (weapon != nullptr)
-	{
-		weapon->CommitReload(weapon->Configuration->AmmunitionCapacity);
-	}*/
-
 	OnReloadWeaponAbilityEnd();
 }
 
@@ -542,23 +562,41 @@ void ATPSCharacter::FellOutOfWorld(const class UDamageType& dmgType) {
 //~ ============================================================= ~//
 
 
-// Overridden in AI Character and Player Character to return appropriate ASC
+// Return local Character's ASC.
 UAbilitySystemComponent* ATPSCharacter::GetAbilitySystemComponent() const {
-	return nullptr;
+	return AbilitySystemComponent;
+}
+
+// Return Player's ASC if possessed.
+UAbilitySystemComponent* ATPSCharacter::GetPlayerAbilitySystemComponent() const {
+	ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>();
+	return ps ? ps->GetAbilitySystemComponent() : nullptr;
 }
 
 // Should only be called from SERVER when initializing.
 void ATPSCharacter::SetupInitialAbilitiesAndEffects() {
+	UE_LOG(LogTemp, Log, TEXT("Initializing ASC for Character[%s]..."), *Name);
+
 	UAbilitySystemComponent* asc = GetAbilitySystemComponent();
 	if (! IsValid(asc)) {
 		return;
 	}
+	asc->GetGameplayAttributeValueChangeDelegate(UCharacterHealthAttributeSet::GetHealthAttribute())
+		.AddUObject(this, &ThisClass::OnHealthAttributeChanged);
+	asc->GetGameplayAttributeValueChangeDelegate(UCharacterHealthAttributeSet::GetArmorAttribute())
+		.AddUObject(this, &ThisClass::OnArmorAttributeChanged);
+	asc->GetGameplayAttributeValueChangeDelegate(UStandardAttributeSet::GetMovementSpeedModifierAttribute())
+		.AddUObject(this, &ThisClass::OnMovementAttributeChanged);
 
+	//- Grant default abilities ---------------------------=
+	//
 	if (IsValid(InitialAbilitySet)) {
 		InitiallyGrantedAbilitySpecHandles.Append(
 			InitialAbilitySet->GrantAbilitiesToAbilitySystem(asc));
 	}
 
+	//- Initialize attributes -----------------------------=
+	//
 	if (IsValid(InitialGameplayEffect)) {
 		asc->ApplyGameplayEffectToSelf(
 			InitialGameplayEffect->GetDefaultObject<UGameplayEffect>(),
@@ -566,35 +604,18 @@ void ATPSCharacter::SetupInitialAbilitiesAndEffects() {
 			asc->MakeEffectContext());
 	}
 
-	asc->GetGameplayAttributeValueChangeDelegate(UCharacterHealthAttributeSet::GetArmorAttribute())
-		.AddUObject(this, &ThisClass::OnArmorAttributeChanged);
-	asc->GetGameplayAttributeValueChangeDelegate(UCharacterHealthAttributeSet::GetHealthAttribute())
-		.AddUObject(this, &ThisClass::OnHealthAttributeChanged);
-	asc->GetGameplayAttributeValueChangeDelegate(UStandardAttributeSet::GetMovementSpeedModifierAttribute())
-		.AddUObject(this, &ThisClass::OnMovementAttributeChanged);
+	UE_LOG(LogTemp, Log, TEXT("ASC for Character[%s] initialized."), *Name);
 }
 
 void ATPSCharacter::OnArmorAttributeChanged(const FOnAttributeChangeData& data) {
-	UE_LOG(LogTemp, Log, TEXT("OnArmorChange"));
-
 	CurrentArmor = data.NewValue;
 	ShouldNotify = true;
 }
 void ATPSCharacter::OnHealthAttributeChanged(const FOnAttributeChangeData& data) {
-	UE_LOG(LogTemp, Log, TEXT("OnHealthChange"));
-
 	CurrentHealth = data.NewValue;
 	ShouldNotify = true;
 }
 void ATPSCharacter::OnMovementAttributeChanged(const FOnAttributeChangeData& data) {
-	if (HasAuthority()) {
-		UE_LOG(LogTemp, Log, TEXT("OnMovementChange-Server"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("OnMovementChange-Client"));
-	}
-
 	MovementSpeedModifier = data.NewValue;
 	ShouldNotify = true;
 }
@@ -614,6 +635,70 @@ void ATPSCharacter::SyncAttributesFromGAS() {
 	//MovementSpeedModifier = asc->GetNumericAttribute(UStandardAttributeSet::GetMovementSpeedModifierAttribute());
 }
 
+
+// Ability System Wiring (from TPSPlayerState)
+void ATPSCharacter::BindToPlayerAbilitySystem() {
+	if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) {
+		ps->GetAbilitySystemComponent()->InitAbilityActorInfo(ps, this);
+	}
+
+	if (HasAuthority() || IsLocallyControlled()) {
+		// init
+	}
+}
+
+// Called to bind functionality to input
+void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* playerInputComponent)
+{
+	Super::SetupPlayerInputComponent(playerInputComponent);
+
+	if (UEnhancedInputComponent* playerEnhancedInputComponent = Cast<UEnhancedInputComponent>(playerInputComponent)) {
+		for (const FAbilityInputToInputActionBinding& binding : AbilityInputBindings.Bindings)
+		{
+			playerEnhancedInputComponent->BindAction(binding.InputAction, ETriggerEvent::Started, this, &ThisClass::AbilityInputBindingPressedHandler, binding.AbilityInput);
+			playerEnhancedInputComponent->BindAction(binding.InputAction, ETriggerEvent::Completed, this, &ThisClass::AbilityInputBindingReleasedHandler, binding.AbilityInput);
+		}
+	}
+}
+
+// EnhancedInput -> GAS plumbing
+void ATPSCharacter::AbilityInputBindingPressedHandler(EAbilityInput abilityInput) {
+	UE_LOG(LogTemp, Log, TEXT("OnInputPressed[%i]"), abilityInput);
+
+	// Perform ability on local character
+	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<uint32>(abilityInput));
+
+	// Extend input to Player's ASC
+	if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) {
+		ps->GetAbilitySystemComponent()->AbilityLocalInputPressed(static_cast<uint32>(abilityInput));
+	}
+}
+void ATPSCharacter::AbilityInputBindingReleasedHandler(EAbilityInput abilityInput) {
+	UE_LOG(LogTemp, Log, TEXT("OnInputReleased[%i]"), abilityInput);
+
+	// Perform ability on local character
+	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<uint32>(abilityInput));
+
+	// Extend input to player's ASC
+	if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) {
+		ps->GetAbilitySystemComponent()->AbilityLocalInputReleased(static_cast<uint32>(abilityInput));
+	}
+}
+
+
+//~ ============================================================= ~//
+//  MISC CONFIGURATION
+//~ ============================================================= ~//
+
+
+// AI Enhancement - Detection FOV is rooted to Character's HEAD.
+void ATPSCharacter::GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const
+{
+	Location = GetMesh()->GetSocketLocation(EyeSocketName);
+	Rotation = GetMesh()->GetSocketRotation(EyeSocketName);
+}
+
+// Apply generic damage to ASC
 /*float ATPSCharacter::TakeDamage(float damage, struct FDamageEvent const& event, AController* instigator, AActor* causer)
 {
 	UAbilitySystemComponent* asc = GetAbilitySystemComponent();

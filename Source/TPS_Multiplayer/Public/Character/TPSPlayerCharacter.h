@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////
+/// DEPRECATED!!!
+///
+/// Moved to consolidated TPSCharacter
+///
+////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -33,11 +40,11 @@ protected:
 	void AbilityInputBindingPressedHandler(EAbilityInput abilityInput);
 	void AbilityInputBindingReleasedHandler(EAbilityInput abilityInput);
 
-protected:
+private:
 	UPROPERTY(EditAnywhere, Category="Input|Binding")
-	UInputMappingContext* InputMappingContext{ nullptr };
+	UInputMappingContext* InputMappingCtx{ nullptr };
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input|Binding")
-	FAbilityInputBindings AbilityInputBindings;
+	FAbilityInputBindings AbilityInputBndgs;
 };
 

@@ -7,6 +7,8 @@
 
 #include "Character/TPSCharacterState.h"
 #include "TPSControllerConfiguration.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 #include "TPSPlayerController.generated.h"
 
@@ -16,18 +18,30 @@ class TPS_MULTIPLAYER_API ATPSPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+	ATPSPlayerController();
 
 	// Show DEBUG view to local player.
 	UPROPERTY(BlueprintReadOnly)
 	bool IsDebugEnabled = false;
 
+	virtual void BeginPlay() override;
+
+//~ ==================================================================== ~//
+//  COMPONENTS
+//~ ==================================================================== ~//
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UCameraComponent* ControllerCamera;
+
 //~ ==================================================================== ~//
 //  BEHAVIOR
 //~ ==================================================================== ~//
 public:
-	void OnPawnDeath();
+	void NotifyPawnDeath();
 
 	void RequestRespawn();
+
 
 //~ ==================================================================== ~//
 //  CONSOLE COMMANDS (Developer-only API)

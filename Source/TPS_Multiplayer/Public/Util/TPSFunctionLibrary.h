@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Character/TPSCharacter.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "TPSFunctionLibrary.generated.h"
 
@@ -21,6 +22,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Actor", meta = (WorldContext = "worldContextObject", DeterminesOutputType = "actorClass"))
 	static AActor* GetNearestActorOfClassAndIgnore(const UObject* worldContextObject, TSubclassOf<AActor> actorClass, FVector location, float radius, TArray<AActor*> toIgnore);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Actor", meta = (WorldContext = "worldContextObject", DeterminesOutputType = "actorClass"))
+	static ATPSCharacter* GetNearestPlayableCharacter(const UObject* worldContextObject, FVector location, float radius, TArray<AActor*> toIgnore);
 
 	UFUNCTION(BlueprintCallable, Category = "Debug")
 	static void DrawDebugTrace(const UObject* WorldContextObject, const FVector startLoc, const FVector direction);

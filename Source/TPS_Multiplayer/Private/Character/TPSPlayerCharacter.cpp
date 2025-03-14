@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////
+/// DEPRECATED!!!
+///
+/// Moved to consolidated TPSCharacter
+///
+////////////////////////////////////////////////////////////////
+
 #include "Character/TPSPlayerCharacter.h"
 
 #include "EnhancedInputSubsystems.h"
@@ -22,6 +29,7 @@ void ATPSPlayerCharacter::InitPlayer() {
 		// init
 	}
 }
+
 void ATPSPlayerCharacter::PossessedBy(AController* NewController) { // server
 	Super::PossessedBy(NewController);
 	
@@ -46,7 +54,7 @@ void ATPSPlayerCharacter::SetupPlayerInputComponent(UInputComponent* playerInput
 	Super::SetupPlayerInputComponent(playerInputComponent);
 
 	if (UEnhancedInputComponent* playerEnhancedInputComponent = Cast<UEnhancedInputComponent>(playerInputComponent)) {
-		for (const FAbilityInputToInputActionBinding& binding : AbilityInputBindings.Bindings)
+		for (const FAbilityInputToInputActionBinding& binding : AbilityInputBndgs.Bindings)
 		{
 			playerEnhancedInputComponent->BindAction(binding.InputAction, ETriggerEvent::Started, this, &ThisClass::AbilityInputBindingPressedHandler, binding.AbilityInput);
 			playerEnhancedInputComponent->BindAction(binding.InputAction, ETriggerEvent::Completed, this, &ThisClass::AbilityInputBindingReleasedHandler, binding.AbilityInput);

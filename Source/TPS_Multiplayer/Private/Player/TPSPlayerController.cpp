@@ -3,9 +3,26 @@
 
 #include "Player/TPSPlayerController.h"
 
-#include "Character/TPSPlayerCharacter.h"
 #include "Game/TPSGameMode.h"
 #include "Util/TPSFunctionLibrary.h"
+
+ATPSPlayerController::ATPSPlayerController()
+{
+	//bHidden = false;
+#if WITH_EDITORONLY_DATA
+	bHiddenEd = false;
+#endif // WITH_EDITORONLY_DATA
+	SetHidden(false);
+
+	ControllerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ControllerCamera"));
+}
+
+
+void ATPSPlayerController::BeginPlay()
+{
+	//SetViewTarget(this);
+}
+
 
 //~ ====================================================================== ~//
 //- BEHAVIOR OPERATIONS
@@ -21,9 +38,9 @@ void ATPSPlayerController::RequestRespawn()
 	}
 }
 
-void ATPSPlayerController::OnPawnDeath()
+void ATPSPlayerController::NotifyPawnDeath()
 {
-	UE_LOG(LogTemp, Log, TEXT("PlayerController requesting respawn..."));
+	UE_LOG(LogTemp, Log, TEXT("PlayerController[%s] requesting respawn..."), *GetName());
 	RequestRespawn();
 }
 
@@ -137,8 +154,8 @@ void ATPSPlayerController::TPS_PossessNearestPlayablePawn()
 		exclusionList.Add(GetPawn());
 	}
 
-	AActor* c = UTPSFunctionLibrary::GetNearestActorOfClassAndIgnore(
-		this, ATPSPlayerCharacter::StaticClass(),
+	AActor* c = UTPSFunctionLibrary::GetNearestPlayableCharacter(
+		this,
 						GetTransformComponent()->GetRelativeLocation(), 10000,
 						exclusionList);
 

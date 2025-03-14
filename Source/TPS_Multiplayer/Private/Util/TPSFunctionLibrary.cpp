@@ -5,6 +5,7 @@
 
 #include <Kismet/GameplayStatics.h>
 
+#include "Character/TPSCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 
 AActor* UTPSFunctionLibrary::GetNearestActorOfClass(const UObject* worldContextObject, TSubclassOf<AActor> actorClass, FVector location, float radius)
@@ -32,6 +33,32 @@ AActor* UTPSFunctionLibrary::GetNearestActorOfClassAndIgnore(const UObject* worl
     }
 
     return nearestActor;
+}
+
+ATPSCharacter* UTPSFunctionLibrary::GetNearestPlayableCharacter(const UObject* worldContextObject, FVector location, float radius, TArray<AActor*> toIgnore)
+{
+    ATPSCharacter* nearestCharacter = nullptr;
+
+    float nearestDistance = radius;
+
+    TArray<AActor*> outActors;
+    UGameplayStatics::GetAllActorsOfClass(worldContextObject, ATPSCharacter::StaticClass(), outActors);
+
+    for (AActor* actor : outActors) {
+        ATPSCharacter* character = Cast<ATPSCharacter>(actor);
+        float distance = FVector::Distance(location, actor->GetActorLocation());
+
+        if (distance < nearestDistance
+            && character->CanBePossessedByPlayer
+            && !character->IsPlayerControlled()
+            && !toIgnore.Contains(actor))
+        {
+            nearestCharacter = character;
+            nearestDistance = distance;
+        }
+    }
+
+    return nearestCharacter;
 }
 
 FVector2D UTPSFunctionLibrary::CalculateNoise2D(const float pitchDegrees, const float yawDegrees)

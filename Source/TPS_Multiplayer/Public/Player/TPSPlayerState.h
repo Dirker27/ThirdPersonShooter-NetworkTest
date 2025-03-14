@@ -33,16 +33,30 @@ protected:
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override; // IAbilitySystemInterface
 
-	UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
-	UStandardAttributeSet* StandardAttributes{ nullptr };
+	//UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
+	//UStandardAttributeSet* StandardAttributes{ nullptr };
 
-	UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
-    UCharacterHealthAttributeSet* CharacterHealthAttributes{ nullptr };
+	//UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
+    //UCharacterHealthAttributeSet* CharacterHealthAttributes{ nullptr };
 
-    UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
-    UWeaponAttributeSet* WeaponAttributes{ nullptr };
+    //UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
+    //UWeaponAttributeSet* WeaponAttributes{ nullptr };
 
-protected:
+private:
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
 	UAbilitySystemComponent* AbilitySystemComponent{ nullptr };
+
+	////////////////////////////////////////////////////////
+	// Initialization (Grant Abilities to System)
+protected:
+	void SetupInitialAbilitiesAndEffects();
+
+	UPROPERTY(EditDefaultsOnly, Category = "TPSCharacter|Abilities")
+	UAbilitySet* InitialAbilitySet{ nullptr };
+
+	// Gameplay Effect used to initialize attribute values on spawn.
+	UPROPERTY(EditDefaultsOnly, Category = "TPSCharacter|Abilities")
+	TSubclassOf<UGameplayEffect> InitialGameplayEffect;
+
+	TArray<FGameplayAbilitySpecHandle> InitiallyGrantedAbilitySpecHandles;
 };

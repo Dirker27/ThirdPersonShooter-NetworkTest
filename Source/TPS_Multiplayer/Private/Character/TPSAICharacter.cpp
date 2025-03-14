@@ -1,20 +1,29 @@
+////////////////////////////////////////////////////////////////
+/// DEPRECATED!!!
+///
+/// Moved to consolidated TPSCharacter
+///
+////////////////////////////////////////////////////////////////
+
+
+
 #include "Character/TPSAICharacter.h"
 
 ATPSAICharacter::ATPSAICharacter() {
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
-	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+	//ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
+	//ASC->SetIsReplicated(true);
+	//ASC->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
-	StandardAttributes = CreateDefaultSubobject<UStandardAttributeSet>(TEXT("StandardAttributes"));
-	CharacterHealthAttributes = CreateDefaultSubobject<UCharacterHealthAttributeSet>(TEXT("HealthAttributes"));
-	WeaponAttributes = CreateDefaultSubobject<UWeaponAttributeSet>(TEXT("WeaponAttributes"));
+	//StandardAttrs = CreateDefaultSubobject<UStandardAttributeSet>(TEXT("StandardAttributes"));
+	//CharacterHealthAttrs = CreateDefaultSubobject<UCharacterHealthAttributeSet>(TEXT("HealthAttributes"));
+	//WeaponAttrs = CreateDefaultSubobject<UWeaponAttributeSet>(TEXT("WeaponAttributes"));
 }
 
 void ATPSAICharacter::BeginPlay() {
 	Super::BeginPlay();
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	//ASC->InitAbilityActorInfo(this, this);
 }
 
 UAbilitySystemComponent* ATPSAICharacter::GetAbilitySystemComponent() const {
-	return AbilitySystemComponent;
+	return ASC;
 }

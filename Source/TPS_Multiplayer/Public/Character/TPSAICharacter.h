@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////
+/// DEPRECATED!!!
+///
+/// Moved to consolidated TPSCharacter
+///
+////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -32,7 +39,7 @@ public:
 
 protected:
    	UPROPERTY(VisibleAnywhere, Category = "Abilities")
-	UAbilitySystemComponent* AbilitySystemComponent{ nullptr };
+	UAbilitySystemComponent* ASC{ nullptr };
 
 public:
 
@@ -42,12 +49,12 @@ public:
     // GAS Attributes
 
 	UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
-	UStandardAttributeSet* StandardAttributes{ nullptr };
+	UStandardAttributeSet* StandardAttrs{ nullptr };
 
 	UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
-    UCharacterHealthAttributeSet* CharacterHealthAttributes{ nullptr };
+    UCharacterHealthAttributeSet* CharacterHealthAttrs{ nullptr };
 
     UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
-    UWeaponAttributeSet* WeaponAttributes{ nullptr };
+    UWeaponAttributeSet* WeaponAttrs{ nullptr };
 };
 

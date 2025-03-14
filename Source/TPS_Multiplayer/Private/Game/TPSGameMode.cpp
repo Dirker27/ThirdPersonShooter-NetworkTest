@@ -2,8 +2,8 @@
 
 #include "Game/TPSGameMode.h"
 
-#include "Character/TPSPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
+
 
 //~ ====================================================================== ~//
 //- CONSOLE CONFIGURATION
@@ -62,14 +62,28 @@ ATPSGameMode::~ATPSGameMode() { }
 //- Operations
 //~ ====================================================================== ~//
 
-bool ATPSGameMode::RequestRespawn(ATPSPlayerController* playercontroller) {
+ATPSCharacter* ATPSGameMode::RequestRespawn(ATPSPlayerController* playerController)
+{
+	if (CanRespawn(playerController)) {
+		return PerformRespawn(playerController);
+	}
+	return nullptr;
+}
+
+bool ATPSGameMode::CanRespawn(ATPSPlayerController* playerController)
+{
+	// TODO: Respawn Rules
 	return true;
 }
 
-void ATPSGameMode::PerformRespawn(ATPSPlayerController* playerController) {
+ATPSCharacter* ATPSGameMode::PerformRespawn(ATPSPlayerController* playerController)
+{
 	ATPSCharacter* p = SpawnPlayer();
 
+	// Should perform from PlayerController?
 	playerController->Possess(p);
+
+	return p;
 }
 
 
@@ -96,12 +110,12 @@ ATPSCharacter* ATPSGameMode::TPS_SpawnNewPlayerCharacter()
 		APlayerStart* spawnPoint = FindSpawnPoint();
 		if (IsValid(spawnPoint))
 		{
-			spawnedCharacter = GetWorld()->SpawnActor<ATPSPlayerCharacter>(PlayerCharacterTemplate,
+			spawnedCharacter = GetWorld()->SpawnActor<ATPSCharacter>(PlayerCharacterTemplate,
 				spawnPoint->GetTransform().GetLocation(), spawnPoint->GetTransform().Rotator());
 		}
 		else
 		{
-			spawnedCharacter = GetWorld()->SpawnActor<ATPSPlayerCharacter>(PlayerCharacterTemplate);
+			spawnedCharacter = GetWorld()->SpawnActor<ATPSCharacter>(PlayerCharacterTemplate);
 		}
 	}
 
@@ -126,12 +140,12 @@ ATPSCharacter* ATPSGameMode::TPS_SpawnNewBot()
 		APlayerStart* spawnPoint = FindSpawnPoint();
 		if (IsValid(spawnPoint))
 		{
-			spawnedBot = GetWorld()->SpawnActor<ATPSAICharacter>(BotTemplate,
+			spawnedBot = GetWorld()->SpawnActor<ATPSCharacter>(BotTemplate,
 				spawnPoint->GetTransform().GetLocation(), spawnPoint->GetTransform().Rotator());
 		}
 		else
 		{
-			spawnedBot = GetWorld()->SpawnActor<ATPSAICharacter>(BotTemplate);
+			spawnedBot = GetWorld()->SpawnActor<ATPSCharacter>(BotTemplate);
 		}
 	}
 

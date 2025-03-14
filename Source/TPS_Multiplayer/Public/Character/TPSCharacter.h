@@ -9,12 +9,13 @@
 #include "AbilitySystemComponent.h"
 #include "TPSCharacterConfiguration.h"
 #include "TPSCharacterInventory.h"
-#include "TPSCharacterSkinConfiguration.h"
 
 #include "GAS/GASAbilitySet.h"
 #include "Character/TPSLocomotionState.h"
 #include "Character/TPSCharacterState.h"
-#include "Character/TPSCharacterBodyType.h"
+#include "GAS/Attributes/CharacterHealthAttributeSet.h"
+#include "GAS/Attributes/StandardAttributeSet.h"
+#include "GAS/Attributes/WeaponAttributeSet.h"
 #include "Inventory/TPSEquipmentManager.h"
 #include "Weapon/TPSWeapon.h"
 
@@ -70,20 +71,14 @@ public:
 	//////////////////////////////////////////////////////
 	// Configuration
 
+	// Can Be Possessed by a Player
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration")
+	bool CanBePossessedByPlayer = false;
+
 	// Character Attributes Configuration
 	//   Can be overridden by PlayerState on Possession.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration")
 	TObjectPtr<UTPSCharacterConfiguration> Configuration;
-
-	// Overrides Skin if Character is being controlled locally
-	//   (ie: use higher-res assets for local Player Characters
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Configuration")
-	UTPSCharacterSkinConfiguration* LocalSkinConfiguration;
-
-	// Overrides skin if the character is being controlled remotely
-	//   (ie: use lower-res assets for remote Player Characters)
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Configuration")
-	UTPSCharacterSkinConfiguration* RemoteSkinConfiguration;
 
 	//////////////////////////////////////////////////////
 	// Attributes
@@ -306,6 +301,7 @@ public:
 		return FString(ETPSLocomotionStateToString(state));
 	}
 
+
 //~ ================================================================ ~//
 //  Character Business Logic
 //~ ================================================================ ~//
@@ -369,29 +365,83 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AActor* LineTrace(const UObject* WorldContextObject);
 
+
 //~ ============================================================= ~//
-//  ABILITY SYSTEM WIRING
+//  ABILITY SYSTEM
 //~ ============================================================= ~//
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "Abilities")
+	UAbilitySystemComponent* AbilitySystemComponent{ nullptr };
+
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override; // IAbilitySystemInterface
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UAbilitySystemComponent* GetPlayerAbilitySystemComponent() const;
+
+	////////////////////////////////////////////////////////
+	// GAS Attributes
+
+	// Movement, Mana, and Stamina
+	UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
+	UStandardAttributeSet* StandardAttributes{ nullptr };
+
+	// Health, Armor, and Regen
+	UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
+	UCharacterHealthAttributeSet* CharacterHealthAttributes{ nullptr };
+
+	// Damage, Accuracy, and Modifiers
+	UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
+	UWeaponAttributeSet* WeaponAttributes{ nullptr };
+
+protected:
+	// Sync's local variables from GAS attributes.
+	//   ie: CharacterHealth.Health -> CurrentHealth
+	// Called every frame.
 	UFUNCTION(BlueprintCallable)
 	void SyncAttributesFromGAS();
 
+	void OnArmorAttributeChanged(const FOnAttributeChangeData&);
+	void OnHealthAttributeChanged(const FOnAttributeChangeData&);
+	void OnMovementAttributeChanged(const FOnAttributeChangeData&);
+
+	////////////////////////////////////////////////////////
+	// Initialization (Grant Abilities to System)
 protected:
+	void SetupInitialAbilitiesAndEffects();
+
 	UPROPERTY(EditDefaultsOnly, Category = "TPSCharacter|Abilities")
 	UAbilitySet* InitialAbilitySet{ nullptr };
 
+	// Gameplay Effect used to initialize attribute values on spawn.
 	UPROPERTY(EditDefaultsOnly, Category = "TPSCharacter|Abilities")
 	TSubclassOf<UGameplayEffect> InitialGameplayEffect;
 
 	TArray<FGameplayAbilitySpecHandle> InitiallyGrantedAbilitySpecHandles;
 
+	////////////////////////////////////////////////////////
+	// Controller Possession
 protected:
-	void SetupInitialAbilitiesAndEffects();
-	void OnArmorAttributeChanged(const FOnAttributeChangeData&);
-	void OnHealthAttributeChanged(const FOnAttributeChangeData&);
-	void OnMovementAttributeChanged(const FOnAttributeChangeData&);
+	void BindToPlayerAbilitySystem();
+
+	// Bind to ASC in PlayerState
+	void PossessedBy(AController* NewController) override;
+	void OnRep_PlayerState() override;
+
+	////////////////////////////////////////////////////////
+	// Input Routing
+protected:
+	UPROPERTY(EditAnywhere, Category = "TPSCharacter|Input|Binding")
+	UInputMappingContext* InputMappingContext{ nullptr };
+
+	UPROPERTY(EditDefaultsOnly, Category = "TPSCharacter|Input|Binding")
+	FAbilityInputBindings AbilityInputBindings;
+
+	// Bind Input->ASC
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void AbilityInputBindingPressedHandler(EAbilityInput abilityInput);
+	void AbilityInputBindingReleasedHandler(EAbilityInput abilityInput);
+
 
 //~ ============================================================= ~//
 //  INVENTORY SYSTEM
