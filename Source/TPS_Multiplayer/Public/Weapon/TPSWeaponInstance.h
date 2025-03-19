@@ -1,0 +1,64 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
+////////////////////////////////////////////////////////////////
+///
+/// IMPORTED FROM LYRA
+///
+////////////////////////////////////////////////////////////////
+
+#pragma once
+
+//#include "Cosmetics/TPSCosmeticAnimationTypes.h"
+#include "Equipment/TPSEquipmentInstance.h"
+#include "Templates/SubclassOf.h"
+#include "UObject/UObjectGlobals.h"
+
+#include "TPSWeaponInstance.generated.h"
+
+class UAnimInstance;
+class UObject;
+struct FFrame;
+struct FGameplayTagContainer;
+
+/**
+ * UTPSWeaponInstance
+ *
+ * A piece of equipment representing a weapon spawned and applied to a pawn
+ */
+UCLASS()
+class UTPSWeaponInstance : public UTPSEquipmentInstance
+{
+	GENERATED_BODY()
+
+public:
+	UTPSWeaponInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	//~UTPSEquipmentInstance interface
+	virtual void OnEquipped();
+	virtual void OnUnequipped();
+	//~End of UTPSEquipmentInstance interface
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateFiringTime();
+
+	// Returns how long it's been since the weapon was interacted with (fired or equipped)
+	UFUNCTION(BlueprintPure)
+	float GetTimeSinceLastInteractedWith() const;
+
+protected:
+	/*
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
+	FTPSAnimLayerSelectionSet EquippedAnimSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
+	FTPSAnimLayerSelectionSet UneuippedAnimSet; 
+
+	// Choose the best layer from EquippedAnimSet or UneuippedAnimSet based on the specified gameplay tags
+	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = Animation)
+	TSubclassOf<UAnimInstance> PickBestAnimLayer(bool bEquipped, const FGameplayTagContainer& CosmeticTags) const;
+	*/
+
+private:
+	double TimeLastEquipped = 0.0;
+	double TimeLastFired = 0.0;
+};
