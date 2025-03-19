@@ -44,12 +44,14 @@ public:
 	// Gameplay Functions
 
 	// Respawn
-	UFUNCTION(BlueprintCallable)
-	ATPSCharacter* RequestRespawn(ATPSPlayerController* playerController);
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void RequestRespawn(ATPSPlayerController* playerController);
+	//virtual void RequestRespawn_Implementation(ATPSPlayerController* playerController);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool CanRespawn(ATPSPlayerController* playerController);
 	UFUNCTION(BlueprintCallable)
-	ATPSCharacter* PerformRespawn(ATPSPlayerController* playerController);
+	void PerformRespawn(ATPSPlayerController* playerController);
 
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -68,25 +70,31 @@ public:
 	UFUNCTION(Exec, Category = "Debug|Visibility")
 	void TPS_ToggleDebugForAllCharacters();
 
+	////////////////////////////////////////////////////////
+	// Pawn Possession
+
+	// Possess an Empty Character
+	UFUNCTION(Server, Reliable, Category = "Possess")
+	void RequestPossession(ATPSPlayerController* controller, ATPSCharacter* character);
 
 	////////////////////////////////////////////////////////
 	// Spawn Actors and Bots
 
 	// Spawn a new Player Character
 	//   (w/o attached PlayerController / PlayerState)
+	UFUNCTION(Server, Reliable, Category = "Spawn|Player")
+	void SpawnNewPlayerCharacter(AController* controller);
 	UFUNCTION(Exec, Category = "Spawn|Player")
-	ATPSCharacter* TPS_SpawnNewPlayerCharacter();
-	UFUNCTION(Exec, Category = "Spawn|Player")
-	ATPSCharacter* SpawnPlayer();
+	void SpawnPlayer();
 	UFUNCTION(Exec, Category = "Spawn|Player")
 	void SpawnPlayers(int numPlayersToSpawn);
 
 	// Spawn a new Bot
 	//   (w/o attached AIController)
+	UFUNCTION(Server, Reliable, Category = "Spawn|Bot")
+	void SpawnNewBot(AController* controller);
 	UFUNCTION(Exec, Category = "Spawn|Bot")
-	ATPSCharacter* TPS_SpawnNewBot();
-	UFUNCTION(Exec, Category = "Spawn|Bot")
-	ATPSCharacter* SpawnBot();
+	void SpawnBot();
 	UFUNCTION(Exec, Category = "Spawn|Bot")
 	void SpawnBots(int numBotsToSpawn);
 

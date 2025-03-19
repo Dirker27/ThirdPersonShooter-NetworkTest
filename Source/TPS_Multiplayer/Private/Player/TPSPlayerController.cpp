@@ -4,15 +4,16 @@
 #include "Player/TPSPlayerController.h"
 
 #include "Game/TPSGameMode.h"
+#include "Kismet/GameplayStatics.h"
 #include "Util/TPSFunctionLibrary.h"
 
 ATPSPlayerController::ATPSPlayerController()
 {
 	//bHidden = false;
 #if WITH_EDITORONLY_DATA
-	bHiddenEd = false;
+	//bHiddenEd = false;
 #endif // WITH_EDITORONLY_DATA
-	SetHidden(false);
+	//SetHidden(false);
 
 	ControllerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ControllerCamera"));
 }
@@ -20,7 +21,7 @@ ATPSPlayerController::ATPSPlayerController()
 
 void ATPSPlayerController::BeginPlay()
 {
-	//SetViewTarget(this);
+	Super::BeginPlay();
 }
 
 
@@ -28,19 +29,18 @@ void ATPSPlayerController::BeginPlay()
 //- BEHAVIOR OPERATIONS
 //~ ====================================================================== ~//
 
-void ATPSPlayerController::RequestRespawn()
+void ATPSPlayerController::RequestRespawn_Implementation()
 {
-	AGameModeBase* m = GetWorld()->GetAuthGameMode(); // null if not Server
-	ATPSGameMode* mode = Cast<ATPSGameMode>(m);
-	if (IsValid(mode) && mode->RequestRespawn(this))
+	ATPSGameMode* mode = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this));
+	if (IsValid(mode))
 	{
-		mode->PerformRespawn(this);
+		UE_LOG(LogTemp, Log, TEXT("Requesting RESPAWN for PlayerController[%s]..."), *GetName());
+		mode->RequestRespawn(this);
 	}
 }
 
 void ATPSPlayerController::NotifyPawnDeath()
 {
-	UE_LOG(LogTemp, Log, TEXT("PlayerController[%s] requesting respawn..."), *GetName());
 	RequestRespawn();
 }
 
@@ -97,6 +97,7 @@ void ATPSPlayerController::UpdateControllerConfiguration(FTPSControllerConfigura
 	configuration->GodModeEnabled = config->GodModeEnabled;
 }
 
+
 //~ ====================================================================== ~//
 //- State Overrides
 //~ ====================================================================== ~//
@@ -146,7 +147,20 @@ void ATPSPlayerController::ToggleCrouch() {
 }
 
 
-void ATPSPlayerController::TPS_PossessNearestPlayablePawn()
+//~ ====================================================================== ~//
+//- Pawn Possession
+//~ ====================================================================== ~//
+
+//~ RESPAWN ~//
+
+void ATPSPlayerController::Respawn()
+{
+	RequestRespawn();
+}
+
+//~ POSSESS ~//
+
+void ATPSPlayerController::PossessNearestPlayablePawn_Implementation()
 {
 	TArray<AActor*> exclusionList = TArray<AActor*>();
 	if (IsValid(GetPawn()))
@@ -160,16 +174,30 @@ void ATPSPlayerController::TPS_PossessNearestPlayablePawn()
 						exclusionList);
 
 	ATPSCharacter* character = Cast<ATPSCharacter>(c);
-	Possess(character);
+	if (!IsValid(character))
+	{
+		UE_LOG(LogTemp, Log, TEXT("No available characters found for possession."));
+		return;
+	}
+
+	ATPSGameMode* mode = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this));
+	if (IsValid(mode)) {
+		UE_LOG(LogTemp, Log, TEXT("Requesting POSSESS for PlayerController[%s]-Character[%s]..."),
+		*GetName(), *character->GetName());
+		mode->RequestPossession(this, character);
+	}
 }
-void ATPSPlayerController::PossessPawn() {
-	TPS_PossessNearestPlayablePawn();
+void ATPSPlayerController::PossessPawn()
+{
+	PossessNearestPlayablePawn();
 }
 
-void ATPSPlayerController::TPS_UnPossessCurrentPawn()
+//~ UN-POSSESS ~//
+
+void ATPSPlayerController::UnPossessCurrentPawn_Implementation()
 {
 	UnPossess();
 }
 void ATPSPlayerController::UnPossessPawn() {
-	TPS_UnPossessCurrentPawn();
+	UnPossessCurrentPawn();
 }

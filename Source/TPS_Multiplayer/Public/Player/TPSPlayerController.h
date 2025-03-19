@@ -40,7 +40,14 @@ protected:
 public:
 	void NotifyPawnDeath();
 
+	UFUNCTION(Server, Reliable, Category = "Pawn|Respawn")
 	void RequestRespawn();
+
+	UFUNCTION(Server, Reliable, Category = "Pawn|Possess")
+	void PossessNearestPlayablePawn();
+
+	UFUNCTION(Server, Reliable, Category = "Pawn|Possess")
+	void UnPossessCurrentPawn();
 
 
 //~ ==================================================================== ~//
@@ -91,13 +98,12 @@ public:
 	////////////////////////////////////////////////////////
 	// Character / Pawn Controls
 
-	UFUNCTION(Exec, Category = "Pawn|Possess")
-	void TPS_PossessNearestPlayablePawn();
+	UFUNCTION(Exec, Category = "Pawn|Respawn")
+	void Respawn();
+
 	UFUNCTION(Exec, Category = "Pawn|Possess")
 	void PossessPawn();
 
-	UFUNCTION(Exec, Category = "Pawn|Possess")
-	void TPS_UnPossessCurrentPawn();
 	UFUNCTION(Exec, Category = "Pawn|Possess")
 	void UnPossessPawn();
 

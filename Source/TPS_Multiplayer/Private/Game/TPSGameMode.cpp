@@ -62,12 +62,11 @@ ATPSGameMode::~ATPSGameMode() { }
 //- Operations
 //~ ====================================================================== ~//
 
-ATPSCharacter* ATPSGameMode::RequestRespawn(ATPSPlayerController* playerController)
+void ATPSGameMode::RequestRespawn_Implementation(ATPSPlayerController* playerController)
 {
 	if (CanRespawn(playerController)) {
-		return PerformRespawn(playerController);
+		PerformRespawn(playerController);
 	}
-	return nullptr;
 }
 
 bool ATPSGameMode::CanRespawn(ATPSPlayerController* playerController)
@@ -76,14 +75,14 @@ bool ATPSGameMode::CanRespawn(ATPSPlayerController* playerController)
 	return true;
 }
 
-ATPSCharacter* ATPSGameMode::PerformRespawn(ATPSPlayerController* playerController)
+void ATPSGameMode::PerformRespawn(ATPSPlayerController* playerController)
 {
-	ATPSCharacter* p = SpawnPlayer();
+	SpawnNewPlayerCharacter(playerController);
 
 	// Should perform from PlayerController?
-	playerController->Possess(p);
+	//playerController->Possess(p);
 
-	return p;
+	//return p;
 }
 
 
@@ -101,28 +100,41 @@ void ATPSGameMode::DebugGlobal() {
 	TPS_ToggleDebugForAllCharacters();
 }
 
-
-ATPSCharacter* ATPSGameMode::TPS_SpawnNewPlayerCharacter()
+void ATPSGameMode::RequestPossession_Implementation(ATPSPlayerController* controller, ATPSCharacter* character)
 {
-	ATPSCharacter* spawnedCharacter = nullptr;
+	if (IsValid(controller) && IsValid(character) && character->CanBePossessedByPlayer)
+	{
+		controller->Possess(character);
+	}
+}
+
+
+//~ Spawn Players ~//
+
+void ATPSGameMode::SpawnNewPlayerCharacter_Implementation(AController* controller)
+{
+	ATPSCharacter* spawned = nullptr;
 	if (IsValid(PlayerCharacterTemplate))
 	{
 		APlayerStart* spawnPoint = FindSpawnPoint();
 		if (IsValid(spawnPoint))
 		{
-			spawnedCharacter = GetWorld()->SpawnActor<ATPSCharacter>(PlayerCharacterTemplate,
+			spawned = GetWorld()->SpawnActor<ATPSCharacter>(PlayerCharacterTemplate,
 				spawnPoint->GetTransform().GetLocation(), spawnPoint->GetTransform().Rotator());
 		}
 		else
 		{
-			spawnedCharacter = GetWorld()->SpawnActor<ATPSCharacter>(PlayerCharacterTemplate);
+			spawned = GetWorld()->SpawnActor<ATPSCharacter>(PlayerCharacterTemplate);
 		}
 	}
 
-	return spawnedCharacter;
+	if (IsValid(controller))
+	{
+		controller->Possess(spawned);
+	}
 }
-ATPSCharacter* ATPSGameMode::SpawnPlayer() {
-	return TPS_SpawnNewPlayerCharacter();
+void ATPSGameMode::SpawnPlayer() {
+	SpawnNewPlayerCharacter(nullptr);
 }
 void ATPSGameMode::SpawnPlayers(int numPlayers)
 {
@@ -132,27 +144,32 @@ void ATPSGameMode::SpawnPlayers(int numPlayers)
 	}
 }
 
-ATPSCharacter* ATPSGameMode::TPS_SpawnNewBot()
+//~ Spawn Bots ~//
+
+void ATPSGameMode::SpawnNewBot_Implementation(AController* controller)
 {
-	ATPSCharacter* spawnedBot = nullptr;
+	ATPSCharacter* spawned = nullptr;
 	if (IsValid(BotTemplate))
 	{
 		APlayerStart* spawnPoint = FindSpawnPoint();
 		if (IsValid(spawnPoint))
 		{
-			spawnedBot = GetWorld()->SpawnActor<ATPSCharacter>(BotTemplate,
+			spawned = GetWorld()->SpawnActor<ATPSCharacter>(BotTemplate,
 				spawnPoint->GetTransform().GetLocation(), spawnPoint->GetTransform().Rotator());
 		}
 		else
 		{
-			spawnedBot = GetWorld()->SpawnActor<ATPSCharacter>(BotTemplate);
+			spawned = GetWorld()->SpawnActor<ATPSCharacter>(BotTemplate);
 		}
 	}
 
-	return spawnedBot;
+	if (IsValid(controller))
+	{
+		controller->Possess(spawned);
+	}
 }
-ATPSCharacter* ATPSGameMode::SpawnBot() {
-	return TPS_SpawnNewBot();
+void ATPSGameMode::SpawnBot() {
+	SpawnNewBot(nullptr);
 }
 void ATPSGameMode::SpawnBots(int numBots)
 {

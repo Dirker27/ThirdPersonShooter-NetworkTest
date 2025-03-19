@@ -7,6 +7,7 @@
 
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
+#include "GAS/GASAbilitySet.h"
 
 #include "GAS/Attributes/StandardAttributeSet.h"
 #include "GAS/Attributes/CharacterHealthAttributeSet.h"
