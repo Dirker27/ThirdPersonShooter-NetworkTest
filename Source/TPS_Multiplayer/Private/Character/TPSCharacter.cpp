@@ -7,9 +7,9 @@
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
-#include "Player/TPSPlayerController.h"
 #include "UObject/ConstructorHelpers.h"
 
+#include "Player/TPSPlayerController.h"
 #include "Player/TPSPlayerState.h"
 
 
@@ -35,7 +35,7 @@ ATPSCharacter::ATPSCharacter()
 	//
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
 	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	//
 	StandardAttributes = CreateDefaultSubobject<UStandardAttributeSet>(TEXT("StandardAttributes"));
 	CharacterHealthAttributes = CreateDefaultSubobject<UCharacterHealthAttributeSet>(TEXT("HealthAttributes"));
@@ -607,6 +607,7 @@ void ATPSCharacter::SetupInitialAbilitiesAndEffects() {
 	UE_LOG(LogTemp, Log, TEXT("ASC for Character[%s] initialized."), *Name);
 }
 
+// Performed on Server
 void ATPSCharacter::OnArmorAttributeChanged(const FOnAttributeChangeData& data) {
 	CurrentArmor = data.NewValue;
 	ShouldNotify = true;
@@ -620,6 +621,7 @@ void ATPSCharacter::OnMovementAttributeChanged(const FOnAttributeChangeData& dat
 	ShouldNotify = true;
 }
 
+// Sync clients from Server-driven GAS updates.
 void ATPSCharacter::SyncAttributesFromGAS() {
 	UAbilitySystemComponent* asc = GetAbilitySystemComponent();
 	if (!IsValid(asc)) {
