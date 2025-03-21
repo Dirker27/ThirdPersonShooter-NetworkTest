@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////
 
 
-#include "Equipment/TPSEquipmentInstance.h"
+#include "Equipment/LyraEquipmentInstance.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/EngineTypes.h"
@@ -19,24 +19,24 @@
 #include "Net/UnrealNetwork.h"
 #include "Templates/Casts.h"
 
-#include "Equipment/TPSEquipmentDefinition.h"
+#include "Equipment/LyraEquipmentDefinition.h"
 
 #if UE_WITH_IRIS
 #include "Iris/ReplicationSystem/ReplicationFragmentUtil.h"
 #endif // UE_WITH_IRIS
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(TPSEquipmentInstance)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(LyraEquipmentInstance)
 
 class FLifetimeProperty;
 class UClass;
 class USceneComponent;
 
-UTPSEquipmentInstance::UTPSEquipmentInstance(const FObjectInitializer& ObjectInitializer)
+ULyraEquipmentInstance::ULyraEquipmentInstance(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }
 
-UWorld* UTPSEquipmentInstance::GetWorld() const
+UWorld* ULyraEquipmentInstance::GetWorld() const
 {
 	if (APawn* OwningPawn = GetPawn())
 	{
@@ -48,7 +48,7 @@ UWorld* UTPSEquipmentInstance::GetWorld() const
 	}
 }
 
-void UTPSEquipmentInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void ULyraEquipmentInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -68,12 +68,12 @@ void UTPSEquipmentInstance::RegisterReplicationFragments(UE::Net::FFragmentRegis
 }
 #endif // UE_WITH_IRIS
 
-APawn* UTPSEquipmentInstance::GetPawn() const
+APawn* ULyraEquipmentInstance::GetPawn() const
 {
 	return Cast<APawn>(GetOuter());
 }
 
-APawn* UTPSEquipmentInstance::GetTypedPawn(TSubclassOf<APawn> PawnType) const
+APawn* ULyraEquipmentInstance::GetTypedPawn(TSubclassOf<APawn> PawnType) const
 {
 	APawn* Result = nullptr;
 	if (UClass* ActualPawnType = PawnType)
@@ -86,7 +86,7 @@ APawn* UTPSEquipmentInstance::GetTypedPawn(TSubclassOf<APawn> PawnType) const
 	return Result;
 }
 
-void UTPSEquipmentInstance::SpawnEquipmentActors(const TArray<FTPSEquipmentActorToSpawn>& ActorsToSpawn)
+void ULyraEquipmentInstance::SpawnEquipmentActors(const TArray<FLyraEquipmentActorToSpawn>& ActorsToSpawn)
 {
 	if (APawn* OwningPawn = GetPawn())
 	{
@@ -96,7 +96,7 @@ void UTPSEquipmentInstance::SpawnEquipmentActors(const TArray<FTPSEquipmentActor
 			AttachTarget = Char->GetMesh();
 		}
 
-		for (const FTPSEquipmentActorToSpawn& SpawnInfo : ActorsToSpawn)
+		for (const FLyraEquipmentActorToSpawn& SpawnInfo : ActorsToSpawn)
 		{
 			AActor* NewActor = GetWorld()->SpawnActorDeferred<AActor>(SpawnInfo.ActorToSpawn, FTransform::Identity, OwningPawn);
 			NewActor->FinishSpawning(FTransform::Identity, /*bIsDefaultTransform=*/ true);
@@ -108,7 +108,7 @@ void UTPSEquipmentInstance::SpawnEquipmentActors(const TArray<FTPSEquipmentActor
 	}
 }
 
-void UTPSEquipmentInstance::DestroyEquipmentActors()
+void ULyraEquipmentInstance::DestroyEquipmentActors()
 {
 	for (AActor* Actor : SpawnedActors)
 	{
@@ -119,17 +119,17 @@ void UTPSEquipmentInstance::DestroyEquipmentActors()
 	}
 }
 
-void UTPSEquipmentInstance::OnEquipped()
+void ULyraEquipmentInstance::OnEquipped()
 {
 	K2_OnEquipped();
 }
 
-void UTPSEquipmentInstance::OnUnequipped()
+void ULyraEquipmentInstance::OnUnequipped()
 {
 	K2_OnUnequipped();
 }
 
-void UTPSEquipmentInstance::OnRep_Instigator()
+void ULyraEquipmentInstance::OnRep_Instigator()
 {
 }
 

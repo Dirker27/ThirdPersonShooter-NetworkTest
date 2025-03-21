@@ -9,11 +9,11 @@
 #pragma once
 
 //#include "Cosmetics/TPSCosmeticAnimationTypes.h"
-#include "Equipment/TPSEquipmentInstance.h"
+#include "Equipment/LyraEquipmentInstance.h"
 #include "Templates/SubclassOf.h"
 #include "UObject/UObjectGlobals.h"
 
-#include "TPSWeaponInstance.generated.h"
+#include "LyraWeaponInstance.generated.h"
 
 class UAnimInstance;
 class UObject;
@@ -26,12 +26,12 @@ struct FGameplayTagContainer;
  * A piece of equipment representing a weapon spawned and applied to a pawn
  */
 UCLASS()
-class UTPSWeaponInstance : public UTPSEquipmentInstance
+class ULyraWeaponInstance : public ULyraEquipmentInstance
 {
 	GENERATED_BODY()
 
 public:
-	UTPSWeaponInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	ULyraWeaponInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	//~UTPSEquipmentInstance interface
 	virtual void OnEquipped();

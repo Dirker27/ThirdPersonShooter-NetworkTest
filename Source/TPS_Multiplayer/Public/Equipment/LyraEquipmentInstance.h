@@ -14,15 +14,15 @@
 #include "UObject/Object.h"
 #include "UObject/UObjectGlobals.h"
 
-#include "TPSEquipmentInstance.generated.h"
+#include "LyraEquipmentInstance.generated.h"
 
 class AActor;
 class APawn;
 struct FFrame;
 struct FLyraEquipmentActorToSpawn;
 
-struct FTPSEquipmentActorToSpawn;
-class UTPSEquipmentDefinition;
+struct FLyraEquipmentActorToSpawn;
+class ULyraEquipmentDefinition;
 
 /**
  * ULyraEquipmentInstance
@@ -30,12 +30,12 @@ class UTPSEquipmentDefinition;
  * A piece of equipment spawned and applied to a pawn
  */
 UCLASS(BlueprintType, Blueprintable)
-class UTPSEquipmentInstance : public UObject
+class ULyraEquipmentInstance : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	UTPSEquipmentInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	ULyraEquipmentInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	//~UObject interface
 	virtual bool IsSupportedForNetworking() const override { return true; }
@@ -56,7 +56,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = Equipment)
 	TArray<AActor*> GetSpawnedActors() const { return SpawnedActors; }
 
-	virtual void SpawnEquipmentActors(const TArray<FTPSEquipmentActorToSpawn>& ActorsToSpawn);
+	virtual void SpawnEquipmentActors(const TArray<FLyraEquipmentActorToSpawn>& ActorsToSpawn);
 	virtual void DestroyEquipmentActors();
 
 	virtual void OnEquipped();

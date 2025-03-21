@@ -9,12 +9,20 @@ public class TPS_Multiplayer : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
 		PublicDependencyModuleNames.AddRange(new string[] { 
-			"Core", "CoreUObject", "Engine", "InputCore", "UMG", "GameplayAbilities"
-		});
+			"Core",
+			"CoreOnline",
+			"CoreUObject",
+			"Engine",
+			"GameFeatures",
+            "GameplayAbilities",
+			"GameplayTags",
+            "InputCore",
+			"UMG",
+        });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
 			"EnhancedInput",
-			"GameplayAbilities", "GameplayTags", "GameplayTasks"
+			"GameplayTasks"
 	//		"OnlineSybsystem"
 		});
 

@@ -6,23 +6,23 @@
 ///
 ////////////////////////////////////////////////////////////////
 
-#include "Weapon/TPSWeaponInstance.h"
+#include "Weapon/LyraWeaponInstance.h"
 
 #include "Engine/World.h"
 #include "Math/UnrealMathUtility.h"
 #include "Misc/AssertionMacros.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(TPSWeaponInstance)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(LyraWeaponInstance)
 
 class UAnimInstance;
 struct FGameplayTagContainer;
 
-UTPSWeaponInstance::UTPSWeaponInstance(const FObjectInitializer& ObjectInitializer)
+ULyraWeaponInstance::ULyraWeaponInstance(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }
 
-void UTPSWeaponInstance::OnEquipped()
+void ULyraWeaponInstance::OnEquipped()
 {
 	Super::OnEquipped();
 
@@ -31,19 +31,19 @@ void UTPSWeaponInstance::OnEquipped()
 	TimeLastEquipped = World->GetTimeSeconds();
 }
 
-void UTPSWeaponInstance::OnUnequipped()
+void ULyraWeaponInstance::OnUnequipped()
 {
 	Super::OnUnequipped();
 }
 
-void UTPSWeaponInstance::UpdateFiringTime()
+void ULyraWeaponInstance::UpdateFiringTime()
 {
 	UWorld* World = GetWorld();
 	check(World);
 	TimeLastFired = World->GetTimeSeconds();
 }
 
-float UTPSWeaponInstance::GetTimeSinceLastInteractedWith() const
+float ULyraWeaponInstance::GetTimeSinceLastInteractedWith() const
 {
 	UWorld* World = GetWorld();
 	check(World);

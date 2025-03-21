@@ -39,50 +39,57 @@ public:
 //  ATTRIBUTES
 //~ ============================================================= ~//
 public:
-    //- Identity -----------------------------------------=
-    //
-    //- Type
+    //////////////////////////////////////////////////////
+    // Identity
+
+    // Weapon Type
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="TPSWeapon|Identity")
     TEnumAsByte<ETPSWeaponType> Type;
 
-    //- Configuration ------------------------------------=
-    //
-    //- Configuration
+    //////////////////////////////////////////////////////
+    // Configuration
+
+    // Configuration
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPSWeapon|Configuration")
     TObjectPtr<UTPSWeaponConfiguration> Configuration;
     //
-    //- UI Reticle
+    // UI Reticle
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
     TObjectPtr<UTPSWeaponReticle> Reticle;
 
-    //- State --------------------------------------------=
-	//
-    //- Ammo
+    //////////////////////////////////////////////////////
+    // State
+
+    // Ammo
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State", Replicated);
     int CurrentAmmunitionCount;
     //
-    //- State
+    // State
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State", Replicated)
     TEnumAsByte<ETPSWeaponState> CurrentWeaponState;
     //
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPSWeapon|State", Replicated)
     TEnumAsByte<ETPSWeaponState> PreviousWeaponState;
     //
+    // Is Currently Reloading
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State", Replicated)
     bool IsReloading;
     //
+    // Is Currently Firing
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State", Replicated)
     bool IsFiring;
     //
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State")
     bool HasEverFired;
     //
-    //- IsAiming (Behavior / Aesthetic Modifier)
+    // Is Currently Aiming (Behavior / Aesthetic Modifier)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State", Replicated)
     bool IsAiming;
     //
-    //- Fire Control -----
-    //
+
+    //////////////////////////////////////////////////////
+    // Fire Control States
+
     // Targeting
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State");
     FRotator TargetDirection;

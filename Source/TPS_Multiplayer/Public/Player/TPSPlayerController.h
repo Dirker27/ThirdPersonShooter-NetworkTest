@@ -3,12 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerController.h"
 
 #include "Character/TPSCharacterState.h"
 #include "TPSControllerConfiguration.h"
-#include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 
 #include "TPSPlayerController.generated.h"
 
@@ -106,6 +105,7 @@ public:
 
 	UFUNCTION(Exec, Category = "Pawn|Possess")
 	void UnPossessPawn();
+
 
 //~ ==================================================================== ~//
 //  CONFIGURATION

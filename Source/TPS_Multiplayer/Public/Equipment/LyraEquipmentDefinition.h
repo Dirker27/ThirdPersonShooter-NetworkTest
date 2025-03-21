@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "TPSEquipmentInstance.h"
+#include "LyraEquipmentInstance.h"
 #include "Containers/Array.h"
 #include "GAS/GASAbilitySet.h"
 #include "Math/Transform.h"
@@ -18,18 +18,18 @@
 #include "UObject/ObjectPtr.h"
 #include "UObject/UObjectGlobals.h"
 
-#include "TPSEquipmentDefinition.generated.h"
+#include "LyraEquipmentDefinition.generated.h"
 
 class AActor;
 class ULyraAbilitySet;
 class ULyraEquipmentInstance;
 
 USTRUCT()
-struct FTPSEquipmentActorToSpawn
+struct FLyraEquipmentActorToSpawn
 {
 	GENERATED_BODY()
 
-	FTPSEquipmentActorToSpawn()
+	FLyraEquipmentActorToSpawn()
 	{}
 
 	UPROPERTY(EditAnywhere, Category = Equipment)
@@ -49,16 +49,16 @@ struct FTPSEquipmentActorToSpawn
  * Definition of a piece of equipment that can be applied to a pawn
  */
 UCLASS(Blueprintable, Const, Abstract, BlueprintType)
-class UTPSEquipmentDefinition : public UObject
+class ULyraEquipmentDefinition : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	UTPSEquipmentDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	ULyraEquipmentDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	// Class to spawn
 	UPROPERTY(EditDefaultsOnly, Category = Equipment)
-	TSubclassOf<UTPSEquipmentInstance> InstanceType;
+	TSubclassOf<ULyraEquipmentInstance> InstanceType;
 
 	// Gameplay ability sets to grant when this is equipped
 	UPROPERTY(EditDefaultsOnly, Category = Equipment)
@@ -66,5 +66,5 @@ public:
 
 	// Actors to spawn on the pawn when this is equipped
 	UPROPERTY(EditDefaultsOnly, Category = Equipment)
-	TArray<FTPSEquipmentActorToSpawn> ActorsToSpawn;
+	TArray<FLyraEquipmentActorToSpawn> ActorsToSpawn;
 };
