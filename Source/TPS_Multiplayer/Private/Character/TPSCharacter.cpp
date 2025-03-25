@@ -69,6 +69,11 @@ ATPSCharacter::ATPSCharacter()
 	TargetLookRotation = FRotator::ZeroRotator;
 }
 
+ATPSCharacter::~ATPSCharacter()
+{
+	// cleanup?
+}
+
 void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -100,12 +105,21 @@ void ATPSCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		EquipmentManager->Initialize();
+		EquipmentManager->EquipPrimary();
 
 		SetupInitialAbilitiesAndEffects();
 	}
 
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	SyncAttributesFromGAS();
+}
+
+void ATPSCharacter::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	UE_LOG(LogTemp, Log, TEXT("Destroying Character[%s]..."), *Name);
+	EquipmentManager->DropAll();
 }
 
 

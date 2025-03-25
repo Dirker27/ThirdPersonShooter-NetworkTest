@@ -22,7 +22,7 @@ public:
 protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+    virtual void BeginDestroy() override;
 
 //~ ============================================================= ~//
 //  STATE
@@ -71,28 +71,38 @@ public:
 //~ ============================================================= ~//
 //  COMPONENTS
 //~ ============================================================= ~//
-private:
+protected:
     //////////////////////////////////////////////////////
     // Mount Targets
     
     // Weapon Hands
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
     TObjectPtr<UTPSMountPoint> PrimaryWeaponHand;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
     TObjectPtr<UTPSMountPoint> SecondaryWeaponHand;
     //
     // Hip Holsters
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
     TObjectPtr<UTPSMountPoint> LeftHipHolster;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
     TObjectPtr<UTPSMountPoint> RightHipHolster;
     //
     // Leg Holsters
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
     TObjectPtr<UTPSMountPoint> LeftLegHolster;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
     TObjectPtr<UTPSMountPoint> RightLegHolster;
     //
     // Back Holsters
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
     TObjectPtr<UTPSMountPoint> BackHolster;
 
 
-
+public:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
     TWeakObjectPtr<UAbilitySystemComponent> OwnerAsc;
+
 
 //~ ============================================================= ~//
 //  PUBLIC OPERATIONS
@@ -112,6 +122,18 @@ public:
     void Ready();
     UFUNCTION(BlueprintCallable)
     void UnReady();
+
+    UFUNCTION(BlueprintCallable)
+    void EquipItemToSlot(ATPSEquipableItem* equipmentItem, ETPSEquipmentSlot slot);
+    UFUNCTION(BlueprintCallable)
+    void DropEquipmentFromSlot(ETPSEquipmentSlot slot);
+    UFUNCTION(BlueprintCallable)
+    void DropAll();
+
+    UFUNCTION(BlueprintCallable)
+    void DestroyItemAtSlot(ETPSEquipmentSlot slot);
+    UFUNCTION(BlueprintCallable)
+    void DestroyAll();
 
     UFUNCTION(BlueprintCallable)
     void EquipPrimary();

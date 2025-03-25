@@ -25,7 +25,7 @@ public:
 //~ ============================================================= ~//
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<UStaticMeshComponent> Mesh;
+    TObjectPtr<USkeletalMeshComponent> Mesh;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UBoxComponent> CollisionComponent;
@@ -47,25 +47,41 @@ public:
     //- Identity ------------------------------------------=
     //
     //- Name
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Identity")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|Identity")
     FString Name;
 
     //- Configuration ------------------------------------=
     //
     //- Name
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Configuration")
     TArray<TSubclassOf<UGameplayEffect>> AppliedEffects;
 
     //- State --------------------------------------------=
     //
+    //- IsOwned
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Equippable|State")
+    bool IsOwned;
+    //
     //- IsEquipped
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Equippable|State")
     bool IsEquipped;
 
 //~ ============================================================= ~//
 //  BEHAVIOR
 //~ ============================================================= ~//
 public:
+    //- Pickupable -----------------------------------------=
+    //
+    // TODO: Move to IPickupable?
+    UFUNCTION(BlueprintCallable)
+    void Pickup();
+    UFUNCTION(BlueprintImplementableEvent)
+    void OnPickup();
+    //
+    UFUNCTION(BlueprintCallable)
+    void Drop();
+    UFUNCTION(BlueprintImplementableEvent)
+    void OnDrop();
 
     //- Equipable -----------------------------------------=
     //

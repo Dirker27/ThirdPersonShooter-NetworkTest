@@ -7,7 +7,7 @@
 ATPSProjectileLauncher::ATPSProjectileLauncher()
 {
 	Muzzle = CreateDefaultSubobject<UTPSMountPoint>(TEXT("Muzzle"));
-	Muzzle->SetupAttachment(CollisionComponent);
+	Muzzle->SetupAttachment(Mesh);
 
 	#if WITH_EDITORONLY_DATA
 	ArrowComponent->SetupAttachment(Muzzle);
@@ -60,6 +60,8 @@ void ATPSProjectileLauncher::PerformFire()
 // TODO: This should be a MultiCast RPC for replication.
 void ATPSProjectileLauncher::LaunchProjectile(FRotator targetDirection)
 {
+	if (!IsValid(ProjectileTemplate)) { return; }
+
 	ATPSProjectile* p = GetWorld()->SpawnActor<ATPSProjectile>(ProjectileTemplate,
 		Muzzle->GetComponentTransform().GetLocation(), targetDirection);
 

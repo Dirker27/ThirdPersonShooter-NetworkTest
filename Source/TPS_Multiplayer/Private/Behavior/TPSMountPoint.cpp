@@ -4,17 +4,36 @@
 
 UTPSMountPoint::UTPSMountPoint()
 {
-    //SphereComponent = CreateDefaultSubobject<USphereComponent>(TargetSocketName);
-    //SphereComponent->SetSphereRadius(.1f, true);
-    //SphereComponent->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("")));
+    OffsetPosition = GetCurrentPosition();
+    OffsetEulerRotation = GetCurrentEulerRotation();
 }
+
+void UTPSMountPoint::MountToTarget(AActor* actor)
+{
+    if (!TargetParentComponent.IsValid()) { return; }
+
+    actor->AttachToComponent(
+        TargetParentComponent.Get(),
+        FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+        TargetSocketName);
+
+    actor->SetActorRelativeLocation(OffsetPosition);
+    actor->SetActorRelativeRotation(OffsetEulerRotation.Rotation());
+}
+
+void UTPSMountPoint::UnMountFromTarget(AActor* actor)
+{
+    actor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+}
+
+
 
 FVector UTPSMountPoint::GetCurrentPosition() const
 {
-    return FVector::Zero();
+    return GetComponentLocation();
 }
 
 FVector UTPSMountPoint::GetCurrentEulerRotation() const
 {
-    return FVector::Zero();
+    return GetComponentRotation().Euler();
 }

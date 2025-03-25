@@ -44,6 +44,9 @@ public:
     //- Active(?) Mount Point
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|State", Replicated)
     TObjectPtr<UTPSMountPoint> MountPoint = nullptr;
+    // Is Currently Mounted to a MountPoint Target.
+    UFUNCTION(BlueprintCallable)
+    bool IsMounted() { return IsValid(MountPoint); }
 
 //~ ============================================================= ~//
 //  BEHAVIOR

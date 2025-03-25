@@ -8,7 +8,32 @@
 
 #include "TPSMountPoint.generated.h"
 
-UCLASS()
+USTRUCT(BlueprintType)
+struct TPS_MULTIPLAYER_API FTPSMountTarget
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
+    TWeakObjectPtr<USceneComponent> TargetParentComponent;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
+    FName TargetSocketName;
+};
+
+USTRUCT(BlueprintType)
+struct TPS_MULTIPLAYER_API FTPSMountOffset
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
+    FVector OffsetPosition = FVector::Zero();
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
+    FVector OffsetEulerRotation = FVector::Zero();
+};
+
+UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSMountPoint : public USceneComponent
 {
     GENERATED_BODY()
@@ -26,10 +51,13 @@ public:
 //  Configuration
 //~ ============================================================= ~//
 public:
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MountPoint|Configuration")
     TWeakObjectPtr<USceneComponent> TargetParentComponent;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MountPoint|Configuration")
     FName TargetSocketName;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MountPoint|Configuration")
+    FTPSMountTarget Target;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
     FVector OffsetPosition = FVector::Zero();
@@ -40,6 +68,11 @@ public:
 //  BEHAVIOR
 //~ ============================================================= ~//
 public:
+    UFUNCTION(BlueprintCallable)
+    void MountToTarget(AActor* actor);
+    UFUNCTION(BlueprintCallable)
+    void UnMountFromTarget(AActor* actor);
+
     UFUNCTION(BlueprintCallable)
     FVector GetCurrentPosition() const;
     UFUNCTION(BlueprintCallable)

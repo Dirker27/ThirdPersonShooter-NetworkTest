@@ -31,13 +31,7 @@ void ATPSMountableActor::Tick(float DeltaSeconds)
 void ATPSMountableActor::Mount(UTPSMountPoint* target)
 {
     MountPoint = target;
-
-    AttachToComponent(
-        target->TargetParentComponent.Get(),
-        FAttachmentTransformRules::SnapToTargetNotIncludingScale, 
-        target->TargetSocketName);
-
-    GetTransform().TransformPosition(target->OffsetPosition);
+    MountPoint->MountToTarget(this);
 
     OnMount();
     UE_LOG(LogTemp, Log, TEXT("Mounted to Target[%s]-[%s]."),
@@ -46,9 +40,8 @@ void ATPSMountableActor::Mount(UTPSMountPoint* target)
 
 void ATPSMountableActor::UnMount()
 {
+    MountPoint->UnMountFromTarget(this);
     MountPoint = nullptr;
-
-    DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
     OnUnMount();
     UE_LOG(LogTemp, Log, TEXT("Un-Mounted."));

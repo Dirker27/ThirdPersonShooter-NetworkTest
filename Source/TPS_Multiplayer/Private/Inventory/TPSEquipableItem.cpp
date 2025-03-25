@@ -4,13 +4,18 @@
 
 ATPSEquipableItem::ATPSEquipableItem()
 {
+	//USceneComponent* root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	//SetRootComponent(root);
+
 	CollisionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Collider"));
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CollisionComponent->SetSimulatePhysics(false);
 	SetRootComponent(CollisionComponent);
+	//CollisionComponent->SetupAttachment(root);
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(CollisionComponent);
+	Mesh->SetSimulatePhysics(false);
 	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 #if WITH_EDITORONLY_DATA
@@ -29,6 +34,33 @@ ATPSEquipableItem::ATPSEquipableItem()
 //~ ============================================================= ~//
 //  DEFAULT INTERFACE BEHAVIOR
 //~ ============================================================= ~//
+
+//- Equip --//
+
+void ATPSEquipableItem::Pickup()
+{
+	IsOwned = true;
+
+	//CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//CollisionComponent->SetSimulatePhysics(false);
+
+	OnPickup();
+}
+void ATPSEquipableItem::Drop()
+{
+	if (IsMounted())
+	{
+		UnMount();
+	}
+	MountPoint = nullptr;
+	IsOwned = false;
+	IsEquipped = false;
+
+	//CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	//CollisionComponent->SetSimulatePhysics(true);
+
+	OnDrop();
+}
 
 //- Equip --//
 

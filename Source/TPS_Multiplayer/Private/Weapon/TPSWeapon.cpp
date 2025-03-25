@@ -8,7 +8,21 @@ ATPSWeapon::ATPSWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	bReplicates = true;
+
     Configuration = CreateDefaultSubobject<UTPSWeaponConfiguration>(TEXT("DefaultConfiguration"));
+}
+
+void ATPSWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATPSWeapon, MountPoint);
+
+	DOREPLIFETIME(ATPSWeapon, CurrentAmmunitionCount);
+	DOREPLIFETIME(ATPSWeapon, IsReloading);
+	DOREPLIFETIME(ATPSWeapon, IsAiming);
+	DOREPLIFETIME(ATPSWeapon, IsFiring);
 }
 
 void ATPSWeapon::BeginPlay()
@@ -29,7 +43,17 @@ void ATPSWeapon::BeginPlay()
 	HasTriggerCompleted = false;
 	TimeLastFired = 0;
 	SuccessiveFireCount = 0;
+
+	if (IsValid(MountPoint)) {
+		MountPoint->MountToTarget(this);
+	}
 }
+
+void ATPSWeapon::BeginDestroy()
+{
+	Super::BeginDestroy();
+}
+
 
 void ATPSWeapon::Tick(float DeltaTime)
 {
@@ -43,14 +67,6 @@ void ATPSWeapon::Tick(float DeltaTime)
 		}
 		//else { UE_LOG(LogTemp, Log, TEXT("-<click>-")); }
 	}*/
-}
-
-void ATPSWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-    DOREPLIFETIME(ATPSWeapon, CurrentAmmunitionCount);
-	DOREPLIFETIME(ATPSWeapon, IsReloading);
-    DOREPLIFETIME(ATPSWeapon, IsAiming);
-    DOREPLIFETIME(ATPSWeapon, IsFiring);
 }
 
 //~ ============================================================= ~//

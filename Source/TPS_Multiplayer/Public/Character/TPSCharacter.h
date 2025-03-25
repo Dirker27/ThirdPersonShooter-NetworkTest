@@ -32,11 +32,14 @@ class TPS_MULTIPLAYER_API ATPSCharacter : public ACharacter, public IAbilitySyst
 public:
 	// Sets default values for this character's properties
 	ATPSCharacter();
+	~ATPSCharacter();
 
 // UE Implementables
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void BeginDestroy() override;
 
 //~ ============================================================= ~//
 //  COMPONENTS
@@ -459,7 +462,6 @@ public:
 //~ ============================================================= ~//
 
 public:
-
 	// Use Actor's Eyes at Mesh Location for detection and docking sweeps
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration")
 	FName EyeSocketName;

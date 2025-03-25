@@ -12,9 +12,15 @@
 
 #include "TPSWeapon.generated.h"
 
-//UDELEGATE(BlueprintAuthorityOnly, NetMulticast, Reliable)
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformFire);
+UDELEGATE(BlueprintAuthorityOnly, NetMulticast, Reliable)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformFire);
 
+UDELEGATE(BlueprintAuthorityOnly, NetMulticast, Reliable)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformEquip);
+
+/**
+ * An Instance of a Weapon in the World that can be fired, dropped, and picked up.
+ */
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSWeapon : public ATPSEquipableItem
 {
@@ -29,6 +35,7 @@ public:
 protected:
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
+    virtual void BeginDestroy() override;
 
 public:
     //- Broadcast Delegate
@@ -86,6 +93,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State", Replicated)
     bool IsAiming;
     //
+    // Should highlight / render display frame to Player.
+    UFUNCTION(BlueprintCallable)
+    bool ShouldRenderUnitFrame() { return IsOwned; }
 
     //////////////////////////////////////////////////////
     // Fire Control States
