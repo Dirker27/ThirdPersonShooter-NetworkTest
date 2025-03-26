@@ -16,13 +16,13 @@ class TPS_MULTIPLAYER_API UTPSLoadout : public UDataAsset
 
 public:
     UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<ATPSEquipableItem> primaryWeapon;
+    TSubclassOf<ATPSEquipableItem> PrimaryWeapon;
     UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<ATPSEquipableItem> secondaryWeapon;
+    TSubclassOf<ATPSEquipableItem> SecondaryWeapon;
     UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<ATPSEquipableItem> tertiaryWeapon;
+    TSubclassOf<ATPSEquipableItem> TertiaryWeapon;
     UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<ATPSEquipableItem> lethalEquipment;
+    TSubclassOf<ATPSEquipableItem> LethalEquipment;
     UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<ATPSEquipableItem> tacticalEquipment;
+    TSubclassOf<ATPSEquipableItem> TacticalEquipment;
 };

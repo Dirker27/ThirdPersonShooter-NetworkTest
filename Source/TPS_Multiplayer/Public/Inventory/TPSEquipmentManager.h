@@ -124,9 +124,9 @@ public:
     void UnReady();
 
     UFUNCTION(BlueprintCallable)
-    void EquipItemToSlot(ATPSEquipableItem* equipmentItem, ETPSEquipmentSlot slot);
+    void PickupAndAssignEquipmentItemToSlot(ATPSEquipableItem* equipmentItem, ETPSEquipmentSlot slot);
     UFUNCTION(BlueprintCallable)
-    void DropEquipmentFromSlot(ETPSEquipmentSlot slot);
+    void DropEquipmentItemFromSlot(ETPSEquipmentSlot slot);
     UFUNCTION(BlueprintCallable)
     void DropAll();
 
@@ -194,5 +194,9 @@ protected:
 public:
     UFUNCTION(BlueprintCallable)
     ATPSEquipableItem* GetItemFromEquipmentSlot(ETPSEquipmentSlot slot) const;
+
+private:
+    void InstantiateAndAssignItemToSlot(TSubclassOf<ATPSEquipableItem>, ETPSEquipmentSlot slot);
+
     UTPSMountPoint* GetMountPointForSlot(ETPSEquipmentSlot slot) const;
 };

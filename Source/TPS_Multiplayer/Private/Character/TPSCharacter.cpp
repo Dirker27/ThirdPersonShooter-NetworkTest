@@ -119,7 +119,8 @@ void ATPSCharacter::BeginDestroy()
 	Super::BeginDestroy();
 
 	UE_LOG(LogTemp, Log, TEXT("Destroying Character[%s]..."), *Name);
-	EquipmentManager->DropAll();
+	//EquipmentManager->DropEquipmentItemFromSlot(PrimaryWeapon);
+	//EquipmentManager->DropAll();
 }
 
 
@@ -417,13 +418,16 @@ bool ATPSCharacter::IsActionActive() const {
 
 void ATPSCharacter::PerformDeath()
 {
-	ApplyCharacterState(Incapacitated);
+	//ApplyCharacterState(Incapacitated);
 
 	ATPSPlayerController* controller = Cast<ATPSPlayerController>(GetController());
 	if (IsValid(controller))
 	{
 		controller->NotifyPawnDeath();
 	}
+
+	EquipmentManager->DropAll();
+
 	OnDeath();
 }
 

@@ -11,6 +11,12 @@
 
 #include "TPSEquipableItem.generated.h"
 
+UDELEGATE(BlueprintAuthorityOnly, NetMulticast, Reliable)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformPickup);
+
+UDELEGATE(BlueprintAuthorityOnly, NetMulticast, Reliable)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformDrop);
+
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSEquipableItem : public ATPSMountableActor
 {
@@ -19,6 +25,12 @@ class TPS_MULTIPLAYER_API ATPSEquipableItem : public ATPSMountableActor
 public:
     ATPSEquipableItem();
     //~ATPSEquipableItem();
+
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+protected:
+    virtual void BeginPlay() override;
+    virtual void BeginDestroy() override;
 
 //~ ============================================================= ~//
 //  COMPONENTS
@@ -59,11 +71,11 @@ public:
     //- State --------------------------------------------=
     //
     //- IsOwned
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Equippable|State")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Equippable|State", Replicated)
     bool IsOwned;
     //
     //- IsEquipped
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Equippable|State")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Equippable|State", Replicated)
     bool IsEquipped;
 
 //~ ============================================================= ~//
@@ -77,11 +89,13 @@ public:
     void Pickup();
     UFUNCTION(BlueprintImplementableEvent)
     void OnPickup();
+    virtual void PerformPickup() { OnPickup(); }
     //
     UFUNCTION(BlueprintCallable)
     void Drop();
     UFUNCTION(BlueprintImplementableEvent)
     void OnDrop();
+    virtual void PerformDrop() { OnDrop(); }
 
     //- Equipable -----------------------------------------=
     //
@@ -106,4 +120,14 @@ public:
     virtual void StopUse();
     UFUNCTION(BlueprintImplementableEvent)
     void OnStopUse();
+
+//~ ============================================================= ~//
+//  STATE MODIFIERS
+//~ ============================================================= ~//
+private:
+    UFUNCTION(BlueprintCallable)
+    void EnableWorldCollision();
+
+    UFUNCTION(BlueprintCallable)
+    void DisableWorldCollision();
 };
