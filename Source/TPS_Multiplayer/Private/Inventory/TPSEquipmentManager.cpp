@@ -13,22 +13,17 @@ UTPSEquipmentManager::UTPSEquipmentManager()
 
     PrimaryWeaponHand = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-PrimaryWeaponHand"));
     //PrimaryWeaponHand->SetupAttachment(this);
-
     SecondaryWeaponHand = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-SecondaryWeaponHand"));
     //SecondaryWeaponHand->SetupAttachment(this);
 
     BackHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-BackHolster"));
     //BackHolster->SetupAttachment(this);
-
     LeftHipHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-LeftHipHolster"));
     //LeftHipHolster->SetupAttachment(this);
-
     LeftLegHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-LeftLegHolster"));
     //LeftLegHolster->SetupAttachment(this);
-
     RightHipHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-RightHipHolster"));
     //RightHipHolster->SetupAttachment(this);
-
     RightLegHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-RightLegHolster"));
     //RightLegHolster->SetupAttachment(this);
 
@@ -91,11 +86,12 @@ void UTPSEquipmentManager::Initialize()
     }
 }
 
+// Should be called in consumer's constructor.
 void UTPSEquipmentManager::BindToMesh(USkeletalMeshComponent* mesh)
 {
     TargetMesh = mesh;
 
-    PrimaryWeaponHand->TargetParentComponent = TargetMesh;
+    /*PrimaryWeaponHand->Target.ParentComponent = TargetMesh;
     SecondaryWeaponHand->TargetParentComponent = TargetMesh;
 
     BackHolster->TargetParentComponent = TargetMesh;
@@ -111,39 +107,39 @@ void UTPSEquipmentManager::BindToMesh(USkeletalMeshComponent* mesh)
     LeftHipHolster->TargetSocketName = FName(TEXT("thigh_l"));
     LeftLegHolster->TargetSocketName = FName(TEXT("calf_l"));
     RightHipHolster->TargetSocketName = FName(TEXT("thigh_r"));
-    RightLegHolster->TargetSocketName = FName(TEXT("calf_r"));
+    RightLegHolster->TargetSocketName = FName(TEXT("calf_r"));*/
 
     if (IsValid(mesh)) {
         UE_LOG(LogTemp, Log, TEXT("Mounting Holsters..."));
 
         if (IsValid(PrimaryWeaponHand) && !PrimaryWeaponHandBone.IsNone())
         {
-            PrimaryWeaponHand->SetupAttachment(mesh, PrimaryWeaponHandBone);;
+            PrimaryWeaponHand->Attach(mesh, PrimaryWeaponHandBone);
         }
         if (IsValid(SecondaryWeaponHand) && !SecondaryWeaponHandBone.IsNone())
         {
-            SecondaryWeaponHand->SetupAttachment(mesh, SecondaryWeaponHandBone);
+            SecondaryWeaponHand->Attach(mesh, SecondaryWeaponHandBone);
         }
 
         if (IsValid(BackHolster) && !BackHolsterBone.IsNone())
         {
-            BackHolster->SetupAttachment(mesh, BackHolsterBone);
+            BackHolster->Attach(mesh, BackHolsterBone);
         }
         if (IsValid(LeftHipHolster) && !LeftHipHolsterBone.IsNone())
         {
-            LeftHipHolster->SetupAttachment(mesh, LeftHipHolsterBone);
+            LeftHipHolster->Attach(mesh, LeftHipHolsterBone);
         }
         if (IsValid(LeftLegHolster) && !LeftLegHolsterBone.IsNone())
         {
-            LeftLegHolster->SetupAttachment(mesh, LeftLegHolsterBone);
+            LeftLegHolster->Attach(mesh, LeftLegHolsterBone);
         }
         if (IsValid(RightHipHolster) && !RightHipHolsterBone.IsNone())
         {
-            RightHipHolster->SetupAttachment(mesh, RightHipHolsterBone);
+            RightHipHolster->Attach(mesh, RightHipHolsterBone);
         }
         if (IsValid(RightLegHolster) && !RightLegHolsterBone.IsNone())
         {
-            RightLegHolster->SetupAttachment(mesh, RightLegHolsterBone);
+            RightLegHolster->Attach(mesh, RightLegHolsterBone);
         }
     }
 }

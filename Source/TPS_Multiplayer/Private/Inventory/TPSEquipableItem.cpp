@@ -14,8 +14,6 @@ ATPSEquipableItem::ATPSEquipableItem()
 
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(CollisionComponent);
-	Mesh->SetSimulatePhysics(false);
-	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 #if WITH_EDITORONLY_DATA
 	ArrowComponent = CreateEditorOnlyDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
@@ -41,6 +39,21 @@ void ATPSEquipableItem::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 void ATPSEquipableItem::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Initialize Colliders (ignore BP overrides)
+	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Block);
+
+	Mesh->SetSimulatePhysics(false);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	if (IsOwned)
+	{
+		DisableWorldCollision();
+	}
+	else
+	{
+		EnableWorldCollision();
+	}
 }
 
 void ATPSEquipableItem::BeginDestroy()
@@ -60,7 +73,7 @@ void ATPSEquipableItem::Pickup()
 {
 	IsOwned = true;
 
-	//DisableWorldCollision();
+	DisableWorldCollision();
 
 	PerformPickup();
 }
@@ -74,7 +87,7 @@ void ATPSEquipableItem::Drop()
 	IsOwned = false;
 	IsEquipped = false;
 
-	//EnableWorldCollision();
+	EnableWorldCollision();
 
 	PerformDrop();
 }
@@ -116,7 +129,7 @@ void ATPSEquipableItem::EnableWorldCollision()
 
 void ATPSEquipableItem::DisableWorldCollision()
 {
-	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CollisionComponent->SetSimulatePhysics(false);
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 

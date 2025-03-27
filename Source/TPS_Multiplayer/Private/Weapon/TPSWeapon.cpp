@@ -43,10 +43,6 @@ void ATPSWeapon::BeginPlay()
 	HasTriggerCompleted = false;
 	TimeLastFired = 0;
 	SuccessiveFireCount = 0;
-
-	if (IsValid(MountPoint)) {
-		MountPoint->MountToTarget(this);
-	}
 }
 
 void ATPSWeapon::BeginDestroy()

@@ -2,38 +2,38 @@
 
 #include "Behavior/TPSMountPoint.h"
 
+#include "Components/BoxComponent.h"
+
 UTPSMountPoint::UTPSMountPoint()
 {
-    OffsetPosition = GetCurrentPosition();
-    OffsetEulerRotation = GetCurrentEulerRotation();
+    //bVisible = true;
+    bVisualizeComponent = true;
+    bHiddenInGame = false;
+    //Offset.RelativeLocation = GetRelativeLocation();
+    //Offset.RelativeEulerRotation = GetComponentRotation().Euler();
 }
 
-void UTPSMountPoint::MountToTarget(AActor* actor)
+void UTPSMountPoint::Attach(USceneComponent* InParent, FName InSocketName)
 {
-    if (!TargetParentComponent.IsValid()) { return; }
+    Target.ParentComponent = InParent;
+    Target.SocketName = InSocketName;
 
-    actor->AttachToComponent(
-        TargetParentComponent.Get(),
-        FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-        TargetSocketName);
+    //Offset.RelativeLocation = InParent->GetSocketLocation(InSocketName) - GetComponentLocation();
+    //Offset.RelativeEulerRotation = InParent->GetComponentRotation().Euler() - GetCurrentEulerRotation();
 
-    actor->SetActorRelativeLocation(OffsetPosition);
-    actor->SetActorRelativeRotation(OffsetEulerRotation.Rotation());
+    SetupAttachment(InParent, InSocketName);
+
+    UE_LOG(LogTemp, Log, TEXT("MountPoint attached to parent with Offset Location[%s]-Rotation[%s]."),
+        *Offset.RelativeLocation.ToString(), *Offset.RelativeEulerRotation.ToString());
 }
-
-void UTPSMountPoint::UnMountFromTarget(AActor* actor)
-{
-    actor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-}
-
 
 
 FVector UTPSMountPoint::GetCurrentPosition() const
 {
-    return GetComponentLocation();
+    return GetComponentTransform().GetLocation();
 }
 
 FVector UTPSMountPoint::GetCurrentEulerRotation() const
 {
-    return GetComponentRotation().Euler();
+    return GetComponentTransform().GetRotation().Euler();
 }

@@ -31,6 +31,7 @@ ATPSCharacter::ATPSCharacter()
 	EquipmentManager->BindToMesh(GetMesh());
 
 
+
 	//- Ability System ------------------------------------=
 	//
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/BoxComponent.h"
 
 #include "Components/SphereComponent.h"
 
@@ -13,12 +14,11 @@ struct TPS_MULTIPLAYER_API FTPSMountTarget
 {
     GENERATED_BODY()
 
-public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
-    TWeakObjectPtr<USceneComponent> TargetParentComponent;
+    TWeakObjectPtr<USceneComponent> ParentComponent = nullptr;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
-    FName TargetSocketName;
+    FName SocketName = FName();
 };
 
 USTRUCT(BlueprintType)
@@ -28,9 +28,9 @@ struct TPS_MULTIPLAYER_API FTPSMountOffset
 
 public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
-    FVector OffsetPosition = FVector::Zero();
+    FVector RelativeLocation = FVector::Zero();
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
-    FVector OffsetEulerRotation = FVector::Zero();
+    FVector RelativeEulerRotation = FVector::Zero();
 };
 
 UCLASS(BlueprintType)
@@ -41,38 +41,22 @@ class TPS_MULTIPLAYER_API UTPSMountPoint : public USceneComponent
 public:
     UTPSMountPoint();
 
-#if WITH_EDITORONLY_DATA
-/** Component shown in the editor only to indicate character facing */
-    UPROPERTY()
-    TObjectPtr<USphereComponent> SphereComponent;
-#endif
+    void Attach(USceneComponent* InParent, FName InSocketName = NAME_None);
 
 //~ ============================================================= ~//
 //  Configuration
 //~ ============================================================= ~//
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MountPoint|Configuration")
-    TWeakObjectPtr<USceneComponent> TargetParentComponent;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MountPoint|Configuration")
-    FName TargetSocketName;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MountPoint|Configuration")
     FTPSMountTarget Target;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
-    FVector OffsetPosition = FVector::Zero();
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
-    FVector OffsetEulerRotation = FVector::Zero();
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MountPoint|Configuration")
+    FTPSMountOffset Offset;
 
 //~ ============================================================= ~//
 //  BEHAVIOR
 //~ ============================================================= ~//
 public:
-    UFUNCTION(BlueprintCallable)
-    void MountToTarget(AActor* actor);
-    UFUNCTION(BlueprintCallable)
-    void UnMountFromTarget(AActor* actor);
-
     UFUNCTION(BlueprintCallable)
     FVector GetCurrentPosition() const;
     UFUNCTION(BlueprintCallable)
