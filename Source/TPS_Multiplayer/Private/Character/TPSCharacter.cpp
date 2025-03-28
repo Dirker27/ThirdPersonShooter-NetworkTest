@@ -144,7 +144,7 @@ void ATPSCharacter::Tick(float deltaTime)
 	//- Extend Input to Weapons -------------------------=
 	//
 	// Extend targeting data to current weapon
-	ATPSWeapon* weapon = GetEquippedWeapon();
+	ATPSRangedWeapon* weapon = GetEquippedWeapon();
 	if (IsValid(weapon))
 	{
 		weapon->TargetDirection = TargetLookRotation;
@@ -245,11 +245,11 @@ FVector2D ATPSCharacter::GetCurrentAccuracyTolerance() const
 }
 
 
-ATPSWeapon* ATPSCharacter::GetEquippedWeapon() const
+ATPSRangedWeapon* ATPSCharacter::GetEquippedWeapon() const
 {
 	if (EquipmentManager->ActiveEquipmentSlot == None) { return nullptr; }
 
-	return Cast<ATPSWeapon>(EquipmentManager->GetItemFromEquipmentSlot(EquipmentManager->ActiveEquipmentSlot));
+	return Cast<ATPSRangedWeapon>(EquipmentManager->GetItemFromEquipmentSlot(EquipmentManager->ActiveEquipmentSlot));
 }
 
 //~ ============================================================= ~//
@@ -478,7 +478,7 @@ void ATPSCharacter::EndBoost() {
 void ATPSCharacter::StartAim() {
 	IsAiming = true;
 
-	ATPSWeapon* weapon = GetEquippedWeapon();
+	ATPSRangedWeapon* weapon = GetEquippedWeapon();
 	if (weapon != nullptr)
 	{
 		weapon->IsAiming = true;
@@ -489,7 +489,7 @@ void ATPSCharacter::StartAim() {
 void ATPSCharacter::EndAim() {
 	IsAiming = false;
 
-	ATPSWeapon* weapon = GetEquippedWeapon();
+	ATPSRangedWeapon* weapon = GetEquippedWeapon();
 	if (weapon != nullptr)
 	{
 		weapon->IsAiming = false;
@@ -503,7 +503,7 @@ void ATPSCharacter::EndAim() {
 void ATPSCharacter::StartFireWeapon() {
 	IsFiring = true;
 
-	ATPSWeapon* weapon = GetEquippedWeapon();
+	ATPSRangedWeapon* weapon = GetEquippedWeapon();
 	if (weapon != nullptr)
 	{
 		weapon->StartUse();
@@ -514,7 +514,7 @@ void ATPSCharacter::StartFireWeapon() {
 void ATPSCharacter::EndFireWeapon() {
 	IsFiring = false;
 
-	ATPSWeapon* weapon = GetEquippedWeapon();
+	ATPSRangedWeapon* weapon = GetEquippedWeapon();
 	if (weapon != nullptr)
 	{
 		weapon->StopUse();

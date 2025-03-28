@@ -11,7 +11,7 @@
 #include "UObject/ObjectPtr.h"
 #include "UObject/UObjectGlobals.h"
 
-#include "TPSEquipmentItemDefinition.generated.h"
+#include "TPSEquipmentDefinition.generated.h"
 
 class AActor;
 class ULyraAbilitySet;
@@ -37,7 +37,7 @@ struct FTPSEquipmentActorToSpawn
 
 
 /**
- * UTPSEquipmentItemDefinition
+ * UTPSEquipmentDefinition
  *
  * Immutable item definition specifying the attributes and behavior of an
  *	Equipment Item. Will be applied to an instanced item at spawn.
@@ -46,12 +46,12 @@ struct FTPSEquipmentActorToSpawn
  *   alongside its relevant abilities and constraints.
  */
 UCLASS(Blueprintable, Const, Abstract, BlueprintType)
-class UTPSEquipmentItemDefinition : public UObject
+class UTPSEquipmentDefinition : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	UTPSEquipmentItemDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get()) {};
+	UTPSEquipmentDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get()) {};
 
 	// Class to spawn
 	UPROPERTY(EditDefaultsOnly, Category = Equipment)

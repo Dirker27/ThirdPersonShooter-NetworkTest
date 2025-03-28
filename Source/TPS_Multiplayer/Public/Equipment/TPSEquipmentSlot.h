@@ -36,3 +36,33 @@ static const char* ETPSEquipmentSlotToString(const ETPSEquipmentSlot slot) {
 		return "UNSUPPORTED";
 	}
 }
+
+
+
+
+UENUM(BlueprintType)
+enum ETPSEquipmentHarnessSlot : int
+{
+	PrimaryHand,
+	SecondaryHand,
+
+	Headgear,
+	Backpack,
+	Vest,
+	Belt,
+
+	LegHolster_Left,
+	LegHolster_Right,
+
+	ChestHolster_Pistol,
+	ChestHolster_Rifle,
+
+	BackHolster_Left,
+	BackHolster_Right,
+	BackHolster_Cross,
+
+	WeaponBelt_Front,
+	WeaponBelt_Rear,
+	WeaponBelt_Left,
+	WeaponBelt_Right,
+};

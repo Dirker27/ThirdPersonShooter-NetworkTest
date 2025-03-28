@@ -44,7 +44,7 @@ void ATPSMountableActor::Mount(UTPSMountPoint* target)
         FAttachmentTransformRules::SnapToTargetNotIncludingScale,
         FName());//target->Target.SocketName);
 
-    //SetActorRelativeLocation(target->Offset.RelativeLocation);
+    SetActorRelativeLocation(MountOffset);
     //SetActorRelativeRotation(target->Offset.RelativeEulerRotation.Rotation());
 
     OnMount();

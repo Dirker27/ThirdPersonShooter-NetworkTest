@@ -7,7 +7,8 @@
 #include "Behavior/TPSMountPoint.h"
 #include "Character/TPSCharacter.h"
 
-UTPSEquipmentManager::UTPSEquipmentManager()
+UTPSEquipmentManager::UTPSEquipmentManager(const FObjectInitializer& ObjectInitializer)
+    : Super(ObjectInitializer)
 {
     Loadout = CreateDefaultSubobject<UTPSEquipmentLoadout>(TEXT("DefaultLoadout"));
 
@@ -20,6 +21,14 @@ UTPSEquipmentManager::UTPSEquipmentManager()
     RightHipHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-RightHipHolster"));
     RightLegHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-RightLegHolster"));
 
+    HarnessSocketMap.Add(PrimaryHand, "hand_r");
+    HarnessSocketMap.Add(SecondaryHand, "hand_l");
+    HarnessSocketMap.Add(LegHolster_Left, "thigh_l");
+    HarnessSocketMap.Add(LegHolster_Right, "thigh_r");
+    HarnessSocketMap.Add(ChestHolster_Pistol, "spine_04");
+    HarnessSocketMap.Add(ChestHolster_Rifle, "spine_03");
+    HarnessSocketMap.Add(BackHolster_Left, "spine_05");
+    HarnessSocketMap.Add(BackHolster_Cross, "spine_05");
 
     PrimaryWeaponHandBone = FName(TEXT("hand_r"));
     SecondaryWeaponHandBone = FName(TEXT("hand_l"));
@@ -28,7 +37,8 @@ UTPSEquipmentManager::UTPSEquipmentManager()
     LeftHipHolsterBone = FName(TEXT("thigh_l"));
     LeftLegHolsterBone = FName(TEXT("calf_l"));
     RightHipHolsterBone = FName(TEXT("thigh_r"));
-    RightLegHolsterBone = FName(TEXT("calf_r"));
+    // Actually the Front-Chest holster for now
+    RightLegHolsterBone = FName(TEXT("spine_04"));
 }
 
 void UTPSEquipmentManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {

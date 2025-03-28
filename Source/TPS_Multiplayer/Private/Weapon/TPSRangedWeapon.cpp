@@ -1,10 +1,10 @@
 // (C) ToasterCat Studios 2025
 
-#include "Weapon/TPSWeapon.h"
+#include "Weapon/TPSRangedWeapon.h"
 
 #include "Net/UnrealNetwork.h"
 
-ATPSWeapon::ATPSWeapon()
+ATPSRangedWeapon::ATPSRangedWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -13,19 +13,19 @@ ATPSWeapon::ATPSWeapon()
     Configuration = CreateDefaultSubobject<UTPSWeaponConfiguration>(TEXT("DefaultConfiguration"));
 }
 
-void ATPSWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void ATPSRangedWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ATPSWeapon, MountPoint);
+	DOREPLIFETIME(ATPSRangedWeapon, MountPoint);
 
-	DOREPLIFETIME(ATPSWeapon, CurrentAmmunitionCount);
-	DOREPLIFETIME(ATPSWeapon, IsReloading);
-	DOREPLIFETIME(ATPSWeapon, IsAiming);
-	DOREPLIFETIME(ATPSWeapon, IsFiring);
+	DOREPLIFETIME(ATPSRangedWeapon, CurrentAmmunitionCount);
+	DOREPLIFETIME(ATPSRangedWeapon, IsReloading);
+	DOREPLIFETIME(ATPSRangedWeapon, IsAiming);
+	DOREPLIFETIME(ATPSRangedWeapon, IsFiring);
 }
 
-void ATPSWeapon::BeginPlay()
+void ATPSRangedWeapon::BeginPlay()
 {
     Super::BeginPlay();
 
@@ -45,16 +45,18 @@ void ATPSWeapon::BeginPlay()
 	SuccessiveFireCount = 0;
 }
 
-void ATPSWeapon::BeginDestroy()
+void ATPSRangedWeapon::BeginDestroy()
 {
 	Super::BeginDestroy();
 }
 
 
-void ATPSWeapon::Tick(float DeltaTime)
+void ATPSRangedWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Performed in GameplayAbility
+	//
 	/*if (IsFiring)
 	{
 		if (CanFire())
@@ -69,7 +71,7 @@ void ATPSWeapon::Tick(float DeltaTime)
 //  Usable / Equipment Interfaces
 //~ ============================================================= ~//
 
-void ATPSWeapon::StartUse()
+void ATPSRangedWeapon::StartUse()
 {
     Super::StartUse();
 
@@ -77,7 +79,7 @@ void ATPSWeapon::StartUse()
 	ApplyWeaponState(Firing);
 }
 
-void ATPSWeapon::StopUse()
+void ATPSRangedWeapon::StopUse()
 {
     Super::StopUse();
 
@@ -90,12 +92,12 @@ void ATPSWeapon::StopUse()
 }
 
 
-void ATPSWeapon::Equip()
+void ATPSRangedWeapon::Equip()
 {
     Super::Equip();
 }
 
-void ATPSWeapon::UnEquip()
+void ATPSRangedWeapon::UnEquip()
 {
     Super::UnEquip();
 }
@@ -104,7 +106,7 @@ void ATPSWeapon::UnEquip()
 //  Fire Control
 //~ ============================================================= ~//
 
-void ATPSWeapon::Fire()
+void ATPSRangedWeapon::Fire()
 {
 	PerformFire();
 
@@ -138,7 +140,7 @@ void ATPSWeapon::Fire()
 	OnFire();
 }
 
-bool ATPSWeapon::CanFire()
+bool ATPSRangedWeapon::CanFire()
 {
 	if (HasTriggerCompleted)
 	{
@@ -159,7 +161,7 @@ bool ATPSWeapon::CanFire()
 //  Loading Control
 //~ ============================================================= ~//
 
-void ATPSWeapon::StartReload()
+void ATPSRangedWeapon::StartReload()
 {
     ApplyWeaponState(Arming);
 
@@ -169,13 +171,13 @@ void ATPSWeapon::StartReload()
 	}
 }
 
-void ATPSWeapon::CommitReload(int newAmmunitionCount)
+void ATPSRangedWeapon::CommitReload(int newAmmunitionCount)
 {
 	CurrentAmmunitionCount += newAmmunitionCount;
 	ApplyWeaponState(Ready);
 }
 
-void ATPSWeapon::ApplyWeaponState(ETPSWeaponState newState)
+void ATPSRangedWeapon::ApplyWeaponState(ETPSWeaponState newState)
 {
 	if (newState == CurrentWeaponState) { return; }
 

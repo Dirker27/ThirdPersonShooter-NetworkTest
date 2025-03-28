@@ -7,7 +7,7 @@
 UTPSMountPoint::UTPSMountPoint()
 {
     //bVisible = true;
-    bVisualizeComponent = true;
+    //bVisualizeComponent = true;
     bHiddenInGame = false;
     //Offset.RelativeLocation = GetRelativeLocation();
     //Offset.RelativeEulerRotation = GetComponentRotation().Euler();

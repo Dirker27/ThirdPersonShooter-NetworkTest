@@ -4,19 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Ammunition/TPSAmmunitionType.h"
-#include "Equipment/TPSEquipmentItemDefinition.h"
+#include "Equipment/TPSEquipmentDefinition.h"
 
 #include "TPSWeaponConfiguration.generated.h"
-
-USTRUCT(BlueprintType)
-struct FTPSWeaponActorToSpawn : public FTPSEquipmentActorToSpawn
-{
-    GENERATED_BODY()
-
-    FTPSWeaponActorToSpawn()
-    {}
-};
-
 
 UENUM(BlueprintType)
 enum ETPSWeaponFireMode : int

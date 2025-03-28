@@ -32,6 +32,7 @@ public:
     //- Offset from Mount target
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|Configuration")
     FVector MountOffset = FVector::Zero();
+    FTPSMountOffset MountPointOffset;
     //
     //- Should Rotate?
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|Configuration")

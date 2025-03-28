@@ -23,11 +23,12 @@ struct TPS_MULTIPLAYER_API FTPSMountOffset
 {
     GENERATED_BODY()
 
-public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
     FVector RelativeLocation = FVector::Zero();
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
     FVector RelativeEulerRotation = FVector::Zero();
+
+    //static FTPSMountOffset Zero() { return FTPSMountOffset(FVector::Zero(), FVector::Zero()); }
 };
 
 UCLASS(BlueprintType)

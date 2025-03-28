@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include "UObject/ObjectMacros.h"
 
-#include "Weapon/TPSWeapon.h"
+#include "Weapon/TPSRangedWeapon.h"
 
 #include "TPSThrowable.generated.h"
 
 UCLASS()
-class TPS_MULTIPLAYER_API ATPSThrowable : public ATPSWeapon
+class TPS_MULTIPLAYER_API ATPSThrowable : public ATPSRangedWeapon
 {
     GENERATED_BODY()
 };

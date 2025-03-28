@@ -15,7 +15,7 @@ class TPS_MULTIPLAYER_API UTPSEquipmentManager : public UActorComponent
     GENERATED_BODY()
 
 public:
-    UTPSEquipmentManager();
+    UTPSEquipmentManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
     //~UTPSEquipmentManager();
 
 protected:
@@ -44,6 +44,10 @@ public:
     // Parent Mesh
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
     TWeakObjectPtr<USkeletalMeshComponent> TargetMesh;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
+    TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, FName> HarnessSocketMap;
+
     //
     // Weapon Hands
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
