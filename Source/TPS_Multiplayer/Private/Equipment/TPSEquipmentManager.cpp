@@ -9,23 +9,16 @@
 
 UTPSEquipmentManager::UTPSEquipmentManager()
 {
-    Loadout = CreateDefaultSubobject<UTPSLoadout>(TEXT("DefaultLoadout"));
+    Loadout = CreateDefaultSubobject<UTPSEquipmentLoadout>(TEXT("DefaultLoadout"));
 
     PrimaryWeaponHand = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-PrimaryWeaponHand"));
-    //PrimaryWeaponHand->SetupAttachment(this);
     SecondaryWeaponHand = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-SecondaryWeaponHand"));
-    //SecondaryWeaponHand->SetupAttachment(this);
 
     BackHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-BackHolster"));
-    //BackHolster->SetupAttachment(this);
     LeftHipHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-LeftHipHolster"));
-    //LeftHipHolster->SetupAttachment(this);
     LeftLegHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-LeftLegHolster"));
-    //LeftLegHolster->SetupAttachment(this);
     RightHipHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-RightHipHolster"));
-    //RightHipHolster->SetupAttachment(this);
     RightLegHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-RightLegHolster"));
-    //RightLegHolster->SetupAttachment(this);
 
 
     PrimaryWeaponHandBone = FName(TEXT("hand_r"));

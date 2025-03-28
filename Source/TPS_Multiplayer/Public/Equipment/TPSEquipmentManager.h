@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Equipment/TPSEquipmentSlot.h"
-#include "Equipment/TPSLoadout.h"
+#include "Equipment/TPSEquipmentLoadout.h"
 
 #include "TPSEquipmentManager.generated.h"
 
@@ -32,7 +32,7 @@ public:
 
     //WeaponController weaponController;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
-    TObjectPtr<UTPSLoadout> Loadout;
+    TObjectPtr<UTPSEquipmentLoadout> Loadout;
 
 //~ ============================================================= ~//
 //  CONFIGURATION

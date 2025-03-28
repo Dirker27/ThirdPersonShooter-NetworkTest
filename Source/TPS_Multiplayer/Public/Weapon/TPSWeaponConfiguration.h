@@ -4,8 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Ammunition/TPSAmmunitionType.h"
+#include "Equipment/TPSEquipmentItemDefinition.h"
 
 #include "TPSWeaponConfiguration.generated.h"
+
+USTRUCT(BlueprintType)
+struct FTPSWeaponActorToSpawn : public FTPSEquipmentActorToSpawn
+{
+    GENERATED_BODY()
+
+    FTPSWeaponActorToSpawn()
+    {}
+};
+
 
 UENUM(BlueprintType)
 enum ETPSWeaponFireMode : int
@@ -30,6 +41,15 @@ enum ETPSProjectileBehavior : int
     Spread = 1
 };
 
+
+/**
+ * The active configuration for a given Weapon.
+ *
+ * Unlike "Definition" classes used for Equipment, this is considered MUTABLE
+ *   and can change over the course of a Weapon's lifetime.
+ *
+ *   (change fire modes, magazine types, etc)
+ */
 UCLASS()
 class TPS_MULTIPLAYER_API UTPSWeaponConfiguration : public UDataAsset
 {

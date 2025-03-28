@@ -6,14 +6,12 @@
 ///
 ////////////////////////////////////////////////////////////////
 
-#include "Inventory/LyraInventoryManagerComponent.h"
+#include "Inventory/Lyra/LyraInventoryManagerComponent.h"
 
 #include "Engine/ActorChannel.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
 //#include "GameFramework/GameplayMessageSubsystem.h"
-#include "Inventory/LyraInventoryItemDefinition.h"
-#include "Inventory/LyraInventoryItemInstance.h"
 #include "Misc/AssertionMacros.h"
 #include "NativeGameplayTags.h"
 #include "Net/UnrealNetwork.h"
@@ -21,6 +19,9 @@
 #include "UObject/Object.h"
 #include "UObject/ObjectPtr.h"
 #include "UObject/UObjectBaseUtility.h"
+
+#include "Inventory/Lyra/LyraInventoryItemDefinition.h"
+#include "Inventory/Lyra/LyraInventoryItemInstance.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraInventoryManagerComponent)
 

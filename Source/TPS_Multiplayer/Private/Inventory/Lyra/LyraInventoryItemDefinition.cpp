@@ -6,7 +6,7 @@
 ///
 ////////////////////////////////////////////////////////////////
 
-#include "Inventory/LyraInventoryItemDefinition.h"
+#include "Inventory/Lyra/LyraInventoryItemDefinition.h"
 
 #include "UObject/Class.h"
 

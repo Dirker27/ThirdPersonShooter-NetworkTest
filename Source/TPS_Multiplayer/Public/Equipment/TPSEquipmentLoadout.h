@@ -7,10 +7,10 @@
 #include "Equipment/TPSEquipableItem.h"
 #include "Equipment/TPSEquipmentSlot.h"
 
-#include "TPSLoadout.generated.h"
+#include "TPSEquipmentLoadout.generated.h"
 
 UCLASS()
-class TPS_MULTIPLAYER_API UTPSLoadout : public UDataAsset
+class TPS_MULTIPLAYER_API UTPSEquipmentLoadout : public UDataAsset
 {
     GENERATED_BODY()
 

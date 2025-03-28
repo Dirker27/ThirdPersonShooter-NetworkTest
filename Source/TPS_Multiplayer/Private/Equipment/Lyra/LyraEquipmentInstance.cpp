@@ -6,8 +6,7 @@
 ///
 ////////////////////////////////////////////////////////////////
 
-
-#include "Equipment/LyraEquipmentInstance.h"
+#include "Equipment/Lyra/LyraEquipmentInstance.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/EngineTypes.h"
@@ -19,7 +18,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Templates/Casts.h"
 
-#include "Equipment/LyraEquipmentDefinition.h"
+#include "Equipment/Lyra/LyraEquipmentDefinition.h"
 
 #if UE_WITH_IRIS
 #include "Iris/ReplicationSystem/ReplicationFragmentUtil.h"

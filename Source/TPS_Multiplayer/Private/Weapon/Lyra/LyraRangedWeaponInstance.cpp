@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////////////
 
 
-#include "Weapon/LyraRangedWeaponInstance.h"
+#include "Weapon/Lyra/LyraRangedWeaponInstance.h"
 #include "NativeGameplayTags.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/CharacterMovementComponent.h"

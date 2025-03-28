@@ -28,6 +28,14 @@ class ULyraEquipmentDefinition;
  * ULyraEquipmentInstance
  *
  * A piece of equipment spawned and applied to a pawn
+ * 
+ * -----------------------------------------------------
+ * 
+ * Epic does this because Lyra's equipment items can de-spawn.
+ *  This class acts as an intermediary object that can be attached to a pawn's
+ *  equipment manager but de-spawned when not equipped. This allows the equipment
+ *  to maintain state and still be available for operations while it's Actor Avatar
+ *  is away.
  */
 UCLASS(BlueprintType, Blueprintable)
 class ULyraEquipmentInstance : public UObject

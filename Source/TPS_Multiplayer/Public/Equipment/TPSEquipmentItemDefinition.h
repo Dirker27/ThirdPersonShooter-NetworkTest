@@ -17,7 +17,7 @@ class AActor;
 class ULyraAbilitySet;
 class ULyraEquipmentInstance;
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FTPSEquipmentActorToSpawn
 {
 	GENERATED_BODY()
@@ -37,9 +37,13 @@ struct FTPSEquipmentActorToSpawn
 
 
 /**
- * ULyraEquipmentDefinition
+ * UTPSEquipmentItemDefinition
  *
- * Definition of a piece of equipment that can be applied to a pawn
+ * Immutable item definition specifying the attributes and behavior of an
+ *	Equipment Item. Will be applied to an instanced item at spawn.
+ *
+ * "Duct-Tape"s an Equipment's instance (UObject) to its Avatar (Actor)
+ *   alongside its relevant abilities and constraints.
  */
 UCLASS(Blueprintable, Const, Abstract, BlueprintType)
 class UTPSEquipmentItemDefinition : public UObject

@@ -6,14 +6,15 @@
 ///
 ////////////////////////////////////////////////////////////////
 
-#include "Inventory/LyraInventoryItemInstance.h"
+#include "Inventory/Lyra/LyraInventoryItemInstance.h"
 
 #include "Containers/Array.h"
 #include "GameplayTagContainer.h"
-#include "Inventory/LyraInventoryItemDefinition.h"
 #include "Misc/AssertionMacros.h"
 #include "Net/UnrealNetwork.h"
 #include "UObject/Class.h"
+
+#include "Inventory/Lyra/LyraInventoryItemDefinition.h"
 
 #if UE_WITH_IRIS
 #include "Iris/ReplicationSystem/ReplicationFragmentUtil.h"

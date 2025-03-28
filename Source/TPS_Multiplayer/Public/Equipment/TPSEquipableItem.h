@@ -17,6 +17,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformPickup);
 UDELEGATE(BlueprintAuthorityOnly, NetMulticast, Reliable)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformDrop);
 
+/**
+ * The physical Actor class for piece of Equipment.
+ *
+ * Equipment characteristics are read from the EquipmentDefinition and applied to
+ *  this object at instantiation.
+ */
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSEquipableItem : public ATPSMountableActor
 {

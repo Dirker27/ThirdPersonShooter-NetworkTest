@@ -6,7 +6,7 @@
 ///
 ////////////////////////////////////////////////////////////////
 
-#include "Weapon/LyraWeaponInstance.h"
+#include "Weapon/Lyra/LyraWeaponInstance.h"
 
 #include "Engine/World.h"
 #include "Math/UnrealMathUtility.h"

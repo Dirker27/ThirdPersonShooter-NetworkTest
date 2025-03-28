@@ -13,7 +13,7 @@
 #include "CoreMinimal.h"
 #include "Curves/CurveFloat.h"
 
-#include "LyraWeaponInstance.h"
+#include "Weapon/Lyra/LyraWeaponInstance.h"
 //#include "AbilitySystem/LyraAbilitySourceInterface.h"
 
 #include "LyraRangedWeaponInstance.generated.h"
@@ -23,7 +23,9 @@ class UPhysicalMaterial;
 /**
  * ULyraRangedWeaponInstance
  *
- * A piece of equipment representing a ranged weapon spawned and applied to a pawn
+ * A piece of equipment representing a ranged weapon spawned and applied to a pawn.
+ *  This does not include the "Avatar" actor that is rendered. That is provided in
+ *  the EquipmentDefinition
  */
 UCLASS()
 class ULyraRangedWeaponInstance : public ULyraWeaponInstance //, public ILyraAbilitySourceInterface

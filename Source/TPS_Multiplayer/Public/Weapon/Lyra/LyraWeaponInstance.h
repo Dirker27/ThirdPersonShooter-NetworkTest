@@ -9,9 +9,10 @@
 #pragma once
 
 //#include "Cosmetics/TPSCosmeticAnimationTypes.h"
-#include "Equipment/LyraEquipmentInstance.h"
 #include "Templates/SubclassOf.h"
 #include "UObject/UObjectGlobals.h"
+
+#include "Equipment/Lyra/LyraEquipmentInstance.h"
 
 #include "LyraWeaponInstance.generated.h"
 

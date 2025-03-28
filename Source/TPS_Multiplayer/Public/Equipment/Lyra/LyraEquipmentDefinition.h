@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "LyraEquipmentInstance.h"
 #include "Containers/Array.h"
 #include "GAS/GASAbilitySet.h"
 #include "Math/Transform.h"

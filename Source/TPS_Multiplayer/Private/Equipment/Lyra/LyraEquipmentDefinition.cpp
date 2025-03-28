@@ -8,8 +8,8 @@
 ////////////////////////////////////////////////////////////////
 
 
-#include "Equipment/LyraEquipmentDefinition.h"
-#include "Equipment/LyraEquipmentInstance.h"
+#include "Equipment/Lyra/LyraEquipmentDefinition.h"
+#include "Equipment/Lyra/LyraEquipmentInstance.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraEquipmentDefinition)
 
