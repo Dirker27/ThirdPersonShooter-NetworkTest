@@ -24,7 +24,7 @@ class TPS_MULTIPLAYER_API ATPSEquipableItem : public ATPSMountableActor
 
 public:
     ATPSEquipableItem();
-    //~ATPSEquipableItem();
+    ~ATPSEquipableItem() {};
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -99,6 +99,7 @@ public:
 
     //- Equipable -----------------------------------------=
     //
+    // TODO: Move to IEquipable?
     UFUNCTION(BlueprintCallable)
     virtual void Equip();
     UFUNCTION(BlueprintImplementableEvent)
@@ -110,7 +111,8 @@ public:
     void OnUnEquip();
 
     //- Usable ------------------------------------------=
-    //  (TODO: Extract to UsableItem?)
+    //
+    // TODO: Extract to UsableItem?
     UFUNCTION(BlueprintCallable)
     virtual void StartUse();
     UFUNCTION(BlueprintImplementableEvent)

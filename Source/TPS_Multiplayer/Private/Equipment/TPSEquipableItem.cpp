@@ -1,4 +1,4 @@
-#include "Inventory/TPSEquipableItem.h"
+#include "Equipment/TPSEquipableItem.h"
 
 #include "Components/BoxComponent.h"
 #include "Net/UnrealNetwork.h"

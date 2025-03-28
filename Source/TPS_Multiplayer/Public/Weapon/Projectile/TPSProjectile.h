@@ -7,6 +7,7 @@
 #include "Behavior/TPSMountPoint.h"
 #include "Character/TPSCharacter.h"
 #include "Components/ArrowComponent.h"
+#include "Components/SphereComponent.h"
 
 #include "Weapon/Ammunition/TPSAmmunitionType.h"
 

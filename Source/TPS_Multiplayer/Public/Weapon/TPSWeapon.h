@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Inventory/TPSEquipableItem.h"
+#include "Equipment/TPSEquipableItem.h"
 #include "Reticle/TPSReticle.h"
 #include "Weapon/TPSWeaponType.h"
 #include "Weapon/TPSWeaponConfiguration.h"
@@ -28,7 +28,7 @@ class TPS_MULTIPLAYER_API ATPSWeapon : public ATPSEquipableItem
 
 public:
     ATPSWeapon();
-    //~ATPSWeapon();
+    ~ATPSWeapon() {};
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

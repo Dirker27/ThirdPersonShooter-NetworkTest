@@ -9,6 +9,7 @@
 
 #include "TPSPlayerInventory.generated.h"
 
+// TODO: Deprecate?
 UCLASS()
 class TPS_MULTIPLAYER_API UTPSPlayerInventory : public UDataAsset
 {

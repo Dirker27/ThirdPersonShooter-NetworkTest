@@ -3,9 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/BoxComponent.h"
-
-#include "Components/SphereComponent.h"
 
 #include "TPSMountPoint.generated.h"
 

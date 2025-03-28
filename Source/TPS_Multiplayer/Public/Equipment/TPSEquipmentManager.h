@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 
-#include "Inventory/TPSEquipmentSlot.h"
-#include "Inventory/TPSLoadout.h"
-#include "Weapon/TPSWeapon.h"
+#include "Equipment/TPSEquipmentSlot.h"
+#include "Equipment/TPSLoadout.h"
 
 #include "TPSEquipmentManager.generated.h"
 

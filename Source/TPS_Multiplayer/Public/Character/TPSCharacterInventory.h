@@ -9,6 +9,7 @@
 
 #include "TPSCharacterInventory.generated.h"
 
+// TODO: Deprecate?
 UCLASS()
 class TPS_MULTIPLAYER_API UTPSCharacterInventory : public UActorComponent
 {

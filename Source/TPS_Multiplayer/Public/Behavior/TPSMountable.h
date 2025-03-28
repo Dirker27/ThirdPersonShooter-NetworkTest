@@ -8,6 +8,7 @@
 
 #include "TPSMountable.generated.h"
 
+// TODO: Migrate to Interface?
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSMountableActor : public AActor
 {

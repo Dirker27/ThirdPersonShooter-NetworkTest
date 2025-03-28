@@ -13,9 +13,9 @@
 #include "Player/TPSPlayerState.h"
 
 
-//~ ============================================================= ~//
+//~ ======================================================================= ~//
 //  INITIALIZATION AND SETUP
-//~ ============================================================= ~//
+//~ ======================================================================= ~//
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -120,8 +120,6 @@ void ATPSCharacter::BeginDestroy()
 	Super::BeginDestroy();
 
 	UE_LOG(LogTemp, Log, TEXT("Destroying Character[%s]..."), *Name);
-	//EquipmentManager->DropEquipmentItemFromSlot(PrimaryWeapon);
-	//EquipmentManager->DropAll();
 }
 
 

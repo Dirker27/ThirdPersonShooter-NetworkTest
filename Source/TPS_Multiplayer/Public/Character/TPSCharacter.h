@@ -13,10 +13,10 @@
 #include "GAS/GASAbilitySet.h"
 #include "Character/TPSLocomotionState.h"
 #include "Character/TPSCharacterState.h"
+#include "Equipment/TPSEquipmentManager.h"
 #include "GAS/Attributes/CharacterHealthAttributeSet.h"
 #include "GAS/Attributes/StandardAttributeSet.h"
 #include "GAS/Attributes/WeaponAttributeSet.h"
-#include "Inventory/TPSEquipmentManager.h"
 #include "Weapon/TPSWeapon.h"
 
 #include "TPSCharacter.generated.h"

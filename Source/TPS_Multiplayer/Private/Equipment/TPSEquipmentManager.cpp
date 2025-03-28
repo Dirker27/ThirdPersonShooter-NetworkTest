@@ -1,11 +1,11 @@
 // (C) ToasterCat Studios 2025
 
-#include "Inventory/TPSEquipmentManager.h"
+#include "Equipment/TPSEquipmentManager.h"
 
-#include "ComponentUtils.h"
+#include "Net/UnrealNetwork.h"
+
 #include "Behavior/TPSMountPoint.h"
 #include "Character/TPSCharacter.h"
-#include "Net/UnrealNetwork.h"
 
 UTPSEquipmentManager::UTPSEquipmentManager()
 {

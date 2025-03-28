@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 
-#include "Inventory/TPSEquipmentSlot.h"
-#include "Weapon/TPSWeapon.h"
+#include "Equipment/TPSEquipableItem.h"
+#include "Equipment/TPSEquipmentSlot.h"
 
 #include "TPSLoadout.generated.h"
 
@@ -15,6 +15,9 @@ class TPS_MULTIPLAYER_API UTPSLoadout : public UDataAsset
     GENERATED_BODY()
 
 public:
+
+    // TODO: Slot-Item Map
+
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<ATPSEquipableItem> PrimaryWeapon;
     UPROPERTY(EditDefaultsOnly)
