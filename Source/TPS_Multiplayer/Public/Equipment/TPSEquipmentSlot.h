@@ -66,3 +66,51 @@ enum ETPSEquipmentHarnessSlot : int
 	WeaponBelt_Left,
 	WeaponBelt_Right,
 };
+
+static const char* ETPSEquipmentHarnessSlotToString(const ETPSEquipmentHarnessSlot slot) {
+	switch (slot) {
+	case PrimaryHand:
+		return "PrimaryWeaponHand";
+	case SecondaryHand:
+		return "SecondaryWeaponHand";
+
+	case Headgear:
+		return "HeadGear";
+	case Backpack:
+		return "Backpack";
+	case Vest:
+		return "Vest";
+	case Belt:
+		return "Best";
+
+	case LegHolster_Left:
+		return "LeftLegHolster";
+	case LegHolster_Right:
+		return "RightLegHolster";
+
+	case ChestHolster_Pistol:
+		return "PistolChestHolster";
+	case ChestHolster_Rifle:
+		return "RifleChestHolster";
+
+
+	case BackHolster_Left:
+		return "LeftBackHolster";
+	case BackHolster_Right:
+		return "RightBackHolster";
+	case BackHolster_Cross:
+		return "CrossBackHolster";
+
+	case WeaponBelt_Front:
+		return "BeltHolsterFront";
+	case WeaponBelt_Rear:
+		return "BeltHolsterRear";
+	case WeaponBelt_Left:
+		return "BeltHolsterLeft";
+	case WeaponBelt_Right:
+		return "BeltHolsterRight";
+
+	default:
+		return "UNSUPPORTED";
+	}
+}

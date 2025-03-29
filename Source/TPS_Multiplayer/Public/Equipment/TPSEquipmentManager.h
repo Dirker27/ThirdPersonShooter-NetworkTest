@@ -9,6 +9,12 @@
 
 #include "TPSEquipmentManager.generated.h"
 
+/*
+ * Manages a Pawn's Equipment Items
+ *  - Mounts visible Actors to Mesh (EquipmentHarness)
+ *  - Applies Equipment GAS Abilities/Effects to owning Pawn's ASC
+ *  - Attaches owner's ASC to Equipment/Weapons to extend abilities
+ */
 UCLASS()
 class TPS_MULTIPLAYER_API UTPSEquipmentManager : public UActorComponent
 {
@@ -47,6 +53,17 @@ public:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
     TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, FName> HarnessSocketMap;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
+    TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, UTPSMountPoint*> HarnessMountPointMap;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
+    TMap<TEnumAsByte<ETPSEquipmentSlot>, TEnumAsByte<ETPSEquipmentHarnessSlot>> EquipmentHolsterMap;
+
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
+    TMap<TEnumAsByte<ETPSEquipmentSlot>, ATPSEquipableItem*> EquipmentMap;// = //TMap<TEnumAsByte<ETPSEquipmentSlot>, ATPSEquipableItem*>::Empty();
+
 
     //
     // Weapon Hands
@@ -114,7 +131,7 @@ public:
     //UFUNCTION(BlueprintCallable)
     void BindToMesh(USkeletalMeshComponent* mesh);
 
-    void BindToOwner(UAbilitySystemComponent* ownerAsc);
+    void BindToOwnerAbilitySystem(UAbilitySystemComponent* ownerAsc);
 
     UFUNCTION(BlueprintCallable)
     void Initialize();
@@ -127,9 +144,9 @@ public:
     void UnReady();
 
     UFUNCTION(BlueprintCallable)
-    void PickupAndAssignEquipmentItemToSlot(ATPSEquipableItem* equipmentItem, ETPSEquipmentSlot slot);
+    void PickupAndAssignEquipmentToSlot(ATPSEquipableItem* equipmentItem, ETPSEquipmentSlot slot);
     UFUNCTION(BlueprintCallable)
-    void DropEquipmentItemFromSlot(ETPSEquipmentSlot slot);
+    void DropEquipmentFromSlot(ETPSEquipmentSlot slot);
     UFUNCTION(BlueprintCallable)
     void DropAll();
 
@@ -196,10 +213,10 @@ protected:
 
 public:
     UFUNCTION(BlueprintCallable)
-    ATPSEquipableItem* GetItemFromEquipmentSlot(ETPSEquipmentSlot slot) const;
+    ATPSEquipableItem* GetItemFromEquipmentSlot(ETPSEquipmentSlot slot);
 
 private:
-    void InstantiateAndAssignItemToSlot(TSubclassOf<ATPSEquipableItem>, ETPSEquipmentSlot slot);
+    void InstantiateAndAssignEquipmentToSlot(TSubclassOf<ATPSEquipableItem>, ETPSEquipmentSlot slot);
 
-    UTPSMountPoint* GetMountPointForSlot(ETPSEquipmentSlot slot) const;
+    UTPSMountPoint* GetHolsterMountPointForEquipmentSlot(ETPSEquipmentSlot slot);
 };

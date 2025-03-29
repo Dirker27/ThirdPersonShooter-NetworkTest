@@ -102,7 +102,7 @@ void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	EquipmentManager->BindToOwner(GetAbilitySystemComponent());
+	EquipmentManager->BindToOwnerAbilitySystem(GetAbilitySystemComponent());
 	if (HasAuthority())
 	{
 		EquipmentManager->Initialize();
