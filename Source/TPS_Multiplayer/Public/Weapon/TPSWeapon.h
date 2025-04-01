@@ -10,7 +10,7 @@
 #include "Weapon/TPSWeaponConfiguration.h"
 #include "Weapon/TPSWeaponState.h"
 
-#include "TPSWeaponEquipment.generated.h"
+#include "TPSWeapon.generated.h"
 
 UDELEGATE(BlueprintAuthorityOnly, NetMulticast, Reliable)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformFire);
@@ -22,13 +22,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformEquip);
  * An Instance of a Weapon in the World that can be fired, dropped, and picked up.
  */
 UCLASS()
-class TPS_MULTIPLAYER_API ATPSWeaponEquipment : public ATPSEquipableItem
+class TPS_MULTIPLAYER_API ATPSWeapon : public ATPSEquipableItem
 {
     GENERATED_BODY()
 
 public:
-    ATPSWeaponEquipment();
-    //~ATPSWeaponEquipment() {};
+    ATPSWeapon();
+    //~ATPSWeapon() {};
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

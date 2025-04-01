@@ -17,7 +17,7 @@
 #include "GAS/Attributes/CharacterHealthAttributeSet.h"
 #include "GAS/Attributes/StandardAttributeSet.h"
 #include "GAS/Attributes/WeaponAttributeSet.h"
-#include "Weapon/TPSWeaponEquipment.h"
+#include "Weapon/TPSWeapon.h"
 
 #include "TPSCharacter.generated.h"
 
@@ -146,7 +146,7 @@ public:
 
 	// Current Equipped Weapon (Synthetic)
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ATPSWeaponEquipment* GetEquippedWeapon() const;
+	ATPSWeapon* GetEquippedWeapon() const;
 
 	////////////////////////////////////////////////////////
 	// Controller Input

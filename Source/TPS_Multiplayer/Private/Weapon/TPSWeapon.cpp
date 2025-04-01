@@ -1,10 +1,10 @@
 // (C) ToasterCat Studios 2025
 
-#include "Weapon/TPSWeaponEquipment.h"
+#include "Weapon/TPSWeapon.h"
 
 #include "Net/UnrealNetwork.h"
 
-ATPSWeaponEquipment::ATPSWeaponEquipment()
+ATPSWeapon::ATPSWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -16,19 +16,19 @@ ATPSWeaponEquipment::ATPSWeaponEquipment()
 	SecondaryHandMountLocation->BindToParentSocket(Mesh);
 }
 
-void ATPSWeaponEquipment::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void ATPSWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ATPSWeaponEquipment, MountPoint);
+	DOREPLIFETIME(ATPSWeapon, MountPoint);
 
-	DOREPLIFETIME(ATPSWeaponEquipment, CurrentAmmunitionCount);
-	DOREPLIFETIME(ATPSWeaponEquipment, IsReloading);
-	DOREPLIFETIME(ATPSWeaponEquipment, IsAiming);
-	DOREPLIFETIME(ATPSWeaponEquipment, IsFiring);
+	DOREPLIFETIME(ATPSWeapon, CurrentAmmunitionCount);
+	DOREPLIFETIME(ATPSWeapon, IsReloading);
+	DOREPLIFETIME(ATPSWeapon, IsAiming);
+	DOREPLIFETIME(ATPSWeapon, IsFiring);
 }
 
-void ATPSWeaponEquipment::BeginPlay()
+void ATPSWeapon::BeginPlay()
 {
     Super::BeginPlay();
 
@@ -48,13 +48,13 @@ void ATPSWeaponEquipment::BeginPlay()
 	SuccessiveFireCount = 0;
 }
 
-void ATPSWeaponEquipment::BeginDestroy()
+void ATPSWeapon::BeginDestroy()
 {
 	Super::BeginDestroy();
 }
 
 
-void ATPSWeaponEquipment::Tick(float DeltaTime)
+void ATPSWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -74,7 +74,7 @@ void ATPSWeaponEquipment::Tick(float DeltaTime)
 //  Usable / Equipment Interfaces
 //~ ============================================================= ~//
 
-void ATPSWeaponEquipment::StartUse()
+void ATPSWeapon::StartUse()
 {
     Super::StartUse();
 
@@ -82,7 +82,7 @@ void ATPSWeaponEquipment::StartUse()
 	ApplyWeaponState(Firing);
 }
 
-void ATPSWeaponEquipment::StopUse()
+void ATPSWeapon::StopUse()
 {
     Super::StopUse();
 
@@ -95,12 +95,12 @@ void ATPSWeaponEquipment::StopUse()
 }
 
 
-void ATPSWeaponEquipment::Equip()
+void ATPSWeapon::Equip()
 {
     Super::Equip();
 }
 
-void ATPSWeaponEquipment::UnEquip()
+void ATPSWeapon::UnEquip()
 {
     Super::UnEquip();
 }
@@ -109,7 +109,7 @@ void ATPSWeaponEquipment::UnEquip()
 //  Fire Control
 //~ ============================================================= ~//
 
-void ATPSWeaponEquipment::Fire()
+void ATPSWeapon::Fire()
 {
 	PerformFire();
 
@@ -143,7 +143,7 @@ void ATPSWeaponEquipment::Fire()
 	OnFire();
 }
 
-bool ATPSWeaponEquipment::CanFire()
+bool ATPSWeapon::CanFire()
 {
 	if (HasTriggerCompleted)
 	{
@@ -164,7 +164,7 @@ bool ATPSWeaponEquipment::CanFire()
 //  Loading Control
 //~ ============================================================= ~//
 
-void ATPSWeaponEquipment::StartReload()
+void ATPSWeapon::StartReload()
 {
     ApplyWeaponState(Arming);
 
@@ -174,13 +174,13 @@ void ATPSWeaponEquipment::StartReload()
 	}
 }
 
-void ATPSWeaponEquipment::CommitReload(int newAmmunitionCount)
+void ATPSWeapon::CommitReload(int newAmmunitionCount)
 {
 	CurrentAmmunitionCount += newAmmunitionCount;
 	ApplyWeaponState(Ready);
 }
 
-void ATPSWeaponEquipment::ApplyWeaponState(ETPSWeaponState newState)
+void ATPSWeapon::ApplyWeaponState(ETPSWeaponState newState)
 {
 	if (newState == CurrentWeaponState) { return; }
 
