@@ -33,11 +33,11 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|Configuration")
     FTPSMountOffset MountOffset;
     //
-    //- Should Rotate?
+    // Should Rotate?
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|Configuration")
     bool ShouldApplyRotation = true;
     //
-    //- Use initial offsets on Mount?
+    // Use initial offsets on Mount?
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|Configuration")
     bool ShouldCaptureOffsetOnStart = true;
 
@@ -45,7 +45,7 @@ public:
     //
     // Active(?) Mount Point
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|State", Replicated)
-    TObjectPtr<UTPSMountPoint> MountPoint = nullptr;
+    UTPSMountPoint* MountPoint = nullptr;
     //
     // Is Currently Mounted to a MountPoint Target.
     UFUNCTION(BlueprintCallable)

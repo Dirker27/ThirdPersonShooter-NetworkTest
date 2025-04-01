@@ -65,13 +65,10 @@ public:
     TObjectPtr<UTPSWeaponReticle> Reticle;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
-    FTPSMountOffset WeaponHandOffset = FTPSMountOffset();
+    FTPSMountOffset PrimaryWeaponHandOffset = FTPSMountOffset();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
-    FTPSMountOffset WeaponHolsterOffset = FTPSMountOffset();
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
-    TObjectPtr<UTPSMountPoint> SecondaryHandMountLocation;
+    TObjectPtr<UTPSMountPoint> SecondaryWeaponHandMountPoint;
 
     //////////////////////////////////////////////////////
     // State

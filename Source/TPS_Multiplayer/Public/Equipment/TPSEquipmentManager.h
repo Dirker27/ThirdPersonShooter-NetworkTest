@@ -157,11 +157,11 @@ protected:
     void EquipAndArm(ETPSEquipmentSlot equipmentSlot);
 
     UFUNCTION(BlueprintCallable)
-    void EquipWeaponToHolster(ATPSEquipableItem* weapon, ETPSEquipmentSlot slot);
+    void EquipItemToHolster(ATPSEquipableItem* item, ETPSEquipmentSlot slot);
     UFUNCTION(BlueprintCallable)
-    void EquipToPrimaryWeaponHand(ATPSEquipableItem* weapon);
+    void EquipToPrimaryWeaponHand(ATPSEquipableItem* item);
     UFUNCTION(BlueprintCallable)
-    void EquipToSecondaryWeaponHand(ATPSEquipableItem* weapon);
+    void EquipToSecondaryWeaponHand(ATPSEquipableItem* item);
     UFUNCTION(BlueprintCallable)
     void EquipToPrimaryHolster(ATPSEquipableItem* weapon);
     UFUNCTION(BlueprintCallable)
@@ -172,20 +172,6 @@ protected:
 	void EquipToLethalHolster(ATPSEquipableItem* weapon);
     UFUNCTION(BlueprintCallable)
     void EquipToBackHolster(ATPSEquipableItem* weapon);
-
-
-protected:
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category="EquipmentManager|State")
-    TObjectPtr<ATPSEquipableItem> PrimaryWeaponInstance;
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "EquipmentManager|State")
-    TObjectPtr<ATPSEquipableItem> SecondaryWeaponInstance;
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "EquipmentManager|State")
-    TObjectPtr<ATPSEquipableItem> TertiaryWeaponInstance;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "EquipmentManager|State")
-    TObjectPtr<ATPSEquipableItem> LethalEquipmentInstance;
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "EquipmentManager|State")
-    TObjectPtr<ATPSEquipableItem> TacticalEquipmentInstance;
 
 public:
     UFUNCTION(BlueprintCallable)

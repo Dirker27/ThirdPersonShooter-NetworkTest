@@ -106,7 +106,7 @@ void ATPSCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		EquipmentManager->Initialize();
-		EquipmentManager->EquipPrimary();
+		//EquipmentManager->EquipPrimary();
 
 		SetupInitialAbilitiesAndEffects();
 	}
@@ -346,7 +346,6 @@ float ATPSCharacter::UpdateCharacterSpeedForCurrentState()
 	float baseSpeed = GetBaseSpeedForCharacterState(CurrentCharacterState);
 	float locomotionStateModifier = GetSpeedModifierForLocomotionState(CurrentLocomotionState);
 
-	//float modifier = MovementSpeedModifier;
 	// Set by GAS
 	UAbilitySystemComponent* asc = GetAbilitySystemComponent();
 	if (IsValid(asc)) {
@@ -417,8 +416,6 @@ bool ATPSCharacter::IsActionActive() const {
 
 void ATPSCharacter::PerformDeath()
 {
-	//ApplyCharacterState(Incapacitated);
-
 	ATPSPlayerController* controller = Cast<ATPSPlayerController>(GetController());
 	if (IsValid(controller))
 	{
@@ -591,7 +588,8 @@ UAbilitySystemComponent* ATPSCharacter::GetPlayerAbilitySystemComponent() const 
 }
 
 // Should only be called from SERVER when initializing.
-void ATPSCharacter::SetupInitialAbilitiesAndEffects() {
+void ATPSCharacter::SetupInitialAbilitiesAndEffects()
+{
 	UE_LOG(LogTemp, Log, TEXT("Initializing ASC for Character[%s]..."), *Name);
 
 	UAbilitySystemComponent* asc = GetAbilitySystemComponent();
@@ -639,7 +637,8 @@ void ATPSCharacter::OnMovementAttributeChanged(const FOnAttributeChangeData& dat
 }
 
 // Sync clients from Server-driven GAS updates.
-void ATPSCharacter::SyncAttributesFromGAS() {
+void ATPSCharacter::SyncAttributesFromGAS()
+{
 	UAbilitySystemComponent* asc = GetAbilitySystemComponent();
 	if (!IsValid(asc)) {
 		return;
@@ -656,7 +655,8 @@ void ATPSCharacter::SyncAttributesFromGAS() {
 
 
 // Ability System Wiring (from TPSPlayerState)
-void ATPSCharacter::BindToPlayerAbilitySystem() {
+void ATPSCharacter::BindToPlayerAbilitySystem()
+{
 	if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) {
 		ps->GetAbilitySystemComponent()->InitAbilityActorInfo(ps, this);
 	}

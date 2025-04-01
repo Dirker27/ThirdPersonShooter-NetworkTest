@@ -38,9 +38,9 @@ protected:
     virtual void BeginPlay() override;
     virtual void BeginDestroy() override;
 
-//~ ============================================================= ~//
+//~ ========================================================================= ~//
 //  COMPONENTS
-//~ ============================================================= ~//
+//~ ========================================================================= ~//
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<USkeletalMeshComponent> Mesh;
@@ -58,38 +58,50 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     TWeakObjectPtr<UAbilitySystemComponent> OwnerAsc;
 
-//~ ============================================================= ~//
+//~ ========================================================================= ~//
 //  ATTRIBUTES
-//~ ============================================================= ~//
+//~ ========================================================================= ~//
 public:
-    //- Identity ------------------------------------------=
-    //
+    //////////////////////////////////////////////////////////////////
+    // Identity
+
     //- Name
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|Identity")
     FString Name;
 
-    //- Configuration ------------------------------------=
-    //
-    //- Name
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Configuration")
-    TArray<TSubclassOf<UGameplayEffect>> AppliedEffects;
+    /////////////////////////////////////////////////////////////////
+    // Configuration
 
-    //- State --------------------------------------------=
-    //
-    //- IsOwned
+    // Effects to be applied to the owning Pawn's ASC when in inventory (passive)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Configuration")
+    TArray<TSubclassOf<UGameplayEffect>> PassiveEffects;
+
+    // Effects to be applied to the owning Pawn's ASC when equipped (active)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Configuration")
+    TArray<TSubclassOf<UGameplayEffect>> ActiveEffects;
+
+    // Offset to use when item is mounted to a Pawn. (not armed)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|Configuration")
+    FTPSMountOffset WeaponHolsterOffset = FTPSMountOffset();
+
+    /////////////////////////////////////////////////////////////////
+    // State
+
+    // IsOwned by a Pawn
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Equippable|State", Replicated)
     bool IsOwned;
-    //
-    //- IsEquipped
+    
+    // IsEquipped by a Pawn
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Equippable|State", Replicated)
     bool IsEquipped;
 
-//~ ============================================================= ~//
+//~ ========================================================================= ~//
 //  BEHAVIOR
-//~ ============================================================= ~//
+//~ ========================================================================= ~//
 public:
-    //- Pickupable -----------------------------------------=
-    //
+    /////////////////////////////////////////////////////////////////
+    // Pickupable
+
     // TODO: Move to IPickupable?
     UFUNCTION(BlueprintCallable)
     void Pickup();
@@ -103,8 +115,9 @@ public:
     void OnDrop();
     virtual void PerformDrop() { OnDrop(); }
 
-    //- Equipable -----------------------------------------=
-    //
+    /////////////////////////////////////////////////////////////////
+    // Equipable
+
     // TODO: Move to IEquipable?
     UFUNCTION(BlueprintCallable)
     virtual void Equip();
@@ -116,8 +129,9 @@ public:
     UFUNCTION(BlueprintImplementableEvent)
     void OnUnEquip();
 
-    //- Usable ------------------------------------------=
-    //
+    /////////////////////////////////////////////////////////////////
+    // Usable
+
     // TODO: Extract to UsableItem?
     UFUNCTION(BlueprintCallable)
     virtual void StartUse();
@@ -129,9 +143,9 @@ public:
     UFUNCTION(BlueprintImplementableEvent)
     void OnStopUse();
 
-//~ ============================================================= ~//
+//~ ========================================================================= ~//
 //  STATE MODIFIERS
-//~ ============================================================= ~//
+//~ ========================================================================= ~//
 private:
     UFUNCTION(BlueprintCallable)
     void EnableWorldCollision();

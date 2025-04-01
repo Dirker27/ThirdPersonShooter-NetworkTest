@@ -42,7 +42,7 @@ void ATPSMountableActor::Tick(float DeltaSeconds)
 
 void ATPSMountableActor::Mount(UTPSMountPoint* target)
 {
-    MountWithOffset(target, FTPSMountOffset());
+    MountWithOffset(target, MountOffset);
 }
 
 void ATPSMountableActor::MountWithOffset(UTPSMountPoint* target, FTPSMountOffset offset)
