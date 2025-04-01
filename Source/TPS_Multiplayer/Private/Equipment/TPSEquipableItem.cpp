@@ -5,12 +5,8 @@
 
 ATPSEquipableItem::ATPSEquipableItem()
 {
-	//USceneComponent* root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	//SetRootComponent(root);
-
 	CollisionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Collider"));
 	SetRootComponent(CollisionComponent);
-	//CollisionComponent->SetupAttachment(root);
 
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(CollisionComponent);
@@ -67,7 +63,7 @@ void ATPSEquipableItem::BeginDestroy()
 //  DEFAULT INTERFACE BEHAVIOR
 //~ ============================================================= ~//
 
-//- Equip --//
+//- Pickup --//
 
 void ATPSEquipableItem::Pickup()
 {

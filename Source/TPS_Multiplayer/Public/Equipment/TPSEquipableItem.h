@@ -30,7 +30,7 @@ class TPS_MULTIPLAYER_API ATPSEquipableItem : public ATPSMountableActor
 
 public:
     ATPSEquipableItem();
-    ~ATPSEquipableItem() {};
+    //~ATPSEquipableItem() {};
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

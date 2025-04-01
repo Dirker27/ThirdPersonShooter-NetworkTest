@@ -10,7 +10,7 @@
 #include "Weapon/TPSWeaponConfiguration.h"
 #include "Weapon/TPSWeaponState.h"
 
-#include "TPSRangedWeapon.generated.h"
+#include "TPSWeaponEquipment.generated.h"
 
 UDELEGATE(BlueprintAuthorityOnly, NetMulticast, Reliable)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformFire);
@@ -22,13 +22,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformEquip);
  * An Instance of a Weapon in the World that can be fired, dropped, and picked up.
  */
 UCLASS()
-class TPS_MULTIPLAYER_API ATPSRangedWeapon : public ATPSEquipableItem
+class TPS_MULTIPLAYER_API ATPSWeaponEquipment : public ATPSEquipableItem
 {
     GENERATED_BODY()
 
 public:
-    ATPSRangedWeapon();
-    ~ATPSRangedWeapon() {};
+    ATPSWeaponEquipment();
+    //~ATPSWeaponEquipment() {};
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -56,13 +56,22 @@ public:
     //////////////////////////////////////////////////////
     // Configuration
 
-    // Configuration
+    // Weapon Attributes (damage, spread, cycle rate, etc)
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPSWeapon|Configuration")
     TObjectPtr<UTPSWeaponConfiguration> Configuration;
-    //
+
     // UI Reticle
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
     TObjectPtr<UTPSWeaponReticle> Reticle;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
+    FTPSMountOffset WeaponHandOffset = FTPSMountOffset();
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
+    FTPSMountOffset WeaponHolsterOffset = FTPSMountOffset();
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
+    TObjectPtr<UTPSMountPoint> SecondaryHandMountLocation;
 
     //////////////////////////////////////////////////////
     // State

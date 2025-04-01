@@ -6,12 +6,12 @@
 
 #include "Projectile/TPSProjectile.h"
 #include "UObject/ObjectMacros.h"
-#include "Weapon/TPSRangedWeapon.h"
+#include "Weapon/TPSWeaponEquipment.h"
 
 #include "TPSProjectileLauncher.generated.h"
 
 UCLASS()
-class TPS_MULTIPLAYER_API ATPSProjectileLauncher : public ATPSRangedWeapon
+class TPS_MULTIPLAYER_API ATPSProjectileLauncher : public ATPSWeaponEquipment
 {
     GENERATED_BODY()
 

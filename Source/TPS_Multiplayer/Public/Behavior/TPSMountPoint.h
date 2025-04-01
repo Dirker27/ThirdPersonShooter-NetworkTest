@@ -25,10 +25,14 @@ struct TPS_MULTIPLAYER_API FTPSMountOffset
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
     FVector RelativeLocation = FVector::Zero();
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
     FVector RelativeEulerRotation = FVector::Zero();
 
-    //static FTPSMountOffset Zero() { return FTPSMountOffset(FVector::Zero(), FVector::Zero()); }
+    /*TPS_MULTIPLAYER_API static inline const FTPSMountOffset Zero = {
+        FVector::Zero(),
+        FVector::Zero()
+    };*/
 };
 
 UCLASS(BlueprintType)
@@ -39,7 +43,7 @@ class TPS_MULTIPLAYER_API UTPSMountPoint : public USceneComponent
 public:
     UTPSMountPoint();
 
-    void Attach(USceneComponent* InParent, FName InSocketName = NAME_None);
+    void BindToParentSocket(USceneComponent* InParent, FName InSocketName = NAME_None);
 
 //~ ============================================================= ~//
 //  Configuration
@@ -49,7 +53,7 @@ public:
     FTPSMountTarget Target;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MountPoint|Configuration")
-    FTPSMountOffset Offset;
+    FTPSMountOffset Offset = FTPSMountOffset();
 
 //~ ============================================================= ~//
 //  BEHAVIOR

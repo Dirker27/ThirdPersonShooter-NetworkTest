@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TPSEquipmentDefinition.h"
 
 #include "Equipment/TPSEquipableItem.h"
 #include "Equipment/TPSEquipmentSlot.h"
@@ -17,17 +16,6 @@ class TPS_MULTIPLAYER_API UTPSEquipmentLoadout : public UDataAsset
 
 public:
 
-    UPROPERTY(EditDefaultsOnly)
-    TMap<TEnumAsByte<ETPSEquipmentSlot>, UTPSEquipmentDefinition*> EquipmentBySlot;
-
-    UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<ATPSEquipableItem> PrimaryWeapon;
-    UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<ATPSEquipableItem> SecondaryWeapon;
-    UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<ATPSEquipableItem> TertiaryWeapon;
-    UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<ATPSEquipableItem> LethalEquipment;
-    UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<ATPSEquipableItem> TacticalEquipment;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TMap<TEnumAsByte<ETPSEquipmentSlot>, TSubclassOf<ATPSEquipableItem>> EquipmentBySlot;
 };

@@ -29,10 +29,9 @@ protected:
 public:
     //- Configuration -----------------------------------=
     //
-    //- Offset from Mount target
+    // Offset from Mount target
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|Configuration")
-    FVector MountOffset = FVector::Zero();
-    FTPSMountOffset MountPointOffset;
+    FTPSMountOffset MountOffset;
     //
     //- Should Rotate?
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|Configuration")
@@ -44,9 +43,10 @@ public:
 
     //- State ---------------------------------------------=
     //
-    //- Active(?) Mount Point
+    // Active(?) Mount Point
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|State", Replicated)
     TObjectPtr<UTPSMountPoint> MountPoint = nullptr;
+    //
     // Is Currently Mounted to a MountPoint Target.
     UFUNCTION(BlueprintCallable)
     bool IsMounted() { return IsValid(MountPoint); }
@@ -57,6 +57,8 @@ public:
 public:
     UFUNCTION(BlueprintCallable)
     void Mount (UTPSMountPoint* target);
+    UFUNCTION(BlueprintCallable)
+    void MountWithOffset(UTPSMountPoint* target, FTPSMountOffset offset);
     UFUNCTION(BlueprintImplementableEvent)
     void OnMount();
 

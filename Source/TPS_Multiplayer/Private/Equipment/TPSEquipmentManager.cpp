@@ -40,25 +40,6 @@ UTPSEquipmentManager::UTPSEquipmentManager(const FObjectInitializer& ObjectIniti
                 FName(prefix.Append(ETPSEquipmentHarnessSlotToString(harnessSocket.Key))))
         );
     }
-
-    /*PrimaryWeaponHand = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-PrimaryWeaponHand"));
-    SecondaryWeaponHand = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-SecondaryWeaponHand"));
-
-    BackHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-BackHolster"));
-    LeftHipHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-LeftHipHolster"));
-    LeftLegHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-LeftLegHolster"));
-    RightHipHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-RightHipHolster"));
-    RightLegHolster = CreateDefaultSubobject<UTPSMountPoint>(TEXT("MP-RightLegHolster"));*/
-
-    /*PrimaryWeaponHandBone = FName(TEXT("hand_r"));
-    SecondaryWeaponHandBone = FName(TEXT("hand_l"));
-
-    BackHolsterBone = FName(TEXT("spine_05"));
-    LeftHipHolsterBone = FName(TEXT("thigh_l"));
-    LeftLegHolsterBone = FName(TEXT("calf_l"));
-    RightHipHolsterBone = FName(TEXT("thigh_r"));
-    // Actually the Front-Chest holster for now
-    RightLegHolsterBone = FName(TEXT("spine_04"));*/
 }
 
 void UTPSEquipmentManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
@@ -67,12 +48,6 @@ void UTPSEquipmentManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
     DOREPLIFETIME(UTPSEquipmentManager, ActiveEquipmentSlot);
 
     DOREPLIFETIME(UTPSEquipmentManager, EquipmentMap);
-
-    DOREPLIFETIME(UTPSEquipmentManager, PrimaryWeaponInstance);
-    DOREPLIFETIME(UTPSEquipmentManager, SecondaryWeaponInstance);
-    DOREPLIFETIME(UTPSEquipmentManager, TertiaryWeaponInstance);
-    DOREPLIFETIME(UTPSEquipmentManager, LethalEquipmentInstance);
-    DOREPLIFETIME(UTPSEquipmentManager, TacticalEquipmentInstance);
 }
 
 void UTPSEquipmentManager::BeginPlay()
@@ -96,12 +71,10 @@ void UTPSEquipmentManager::Initialize()
     if (IsValid(Loadout)) {
         InstantiateLoadout();
 
-        EquipToPrimaryHolster(GetItemFromEquipmentSlot(PrimaryWeapon));
-        EquipToSecondaryHolster(GetItemFromEquipmentSlot(SecondaryWeapon));
-        EquipToBackHolster(GetItemFromEquipmentSlot(TertiaryWeapon));
-
-        EquipToLethalHolster(GetItemFromEquipmentSlot(LethalEquipment));
-        EquipToTacticalHolster(GetItemFromEquipmentSlot(TacticalEquipment));
+        for (auto entry : EquipmentMap)
+        {
+            EquipWeaponToHolster(entry.Value, entry.Key);
+        }
     }
 
     // For characters who should spawn equipped.
@@ -116,65 +89,14 @@ void UTPSEquipmentManager::BindToMesh(USkeletalMeshComponent* mesh)
 {
     TargetMesh = mesh;
 
-    /*PrimaryWeaponHand->Target.ParentComponent = TargetMesh;
-    SecondaryWeaponHand->TargetParentComponent = TargetMesh;
-
-    BackHolster->TargetParentComponent = TargetMesh;
-    LeftHipHolster->TargetParentComponent = TargetMesh;
-    LeftLegHolster->TargetParentComponent = TargetMesh;
-    RightHipHolster->TargetParentComponent = TargetMesh;
-    RightLegHolster->TargetParentComponent = TargetMesh;
-
-    PrimaryWeaponHand->TargetSocketName = FName(TEXT("hand_r"));
-    SecondaryWeaponHand->TargetSocketName = FName(TEXT("hand_l"));
-
-    BackHolster->TargetSocketName = FName(TEXT("spine_05"));
-    LeftHipHolster->TargetSocketName = FName(TEXT("thigh_l"));
-    LeftLegHolster->TargetSocketName = FName(TEXT("calf_l"));
-    RightHipHolster->TargetSocketName = FName(TEXT("thigh_r"));
-    RightLegHolster->TargetSocketName = FName(TEXT("calf_r"));*/
 
     if (IsValid(mesh)) {
         UE_LOG(LogTemp, Log, TEXT("Mounting Holsters..."));
 
         for (auto entry : HarnessMountPointMap)
         {
-            entry.Value->Attach(mesh, *HarnessSocketMap.Find(entry.Key));
+            entry.Value->BindToParentSocket(mesh, *HarnessSocketMap.Find(entry.Key));
         }
-
-        // ---
-
-        /*
-        if (IsValid(PrimaryWeaponHand) && !PrimaryWeaponHandBone.IsNone())
-        {
-            PrimaryWeaponHand->Attach(mesh, PrimaryWeaponHandBone);
-        }
-        if (IsValid(SecondaryWeaponHand) && !SecondaryWeaponHandBone.IsNone())
-        {
-            SecondaryWeaponHand->Attach(mesh, SecondaryWeaponHandBone);
-        }
-
-        if (IsValid(BackHolster) && !BackHolsterBone.IsNone())
-        {
-            BackHolster->Attach(mesh, BackHolsterBone);
-        }
-        if (IsValid(LeftHipHolster) && !LeftHipHolsterBone.IsNone())
-        {
-            LeftHipHolster->Attach(mesh, LeftHipHolsterBone);
-        }
-        if (IsValid(LeftLegHolster) && !LeftLegHolsterBone.IsNone())
-        {
-            LeftLegHolster->Attach(mesh, LeftLegHolsterBone);
-        }
-        if (IsValid(RightHipHolster) && !RightHipHolsterBone.IsNone())
-        {
-            RightHipHolster->Attach(mesh, RightHipHolsterBone);
-        }
-        if (IsValid(RightLegHolster) && !RightLegHolsterBone.IsNone())
-        {
-            RightLegHolster->Attach(mesh, RightLegHolsterBone);
-        }
-        */
     }
 }
 
@@ -197,25 +119,12 @@ void UTPSEquipmentManager::InstantiateLoadout()
 {
     if (!IsValid(Loadout)) { return; }
 
-    if (IsValid(Loadout->PrimaryWeapon)) {
-        UE_LOG(LogTemp, Log, TEXT("Instantiating Primary Weapon [%s]..."), *Loadout->PrimaryWeapon->GetName());
-        InstantiateAndAssignEquipmentToSlot(Loadout->PrimaryWeapon, PrimaryWeapon);
-    }
-    if (IsValid(Loadout->SecondaryWeapon)) {
-        UE_LOG(LogTemp, Log, TEXT("Instantiating Secondary Weapon [%s]..."), *Loadout->SecondaryWeapon->GetName());
-        InstantiateAndAssignEquipmentToSlot(Loadout->SecondaryWeapon, SecondaryWeapon);
-    }
-    if (IsValid(Loadout->TertiaryWeapon)) {
-        UE_LOG(LogTemp, Log, TEXT("Instantiating Tertiary Weapon [%s]..."), *Loadout->TertiaryWeapon->GetName());
-        InstantiateAndAssignEquipmentToSlot(Loadout->TertiaryWeapon, TertiaryWeapon);
-    }
-    if (IsValid(Loadout->TacticalEquipment)) {
-        UE_LOG(LogTemp, Log, TEXT("Instantiating Tactical Equipment [%s]..."), *Loadout->TacticalEquipment->GetName());
-        InstantiateAndAssignEquipmentToSlot(Loadout->TacticalEquipment, TacticalEquipment);
-    }
-    if (IsValid(Loadout->LethalEquipment)) {
-        UE_LOG(LogTemp, Log, TEXT("Instantiating Lethal Equipment [%s]..."), *Loadout->LethalEquipment->GetName());
-        InstantiateAndAssignEquipmentToSlot(Loadout->LethalEquipment, LethalEquipment);
+    for (auto entry : Loadout->EquipmentBySlot)
+    {
+        if (IsValid(entry.Value)) {
+            UE_LOG(LogTemp, Log, TEXT("Instantiating[%hs]..."), ETPSEquipmentSlotToString(entry.Key));
+            InstantiateAndAssignEquipmentToSlot(entry.Value, entry.Key);
+        }
     }
 }
 
@@ -295,25 +204,6 @@ void UTPSEquipmentManager::PickupAndAssignEquipmentToSlot(ATPSEquipableItem* equ
         DropEquipmentFromSlot(slot);
     }
 
-    /*
-    switch (slot)
-    {
-    case PrimaryWeapon:
-        PrimaryWeaponInstance = equipmentItem;
-        break;
-    case SecondaryWeapon:
-        SecondaryWeaponInstance = equipmentItem;
-        break;
-    case TertiaryWeapon:
-        TertiaryWeaponInstance = equipmentItem;
-        break;
-    case LethalEquipment:
-        LethalEquipmentInstance = equipmentItem;
-        break;
-    case TacticalEquipment:
-        TacticalEquipmentInstance = equipmentItem;
-        break;
-    }*/
     EquipmentMap.Add(slot, equipmentItem);
 
     equipmentItem->Pickup();
@@ -324,48 +214,20 @@ void UTPSEquipmentManager::PickupAndAssignEquipmentToSlot(ATPSEquipableItem* equ
 void UTPSEquipmentManager::DropEquipmentFromSlot(ETPSEquipmentSlot slot)
 {
     ATPSEquipableItem* item = *EquipmentMap.Find(slot);
-    if (item == nullptr) { return; }
+    if (!IsValid(item)) { return; }
 
-    item->Drop();
     EquipmentMap.Remove(slot);
-
-    /*
-    switch (slot)
-    {
-    case PrimaryWeapon:
-        item = PrimaryWeaponInstance;
-        PrimaryWeaponInstance = nullptr;
-        break;
-    case SecondaryWeapon:
-        item = SecondaryWeaponInstance;
-        SecondaryWeaponInstance = nullptr;
-        break;
-    case TertiaryWeapon:
-        item = TertiaryWeaponInstance;
-        TertiaryWeaponInstance = nullptr;
-        break;
-    case LethalEquipment:
-        item = LethalEquipmentInstance;
-        LethalEquipmentInstance = nullptr;
-        break;
-    case TacticalEquipment:
-        item = TacticalEquipmentInstance;
-        TacticalEquipmentInstance = nullptr;
-        break;
-    }
-
-    if (IsValid(item))
-    {
-        item->Drop();
-    }*/
+    item->Drop();
 }
 void UTPSEquipmentManager::DropAll()
 {
-    DropEquipmentFromSlot(PrimaryWeapon);
-    DropEquipmentFromSlot(SecondaryWeapon);
-    DropEquipmentFromSlot(TertiaryWeapon);
-    DropEquipmentFromSlot(LethalEquipment);
-    DropEquipmentFromSlot(TacticalEquipment);
+    TArray<TEnumAsByte<ETPSEquipmentSlot>> activeSlots;
+    EquipmentMap.GetKeys(activeSlots);
+
+    for (ETPSEquipmentSlot slot : activeSlots)
+    {
+        DropEquipmentFromSlot(slot);
+    }
 }
 
 

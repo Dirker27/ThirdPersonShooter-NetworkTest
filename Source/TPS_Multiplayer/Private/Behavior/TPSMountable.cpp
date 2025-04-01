@@ -4,6 +4,8 @@
 
 #include "Net/UnrealNetwork.h"
 
+//template<> const FTPSMountOffset FTPSMountOffset::Zero(FVector::Zero(), FVector::Zero());
+
 ATPSMountableActor::ATPSMountableActor()
 {
     bReplicates = true;
@@ -22,6 +24,11 @@ void ATPSMountableActor::BeginPlay()
     Super::BeginPlay();
 
     if (IsValid(MountPoint)) {
+        if (ShouldCaptureOffsetOnStart)
+        {
+            MountOffset.RelativeLocation = GetTransform().GetLocation();
+            MountOffset.RelativeLocation = GetTransform().GetRotation().Euler();
+        }
         Mount(MountPoint);
     }
 }
@@ -35,22 +42,28 @@ void ATPSMountableActor::Tick(float DeltaSeconds)
 
 void ATPSMountableActor::Mount(UTPSMountPoint* target)
 {
+    MountWithOffset(target, FTPSMountOffset());
+}
+
+void ATPSMountableActor::MountWithOffset(UTPSMountPoint* target, FTPSMountOffset offset)
+{
     if (!IsValid(target) || !IsValid(target->Target.ParentComponent.Get())) { return; }
 
     MountPoint = target;
 
     AttachToComponent(
-        target,//target->Target.ParentComponent.Get(),
-        FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-        FName());//target->Target.SocketName);
+        target,
+        FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
-    SetActorRelativeLocation(MountOffset);
-    //SetActorRelativeRotation(target->Offset.RelativeEulerRotation.Rotation());
+    SetActorRelativeLocation(offset.RelativeLocation);
+    if (ShouldApplyRotation) {
+        SetActorRelativeRotation(offset.RelativeEulerRotation.Rotation());
+    }
 
     OnMount();
     UE_LOG(LogTemp, Log, TEXT("Mounted to Target[%s]-[%s] with Offset[%s]."),
         *target->Target.ParentComponent.Get()->GetName(), *target->Target.SocketName.ToString(),
-        *target->Offset.RelativeLocation.ToString());
+        *offset.RelativeLocation.ToString());
 }
 
 void ATPSMountableActor::UnMount()

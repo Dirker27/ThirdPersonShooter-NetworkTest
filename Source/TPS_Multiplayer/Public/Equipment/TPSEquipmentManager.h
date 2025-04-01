@@ -36,98 +36,54 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
     TEnumAsByte<ETPSEquipmentSlot> ActiveEquipmentSlot;
 
-    //WeaponController weaponController;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
     TObjectPtr<UTPSEquipmentLoadout> Loadout;
 
 //~ ============================================================= ~//
 //  CONFIGURATION
 //~ ============================================================= ~//
-public:
+protected:
     //////////////////////////////////////////////////////
     // Target Mesh Configuration
 
-    // Parent Mesh
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
+    // Parent Mesh - Bound on Startup
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
     TWeakObjectPtr<USkeletalMeshComponent> TargetMesh;
 
+    // Owner's ASC (integrates to equipment w/ owner GAS) - Bound on Startup
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
+    TWeakObjectPtr<UAbilitySystemComponent> OwnerAsc;
+
+    // HarnessSlot -> Mesh SocketName (MountPoint setup only)
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
     TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, FName> HarnessSocketMap;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
-    TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, UTPSMountPoint*> HarnessMountPointMap;
-
+    // EquipmentSlot -> HarnessSlot (when holstered)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
     TMap<TEnumAsByte<ETPSEquipmentSlot>, TEnumAsByte<ETPSEquipmentHarnessSlot>> EquipmentHolsterMap;
 
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
-    TMap<TEnumAsByte<ETPSEquipmentSlot>, ATPSEquipableItem*> EquipmentMap;// = //TMap<TEnumAsByte<ETPSEquipmentSlot>, ATPSEquipableItem*>::Empty();
-
-
-    //
-    // Weapon Hands
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    FName PrimaryWeaponHandBone;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    FName SecondaryWeaponHandBone;
-    //
-    // Hip Holsters
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    FName LeftHipHolsterBone;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    FName RightHipHolsterBone;
-    //
-    // Leg Holsters
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    FName LeftLegHolsterBone;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    FName RightLegHolsterBone;
-    //
-    // Back Holsters
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    FName BackHolsterBone;
-
 //~ ============================================================= ~//
 //  COMPONENTS
 //~ ============================================================= ~//
-protected:
-    //////////////////////////////////////////////////////
-    // Mount Targets
-    
-    // Weapon Hands
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    TObjectPtr<UTPSMountPoint> PrimaryWeaponHand;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    TObjectPtr<UTPSMountPoint> SecondaryWeaponHand;
-    //
-    // Hip Holsters
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    TObjectPtr<UTPSMountPoint> LeftHipHolster;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    TObjectPtr<UTPSMountPoint> RightHipHolster;
-    //
-    // Leg Holsters
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    TObjectPtr<UTPSMountPoint> LeftLegHolster;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    TObjectPtr<UTPSMountPoint> RightLegHolster;
-    //
-    // Back Holsters
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    TObjectPtr<UTPSMountPoint> BackHolster;
-
-
 public:
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
-    TWeakObjectPtr<UAbilitySystemComponent> OwnerAsc;
+    // HarnessSlot -> MountPoint
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
+    TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, UTPSMountPoint*> HarnessMountPointMap;
+
+    // Equipment Instances
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
+    TMap<TEnumAsByte<ETPSEquipmentSlot>, ATPSEquipableItem*> EquipmentMap;
 
 
 //~ ============================================================= ~//
 //  PUBLIC OPERATIONS
 //~ ============================================================= ~//
 public:
+
+    //////////////////////////////////////////////////////
+    // Startup and Binding
+
     //UFUNCTION(BlueprintCallable)
     void BindToMesh(USkeletalMeshComponent* mesh);
 
@@ -135,25 +91,44 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void Initialize();
+
+protected:
     UFUNCTION(BlueprintCallable)
     void InstantiateLoadout();
 
+public:
+    //////////////////////////////////////////////////////
+    // Target Mesh Configuration
+
+    // Equip the current ActiveWeaponSlot to the armed hand.
+    //   If no equipment is currently active, pick the first available slot.
     UFUNCTION(BlueprintCallable)
     void Ready();
+
+    // Stow the currently Equipped Weapon, but don't change the active slot.
     UFUNCTION(BlueprintCallable)
     void UnReady();
 
+    //////////////////////////////////////////////////////
+    // Drop / Pickup Items
+
+    // Pick up a new item and bind it to the designated equipment slot.
+    //   - Bound GAS abilities/attributes will be applied to owner's ASC.
+    //   - If slot is occupied, that equipment item will be dropped.
     UFUNCTION(BlueprintCallable)
     void PickupAndAssignEquipmentToSlot(ATPSEquipableItem* equipmentItem, ETPSEquipmentSlot slot);
+    // Drops an equipment item from 
     UFUNCTION(BlueprintCallable)
     void DropEquipmentFromSlot(ETPSEquipmentSlot slot);
     UFUNCTION(BlueprintCallable)
     void DropAll();
 
+
     UFUNCTION(BlueprintCallable)
     void DestroyItemAtSlot(ETPSEquipmentSlot slot);
     UFUNCTION(BlueprintCallable)
     void DestroyAll();
+
 
     UFUNCTION(BlueprintCallable)
     void EquipPrimary();
@@ -165,6 +140,7 @@ public:
     void EquipLethalThrowable();
     UFUNCTION(BlueprintCallable)
     void EquipTacticalThrowable();
+
 
     UFUNCTION(BlueprintCallable)
     void WeaponSwap();
