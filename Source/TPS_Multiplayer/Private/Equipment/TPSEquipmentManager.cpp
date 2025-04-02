@@ -58,7 +58,7 @@ void UTPSEquipmentManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
     DOREPLIFETIME(UTPSEquipmentManager, ActiveEquipmentSlot);
 
-    DOREPLIFETIME(UTPSEquipmentManager, EquipmentMap);
+    //DOREPLIFETIME(UTPSEquipmentManager, EquipmentMap);
 }
 
 void UTPSEquipmentManager::BeginPlay()

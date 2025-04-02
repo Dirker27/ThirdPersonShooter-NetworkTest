@@ -4,8 +4,9 @@
 
 UTPSMountPoint::UTPSMountPoint()
 {
-    //bVisualizeComponent = true;
+    bVisualizeComponent = true;
     bHiddenInGame = false;
+    SetIsReplicated(true);
 }
 
 void UTPSMountPoint::BindToParentSocket(USceneComponent* InParent, FName InSocketName)

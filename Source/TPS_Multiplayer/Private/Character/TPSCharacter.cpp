@@ -422,8 +422,6 @@ void ATPSCharacter::PerformDeath()
 		controller->NotifyPawnDeath();
 	}
 
-	EquipmentManager->DropAll();
-
 	OnDeath();
 }
 
