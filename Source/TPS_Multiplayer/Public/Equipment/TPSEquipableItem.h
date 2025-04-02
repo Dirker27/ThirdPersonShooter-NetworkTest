@@ -73,11 +73,11 @@ public:
     // Configuration
 
     // Effects to be applied to the owning Pawn's ASC when in inventory (passive)
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPS|Configuration")
     TArray<TSubclassOf<UGameplayEffect>> PassiveEffects;
 
     // Effects to be applied to the owning Pawn's ASC when equipped (active)
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPS|Configuration")
     TArray<TSubclassOf<UGameplayEffect>> ActiveEffects;
 
     // Offset to use when item is mounted to a Pawn. (not armed)

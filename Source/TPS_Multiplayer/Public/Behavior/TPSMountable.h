@@ -45,11 +45,11 @@ public:
     //
     // Active(?) Mount Point
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|State", Replicated)
-    UTPSMountPoint* MountPoint = nullptr;
+    TWeakObjectPtr<UTPSMountPoint> MountPoint = nullptr;
     //
     // Is Currently Mounted to a MountPoint Target.
     UFUNCTION(BlueprintCallable)
-    bool IsMounted() { return IsValid(MountPoint); }
+    bool IsMounted() { return MountPoint.IsValid(); }
 
 //~ ============================================================= ~//
 //  BEHAVIOR

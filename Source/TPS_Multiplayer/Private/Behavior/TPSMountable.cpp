@@ -23,13 +23,13 @@ void ATPSMountableActor::BeginPlay()
 {
     Super::BeginPlay();
 
-    if (IsValid(MountPoint)) {
+    if (MountPoint.IsValid()) {
         if (ShouldCaptureOffsetOnStart)
         {
             MountOffset.RelativeLocation = GetTransform().GetLocation();
             MountOffset.RelativeLocation = GetTransform().GetRotation().Euler();
         }
-        Mount(MountPoint);
+        Mount(MountPoint.Get());
     }
 }
 

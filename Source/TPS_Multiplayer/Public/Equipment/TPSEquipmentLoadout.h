@@ -18,6 +18,4 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TMap<TEnumAsByte<ETPSEquipmentSlot>, TSubclassOf<ATPSEquipableItem>> EquipmentBySlot;
-
-
 };

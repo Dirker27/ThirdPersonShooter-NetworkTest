@@ -14,6 +14,7 @@ UTPSEquipmentManager::UTPSEquipmentManager(const FObjectInitializer& ObjectIniti
 
     HarnessSocketMap.Add(PrimaryHand, "hand_r");
     HarnessSocketMap.Add(SecondaryHand, "hand_l");
+
     HarnessSocketMap.Add(LegHolster_Left, "thigh_l");
     HarnessSocketMap.Add(LegHolster_Right, "thigh_r");
     HarnessSocketMap.Add(ChestHolster_Pistol, "spine_05");
@@ -26,11 +27,20 @@ UTPSEquipmentManager::UTPSEquipmentManager(const FObjectInitializer& ObjectIniti
     HarnessSocketMap.Add(WeaponBelt_Left, "pelvis");
     HarnessSocketMap.Add(WeaponBelt_Right, "pelvis");
 
+    HarnessSocketMap.Add(Headgear, "head");
+    HarnessSocketMap.Add(Backpack, "spine_05");
+    HarnessSocketMap.Add(Vest, "spine_05");
+    HarnessSocketMap.Add(Belt, "pelvis");
+
     EquipmentHolsterMap.Add(PrimaryWeapon, ChestHolster_Rifle);
-    EquipmentHolsterMap.Add(SecondaryWeapon, LegHolster_Right);
+    EquipmentHolsterMap.Add(SecondaryWeapon, WeaponBelt_Rear);
     EquipmentHolsterMap.Add(TertiaryWeapon, BackHolster_Left);
     EquipmentHolsterMap.Add(LethalEquipment, WeaponBelt_Left);
-    EquipmentHolsterMap.Add(TacticalEquipment, WeaponBelt_Rear);
+    EquipmentHolsterMap.Add(TacticalEquipment, WeaponBelt_Right);
+
+    EquipmentHolsterMap.Add(Helmet, Headgear);
+    EquipmentHolsterMap.Add(PlateCarrier, Vest);
+    EquipmentHolsterMap.Add(Pack, Backpack);
 
     for (auto harnessSocket : HarnessSocketMap)
     {
@@ -374,8 +384,10 @@ ATPSEquipableItem* UTPSEquipmentManager::GetItemFromEquipmentSlot(ETPSEquipmentS
 
 UTPSMountPoint* UTPSEquipmentManager::GetHolsterMountPointForEquipmentSlot(ETPSEquipmentSlot slot)
 {
-    ETPSEquipmentHarnessSlot s = *EquipmentHolsterMap.Find(slot);
-    UTPSMountPoint** mp = HarnessMountPointMap.Find(s);
+    TEnumAsByte<ETPSEquipmentHarnessSlot>* s = EquipmentHolsterMap.Find(slot);
+    if (s == nullptr) { return nullptr; }
+
+    UTPSMountPoint** mp = HarnessMountPointMap.Find(*s);
 
     if (mp != nullptr)
     {

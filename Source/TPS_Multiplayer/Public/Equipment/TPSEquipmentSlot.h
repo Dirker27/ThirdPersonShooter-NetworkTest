@@ -10,12 +10,16 @@
 UENUM(BlueprintType)
 enum ETPSEquipmentSlot : int
 {
-	None = 0,
-	PrimaryWeapon = 1,
-	SecondaryWeapon = 2,
-	TertiaryWeapon = 3,
-	LethalEquipment = 4,
-	TacticalEquipment = 5
+	None,
+	PrimaryWeapon,
+	SecondaryWeapon,
+	TertiaryWeapon,
+	LethalEquipment,
+	TacticalEquipment,
+
+	Helmet,
+	PlateCarrier,
+	Pack
 };
 
 static const char* ETPSEquipmentSlotToString(const ETPSEquipmentSlot slot) {
@@ -36,8 +40,6 @@ static const char* ETPSEquipmentSlotToString(const ETPSEquipmentSlot slot) {
 		return "UNSUPPORTED";
 	}
 }
-
-
 
 
 UENUM(BlueprintType)
@@ -81,12 +83,12 @@ static const char* ETPSEquipmentHarnessSlotToString(const ETPSEquipmentHarnessSl
 	case Vest:
 		return "Vest";
 	case Belt:
-		return "Best";
+		return "Belt";
 
 	case LegHolster_Left:
-		return "LeftLegHolster";
+		return "LegHolster-Left";
 	case LegHolster_Right:
-		return "RightLegHolster";
+		return "LegHolster-Right";
 
 	case ChestHolster_Pistol:
 		return "PistolChestHolster";
@@ -102,13 +104,13 @@ static const char* ETPSEquipmentHarnessSlotToString(const ETPSEquipmentHarnessSl
 		return "CrossBackHolster";
 
 	case WeaponBelt_Front:
-		return "BeltHolsterFront";
+		return "BeltHolster-Front";
 	case WeaponBelt_Rear:
-		return "BeltHolsterRear";
+		return "BeltHolster-Rear";
 	case WeaponBelt_Left:
-		return "BeltHolsterLeft";
+		return "BeltHolster-Left";
 	case WeaponBelt_Right:
-		return "BeltHolsterRight";
+		return "BeltHolster-Right";
 
 	default:
 		return "UNSUPPORTED";
