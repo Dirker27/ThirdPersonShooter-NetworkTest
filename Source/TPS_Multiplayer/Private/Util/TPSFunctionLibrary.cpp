@@ -50,6 +50,7 @@ ATPSCharacter* UTPSFunctionLibrary::GetNearestPlayableCharacter(const UObject* w
 
         if (distance < nearestDistance
             && character->CanBePossessedByPlayer
+            && character->IsAlive()
             && !character->IsPlayerControlled()
             && !toIgnore.Contains(actor))
         {

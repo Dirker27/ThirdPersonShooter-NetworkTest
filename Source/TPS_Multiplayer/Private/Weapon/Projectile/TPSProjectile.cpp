@@ -148,6 +148,14 @@ void ATPSProjectile::CharacterHit(ATPSCharacter* character, FHitResult hit)
 {
 	if (!hit.IsValidBlockingHit() || !IsValid(character)) { return; }
 
+	// Carry-Over Physics to Mesh
+	if (HasAuthority() && hit.GetComponent()->IsSimulatingPhysics())
+	{
+		FVector impulse = UTPSFunctionLibrary::CalculateImpulseJoules(
+			GetVelocity(), CollisionComponent->GetMass());
+		hit.GetComponent()->AddImpulseAtLocation(impulse, hit.Location, "None");
+	}
+
 	OnCharacterHit(character, hit);
 }
 

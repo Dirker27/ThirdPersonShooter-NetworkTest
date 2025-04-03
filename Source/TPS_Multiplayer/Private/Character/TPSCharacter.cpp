@@ -120,6 +120,8 @@ void ATPSCharacter::BeginDestroy()
 	Super::BeginDestroy();
 
 	UE_LOG(LogTemp, Log, TEXT("Destroying Character[%s]..."), *Name);
+
+	EquipmentManager->DestroyAll();
 }
 
 
@@ -285,11 +287,12 @@ void ATPSCharacter::ApplyCharacterState(const ETPSCharacterState CharacterState)
 	PreviousCharacterState = CurrentCharacterState;
 	CurrentCharacterState = CharacterState;
 
+	// TODO: State Transitions Engine
 	if (CurrentCharacterState == Combat)
 	{
 		EquipmentManager->Ready();
 	}
-	else if (PreviousCharacterState == Combat)
+	else if (PreviousCharacterState == Combat && CurrentCharacterState != Incapacitated)
 	{
 		EquipmentManager->UnReady();
 	}

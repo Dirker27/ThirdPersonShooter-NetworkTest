@@ -73,7 +73,7 @@ void UTPSEquipmentManager::BeginDestroy()
     Super::BeginDestroy();
 
     UE_LOG(LogTemp, Log, TEXT("Destroying EquipmentManager sub-component and all managed Equipment items..."));
-    DestroyAll();
+    //DestroyAll();
 }
 
 
@@ -275,11 +275,14 @@ void UTPSEquipmentManager::DestroyItemAtSlot(ETPSEquipmentSlot slot)
 }
 void UTPSEquipmentManager::DestroyAll()
 {
-    for (auto EquipmentSlot : EquipmentMap)
+    TArray<TEnumAsByte<ETPSEquipmentSlot>> activeSlots;
+    EquipmentMap.GetKeys(activeSlots);
+
+    for (ETPSEquipmentSlot slot : activeSlots)
     {
-        EquipmentSlot.Value->Destroy();
+        ATPSEquipableItem* item = EquipmentMap.FindAndRemoveChecked(slot);
+        item->Destroy();
     }
-    EquipmentMap.Empty();
 }
 
 
