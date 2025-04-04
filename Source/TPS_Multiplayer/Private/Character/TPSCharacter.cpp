@@ -115,15 +115,6 @@ void ATPSCharacter::BeginPlay()
 	SyncAttributesFromGAS();
 }
 
-void ATPSCharacter::BeginDestroy()
-{
-	Super::BeginDestroy();
-
-	UE_LOG(LogTemp, Log, TEXT("Destroying Character[%s]..."), *Name);
-
-	EquipmentManager->DestroyAll();
-}
-
 
 //~ ============================================================= ~//
 //  GAME LOOP

@@ -66,14 +66,9 @@ void UTPSEquipmentManager::BeginPlay()
     Super::BeginPlay();
 
     SetIsReplicated(true);
-}
 
-void UTPSEquipmentManager::BeginDestroy()
-{
-    Super::BeginDestroy();
-
-    UE_LOG(LogTemp, Log, TEXT("Destroying EquipmentManager sub-component and all managed Equipment items..."));
-    //DestroyAll();
+    // Re-bind with BP overrides.
+    //BindToMesh(TargetMesh.Get());
 }
 
 
@@ -106,7 +101,14 @@ void UTPSEquipmentManager::BindToMesh(USkeletalMeshComponent* mesh)
 
         for (auto entry : HarnessMountPointMap)
         {
-            entry.Value->BindToParentSocket(mesh, *HarnessSocketMap.Find(entry.Key));
+            FName* socket = HarnessSocketMap.Find(entry.Key);
+            if (socket != nullptr) {
+                entry.Value->BindToParentSocket(mesh, *HarnessSocketMap.Find(entry.Key));
+            } else
+            {
+                UE_LOG(LogTemp, Log, TEXT("FAILED to bind socket for slot[%hs]..."),
+                    ETPSEquipmentHarnessSlotToString(entry.Key));
+            }
         }
     }
 }
@@ -135,6 +137,23 @@ void UTPSEquipmentManager::InstantiateLoadout()
         if (IsValid(entry.Value)) {
             UE_LOG(LogTemp, Log, TEXT("Instantiating[%hs]..."), ETPSEquipmentSlotToString(entry.Key));
             InstantiateAndAssignEquipmentToSlot(entry.Value, entry.Key);
+        }
+    }
+
+    for (auto entry : Loadout->PassiveEquipmentBySlot)
+    {
+        if (IsValid(entry.Value)) {
+            UE_LOG(LogTemp, Log, TEXT("Instantiating[%hs]..."), ETPSEquipmentHarnessSlotToString(entry.Key));
+
+            ATPSEquipableItem* item = GetWorld()->SpawnActor<ATPSEquipableItem>(entry.Value);
+
+            PassiveEquipmentMap.Add(entry.Key, item);
+
+            item->Pickup();
+            item->OwnerAsc = OwnerAsc;
+
+            item->MountWithOffset(*HarnessMountPointMap.Find(entry.Key), item->WeaponHolsterOffset);
+            item->Equip();
         }
     }
 }

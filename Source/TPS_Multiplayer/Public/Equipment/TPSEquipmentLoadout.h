@@ -18,4 +18,7 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TMap<TEnumAsByte<ETPSEquipmentSlot>, TSubclassOf<ATPSEquipableItem>> EquipmentBySlot;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, TSubclassOf<ATPSEquipableItem>> PassiveEquipmentBySlot;
 };

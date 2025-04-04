@@ -52,13 +52,6 @@ void ATPSEquipableItem::BeginPlay()
 	}
 }
 
-void ATPSEquipableItem::BeginDestroy()
-{
-	Super::BeginDestroy();
-
-	UE_LOG(LogTemp, Log, TEXT("Destroying EquipableItemInstance[%s]..."), *Name);
-}
-
 //~ ============================================================= ~//
 //  DEFAULT INTERFACE BEHAVIOR
 //~ ============================================================= ~//

@@ -27,7 +27,6 @@ public:
 protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-    virtual void BeginDestroy() override;
 
 //~ ============================================================= ~//
 //  STATE
@@ -74,6 +73,9 @@ public:
     // Equipment Instances
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
     TMap<TEnumAsByte<ETPSEquipmentSlot>, ATPSEquipableItem*> EquipmentMap;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
+    TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, ATPSEquipableItem*> PassiveEquipmentMap;
 
 
 //~ ============================================================= ~//
