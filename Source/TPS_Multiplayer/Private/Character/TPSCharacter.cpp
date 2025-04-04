@@ -281,7 +281,7 @@ void ATPSCharacter::ApplyCharacterState(const ETPSCharacterState CharacterState)
 	// TODO: State Transitions Engine
 	if (CurrentCharacterState == Combat)
 	{
-		EquipmentManager->Ready();
+		//EquipmentManager->Ready();
 	}
 	else if (PreviousCharacterState == Combat && CurrentCharacterState != Incapacitated)
 	{
