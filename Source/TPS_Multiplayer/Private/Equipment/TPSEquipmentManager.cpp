@@ -12,35 +12,7 @@ UTPSEquipmentManager::UTPSEquipmentManager(const FObjectInitializer& ObjectIniti
 {
     //Loadout = CreateDefaultSubobject<UTPSEquipmentLoadout>(TEXT("DefaultLoadout"));
 
-    HarnessSocketMap.Add(PrimaryHand, "hand_r");
-    HarnessSocketMap.Add(SecondaryHand, "hand_l");
-
-    HarnessSocketMap.Add(LegHolster_Left, "thigh_l");
-    HarnessSocketMap.Add(LegHolster_Right, "thigh_r");
-    HarnessSocketMap.Add(ChestHolster_Pistol, "spine_05");
-    HarnessSocketMap.Add(ChestHolster_Rifle, "spine_03");
-    HarnessSocketMap.Add(BackHolster_Left, "spine_05");
-    HarnessSocketMap.Add(BackHolster_Right, "spine_05");
-    HarnessSocketMap.Add(BackHolster_Cross, "spine_05");
-    HarnessSocketMap.Add(WeaponBelt_Front, "pelvis");
-    HarnessSocketMap.Add(WeaponBelt_Rear, "pelvis");
-    HarnessSocketMap.Add(WeaponBelt_Left, "pelvis");
-    HarnessSocketMap.Add(WeaponBelt_Right, "pelvis");
-
-    HarnessSocketMap.Add(Headgear, "head");
-    HarnessSocketMap.Add(Backpack, "spine_05");
-    HarnessSocketMap.Add(Vest, "spine_05");
-    HarnessSocketMap.Add(Belt, "pelvis");
-
-    EquipmentHolsterMap.Add(PrimaryWeapon, ChestHolster_Rifle);
-    EquipmentHolsterMap.Add(SecondaryWeapon, WeaponBelt_Rear);
-    EquipmentHolsterMap.Add(TertiaryWeapon, BackHolster_Left);
-    EquipmentHolsterMap.Add(LethalEquipment, WeaponBelt_Left);
-    EquipmentHolsterMap.Add(TacticalEquipment, WeaponBelt_Right);
-
-    EquipmentHolsterMap.Add(Helmet, Headgear);
-    EquipmentHolsterMap.Add(PlateCarrier, Vest);
-    EquipmentHolsterMap.Add(Pack, Backpack);
+    ConfigureHarnessSlots();
 
     for (auto harnessSocket : HarnessSocketMap)
     {
@@ -57,8 +29,6 @@ void UTPSEquipmentManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(UTPSEquipmentManager, ActiveEquipmentSlot);
-
-    //DOREPLIFETIME(UTPSEquipmentManager, EquipmentMap);
 }
 
 void UTPSEquipmentManager::BeginPlay()
@@ -76,11 +46,6 @@ void UTPSEquipmentManager::Initialize()
 {
     if (IsValid(Loadout)) {
         InstantiateLoadout();
-
-        for (auto entry : EquipmentMap)
-        {
-            EquipItemToHolster(entry.Value, entry.Key);
-        }
     }
 
     // For characters who should spawn equipped.
@@ -116,17 +81,22 @@ void UTPSEquipmentManager::BindToMesh(USkeletalMeshComponent* mesh)
 void UTPSEquipmentManager::BindToOwnerAbilitySystem(UAbilitySystemComponent* ownerAsc)
 {
     OwnerAsc = ownerAsc;
-    for (auto equipment : EquipmentMap)
+    for (auto equipment : EquipmentItems)
     {
         equipment.Value->OwnerAsc = ownerAsc;
+    }
+
+    for (auto gear : GearItems)
+    {
+        gear.Value->OwnerAsc = ownerAsc;
     }
 }
 
 
 
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 //  EQUIPMENT OPERATIONS
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 
 void UTPSEquipmentManager::InstantiateLoadout()
 {
@@ -135,46 +105,47 @@ void UTPSEquipmentManager::InstantiateLoadout()
     for (auto entry : Loadout->EquipmentBySlot)
     {
         if (IsValid(entry.Value)) {
-            UE_LOG(LogTemp, Log, TEXT("Instantiating[%hs]..."), ETPSEquipmentSlotToString(entry.Key));
-            InstantiateAndAssignEquipmentToSlot(entry.Value, entry.Key);
+            UE_LOG(LogTemp, Log, TEXT("Instantiating Equipment[%hs]..."), ETPSEquipmentSlotToString(entry.Key));
+            InstantiateAndAssignEquipmentItemToSlot(entry.Value, entry.Key);
         }
     }
 
-    for (auto entry : Loadout->PassiveEquipmentBySlot)
+    for (auto entry : Loadout->GearBySlot)
     {
         if (IsValid(entry.Value)) {
-            UE_LOG(LogTemp, Log, TEXT("Instantiating[%hs]..."), ETPSEquipmentHarnessSlotToString(entry.Key));
-
-            ATPSEquipableItem* item = GetWorld()->SpawnActor<ATPSEquipableItem>(entry.Value);
-
-            PassiveEquipmentMap.Add(entry.Key, item);
-
-            item->Pickup();
-            item->OwnerAsc = OwnerAsc;
-
-            item->MountWithOffset(*HarnessMountPointMap.Find(entry.Key), item->WeaponHolsterOffset);
-            item->Equip();
+            UE_LOG(LogTemp, Log, TEXT("Instantiating Gear[%hs]..."), ETPSGearSlotToString(entry.Key));
+            InstantiateAndAssignGearItemToSlot(entry.Value, entry.Key);
         }
     }
 }
 
-void UTPSEquipmentManager::InstantiateAndAssignEquipmentToSlot(TSubclassOf<ATPSEquipableItem> templ, ETPSEquipmentSlot slot)
+
+
+void UTPSEquipmentManager::InstantiateAndAssignEquipmentItemToSlot(TSubclassOf<ATPSEquipableItem> templ, const ETPSEquipmentSlot slot)
 {
     ATPSEquipableItem* item = GetWorld()->SpawnActor<ATPSEquipableItem>(templ);
-    PickupAndAssignEquipmentToSlot(item, slot);
+    PickUpEquipmentItem(item, slot);
+}
+
+void UTPSEquipmentManager::InstantiateAndAssignGearItemToSlot(TSubclassOf<ATPSEquipableItem> templ, const ETPSGearSlot slot)
+{
+    ATPSEquipableItem* item = GetWorld()->SpawnActor<ATPSEquipableItem>(templ);
+    PickUpGearItem(item, slot);
 }
 
 
-void UTPSEquipmentManager::EquipItemToHolster(ATPSEquipableItem* item, ETPSEquipmentSlot slot)
-{
-    if (!IsValid(item)) { return; }
 
-    UTPSMountPoint* mount = GetHolsterMountPointForEquipmentSlot(slot);
-    if (!IsValid(mount)) { return; }
+
+void UTPSEquipmentManager::HolsterEquipmentItem(const ETPSEquipmentSlot slot)
+{
+    ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
+    UTPSMountPoint* mount = GetHarnessMountPointForEquipmentSlot(slot);
+    if (!IsValid(mount) || !IsValid(item)) { return; }
 
     item->MountWithOffset(mount, item->WeaponHolsterOffset);
     item->UnEquip();
 }
+
 void UTPSEquipmentManager::EquipToPrimaryWeaponHand(ATPSEquipableItem* item)
 {
     if (!IsValid(item)) { return; }
@@ -196,110 +167,114 @@ void UTPSEquipmentManager::EquipToPrimaryWeaponHand(ATPSEquipableItem* item)
     UE_LOG(LogTemp, Log, TEXT("Weapon[%s] mounted to Primary Hand."), *item->GetName());
 }
 
-void UTPSEquipmentManager::EquipToSecondaryWeaponHand(ATPSEquipableItem* item)
-{
-    if (!IsValid(item)) { return; }
-
-    UTPSMountPoint* mp = *HarnessMountPointMap.Find(SecondaryHand);
-    if (!IsValid(mp)) { return; }
-
-    ATPSWeapon* weapon = Cast<ATPSWeapon>(item);
-    if (IsValid(weapon))
-    {
-        weapon->MountWithOffset(mp, weapon->PrimaryWeaponHandOffset);
-    }
-    else
-    {
-        item->Mount(mp);
-    }
-
-    item->Equip();
-    UE_LOG(LogTemp, Log, TEXT("Weapon[%s] mounted to Secondary Hand."), *item->GetName());
-
-}
-
-// TODO: Deprecate this block?
-void UTPSEquipmentManager::EquipToPrimaryHolster(ATPSEquipableItem* weapon)
-{
-    EquipItemToHolster(weapon, PrimaryWeapon);
-}
-void UTPSEquipmentManager::EquipToSecondaryHolster(ATPSEquipableItem* weapon)
-{
-    EquipItemToHolster(weapon, SecondaryWeapon);
-}
-void UTPSEquipmentManager::EquipToTacticalHolster(ATPSEquipableItem* weapon)
-{
-    EquipItemToHolster(weapon, TacticalEquipment);
-}
-void UTPSEquipmentManager::EquipToLethalHolster(ATPSEquipableItem* weapon)
-{
-    EquipItemToHolster(weapon, LethalEquipment);
-}
-void UTPSEquipmentManager::EquipToBackHolster(ATPSEquipableItem* weapon)
-{
-    EquipItemToHolster(weapon, TertiaryWeapon);
-}
 
 
-//~ ============================================================= ~//
-//  PUBLIC OPERATIONS
-//~ ============================================================= ~//
-
-void UTPSEquipmentManager::PickupAndAssignEquipmentToSlot(ATPSEquipableItem* equipmentItem, ETPSEquipmentSlot slot)
+void UTPSEquipmentManager::PickUpEquipmentItem(ATPSEquipableItem* equipmentItem, const ETPSEquipmentSlot slot)
 {
     ATPSEquipableItem* existingItem = GetItemFromEquipmentSlot(slot);
     if (IsValid(existingItem))
     {
-        DropEquipmentFromSlot(slot);
+        DropEquipmentItem(slot);
     }
 
-    EquipmentMap.Add(slot, equipmentItem);
+    EquipmentItems.Add(slot, equipmentItem);
 
     equipmentItem->Pickup();
     equipmentItem->OwnerAsc = OwnerAsc;
-    EquipItemToHolster(equipmentItem, slot);
+    HolsterEquipmentItem(slot);
 }
 
-void UTPSEquipmentManager::DropEquipmentFromSlot(ETPSEquipmentSlot slot)
+void UTPSEquipmentManager::PickUpGearItem(ATPSEquipableItem* gearItem, const ETPSGearSlot slot)
+{
+    ATPSEquipableItem* existingItem = GetGearItem(slot);
+    if (IsValid(existingItem))
+    {
+        DropGearItem(slot);
+    }
+
+    GearItems.Add(slot, gearItem);
+
+    gearItem->Pickup();
+    gearItem->OwnerAsc = OwnerAsc;
+
+    gearItem->Mount(GetHarnessMountPointForGearSlot(slot));
+}
+
+
+
+void UTPSEquipmentManager::DropEquipmentItem(const ETPSEquipmentSlot slot)
 {
     ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
 
     if (IsValid(item)) {
-        EquipmentMap.Remove(slot);
+        EquipmentItems.Remove(slot);
+        item->Drop();
+    }
+}
+void UTPSEquipmentManager::DropGearItem(const ETPSGearSlot slot)
+{
+    ATPSEquipableItem* item = GetGearItem(slot);
+
+    if (IsValid(item)) {
+        GearItems.Remove(slot);
         item->Drop();
     }
 }
 void UTPSEquipmentManager::DropAll()
 {
     TArray<TEnumAsByte<ETPSEquipmentSlot>> activeSlots;
-    EquipmentMap.GetKeys(activeSlots);
-
+    EquipmentItems.GetKeys(activeSlots);
     for (ETPSEquipmentSlot slot : activeSlots)
     {
-        DropEquipmentFromSlot(slot);
+        DropEquipmentItem(slot);
+    }
+
+    TArray<TEnumAsByte<ETPSGearSlot>> activeGearSlots;
+    GearItems.GetKeys(activeGearSlots);
+    for (ETPSGearSlot slot : activeGearSlots)
+    {
+        DropGearItem(slot);
     }
 }
 
 
 
-void UTPSEquipmentManager::DestroyItemAtSlot(ETPSEquipmentSlot slot)
+void UTPSEquipmentManager::DestroyEquipmentItem(const ETPSEquipmentSlot slot)
 {
     ATPSEquipableItem* item = nullptr;
 
     if (IsValid(item))
     {
-        EquipmentMap.Remove(slot);
+        EquipmentItems.Remove(slot);
+        item->Destroy();
+    }
+}
+void UTPSEquipmentManager::DestroyGearItem(const ETPSGearSlot slot)
+{
+    ATPSEquipableItem* item = nullptr;
+
+    if (IsValid(item))
+    {
+        GearItems.Remove(slot);
         item->Destroy();
     }
 }
 void UTPSEquipmentManager::DestroyAll()
 {
     TArray<TEnumAsByte<ETPSEquipmentSlot>> activeSlots;
-    EquipmentMap.GetKeys(activeSlots);
+    EquipmentItems.GetKeys(activeSlots);
 
     for (ETPSEquipmentSlot slot : activeSlots)
     {
-        ATPSEquipableItem* item = EquipmentMap.FindAndRemoveChecked(slot);
+        ATPSEquipableItem* item = EquipmentItems.FindAndRemoveChecked(slot);
+        item->Destroy();
+    }
+
+    TArray<TEnumAsByte<ETPSGearSlot>> activeGearSlots;
+    GearItems.GetKeys(activeGearSlots);
+    for (ETPSGearSlot slot : activeGearSlots)
+    {
+        ATPSEquipableItem* item = GearItems.FindAndRemoveChecked(slot);
         item->Destroy();
     }
 }
@@ -322,43 +297,12 @@ void UTPSEquipmentManager::UnReady()
 {
     ATPSEquipableItem* activeItem = GetItemFromEquipmentSlot(ActiveEquipmentSlot);
 
-    EquipItemToHolster(activeItem, ActiveEquipmentSlot);
+    HolsterEquipmentItem(ActiveEquipmentSlot);
 }
 
-void UTPSEquipmentManager::EquipPrimary()
-{
-    UnEquipActive();
-    EquipAndArm(ETPSEquipmentSlot::PrimaryWeapon);
-}
-void UTPSEquipmentManager::EquipSecondary()
-{
-    UnEquipActive();
-    EquipAndArm(ETPSEquipmentSlot::SecondaryWeapon);
-}
-void UTPSEquipmentManager::EquipTertiary() {
-    UnEquipActive();
-    EquipAndArm(ETPSEquipmentSlot::TertiaryWeapon);
-}
-void UTPSEquipmentManager::EquipLethalThrowable() {
-    UnEquipActive();
-    EquipAndArm(ETPSEquipmentSlot::LethalEquipment);
-}
-void UTPSEquipmentManager::EquipTacticalThrowable() {
-    UnEquipActive();
-    EquipAndArm(ETPSEquipmentSlot::TacticalEquipment);
-}
 
-void UTPSEquipmentManager::UnEquipActive() {
-    if (ActiveEquipmentSlot == ETPSEquipmentSlot::None) { return; }
 
-    ATPSEquipableItem* item = GetItemFromEquipmentSlot(ActiveEquipmentSlot);
-    if (IsValid(item)) {
-        item->UnEquip();
-        EquipItemToHolster(item, ActiveEquipmentSlot);
-    }
 
-    ActiveEquipmentSlot = ETPSEquipmentSlot::None;
-}
 
 void UTPSEquipmentManager::EquipAndArm(ETPSEquipmentSlot equipmentSlot) {
     ATPSEquipableItem* item = GetItemFromEquipmentSlot(equipmentSlot);
@@ -367,35 +311,27 @@ void UTPSEquipmentManager::EquipAndArm(ETPSEquipmentSlot equipmentSlot) {
         EquipToPrimaryWeaponHand(item);
         ActiveEquipmentSlot = equipmentSlot;
         item->Equip();
-
-        /*UAbilitySystemComponent* asc = OwningCharacter->GetAbilitySystemComponent();
-        for (TSubclassOf<UGameplayEffect*> effect : item->PassiveEffects)
-        {
-            asc->ApplyGameplayEffectToSelf(effect.Get(), 1, FGameplayEffectContextHandle::Get(),
-            FPredictionKey::Base);
-        }*/
     }
 }
 
+void UTPSEquipmentManager::UnEquipActive() {
+    if (ActiveEquipmentSlot == ETPSEquipmentSlot::None) { return; }
 
-void UTPSEquipmentManager::WeaponSwap() {
-    UE_LOG(LogTemp, Log, TEXT("Swapping Weapons..."));
+    ATPSEquipableItem* item = GetItemFromEquipmentSlot(ActiveEquipmentSlot);
+    if (IsValid(item)) {
+        item->UnEquip();
+        HolsterEquipmentItem(ActiveEquipmentSlot);
+    }
 
-    // Needs to acct for non-populated slots.
-
-    /*int nextSlot = ((int)ActiveEquipmentSlot) + 1 % 5;
-
-    UnEquipActive();
-    EquipAndArm((ETPSEquipmentSlot) nextSlot);*/
+    ActiveEquipmentSlot = ETPSEquipmentSlot::None;
 }
 
-void UTPSEquipmentManager::EquipmentSwap() {
-    UE_LOG(LogTemp, Log, TEXT("Swapping Equipment..."));
-}
 
-ATPSEquipableItem* UTPSEquipmentManager::GetItemFromEquipmentSlot(ETPSEquipmentSlot slot)
+
+
+ATPSEquipableItem* UTPSEquipmentManager::GetItemFromEquipmentSlot(const ETPSEquipmentSlot slot)
 {
-    ATPSEquipableItem** item = EquipmentMap.Find(slot);
+    ATPSEquipableItem** item = EquipmentItems.Find(slot);
 
     if (item != nullptr)
     {
@@ -404,9 +340,71 @@ ATPSEquipableItem* UTPSEquipmentManager::GetItemFromEquipmentSlot(ETPSEquipmentS
     return nullptr;
 }
 
-UTPSMountPoint* UTPSEquipmentManager::GetHolsterMountPointForEquipmentSlot(ETPSEquipmentSlot slot)
+ATPSEquipableItem* UTPSEquipmentManager::GetGearItem(const ETPSGearSlot slot)
 {
-    TEnumAsByte<ETPSEquipmentHarnessSlot>* s = EquipmentHolsterMap.Find(slot);
+    ATPSEquipableItem** item = GearItems.Find(slot);
+
+    if (item != nullptr)
+    {
+        return *item;
+    }
+    return nullptr;
+}
+
+
+
+
+void UTPSEquipmentManager::ConfigureHarnessSlots()
+{
+    HarnessSocketMap.Add(PrimaryHand, "hand_r");
+    HarnessSocketMap.Add(SecondaryHand, "hand_l");
+
+    HarnessSocketMap.Add(LegHolster_Left, "thigh_l");
+    HarnessSocketMap.Add(LegHolster_Right, "thigh_r");
+    HarnessSocketMap.Add(ChestHolster_Pistol, "spine_05");
+    HarnessSocketMap.Add(ChestHolster_Rifle, "spine_03");
+    HarnessSocketMap.Add(BackHolster_Left, "spine_05");
+    HarnessSocketMap.Add(BackHolster_Right, "spine_05");
+    HarnessSocketMap.Add(BackHolster_Cross, "spine_05");
+    HarnessSocketMap.Add(WeaponBelt_Front, "pelvis");
+    HarnessSocketMap.Add(WeaponBelt_Rear, "pelvis");
+    HarnessSocketMap.Add(WeaponBelt_Left, "pelvis");
+    HarnessSocketMap.Add(WeaponBelt_Right, "pelvis");
+
+    HarnessSocketMap.Add(Headgear, "head");
+    HarnessSocketMap.Add(Backpack, "spine_05");
+    HarnessSocketMap.Add(Vest, "spine_05");
+    HarnessSocketMap.Add(Belt, "pelvis");
+
+    EquipmentHarnessMap.Add(PrimaryWeapon, ChestHolster_Rifle);
+    EquipmentHarnessMap.Add(SecondaryWeapon, WeaponBelt_Rear);
+    EquipmentHarnessMap.Add(TertiaryWeapon, BackHolster_Left);
+    EquipmentHarnessMap.Add(LethalEquipment, WeaponBelt_Left);
+    EquipmentHarnessMap.Add(TacticalEquipment, WeaponBelt_Right);
+
+    GearHarnessMap.Add(Helmet, Headgear);
+    GearHarnessMap.Add(PlateCarrier, Vest);
+    GearHarnessMap.Add(Pack, Backpack);
+}
+
+
+UTPSMountPoint* UTPSEquipmentManager::GetHarnessMountPointForEquipmentSlot(const ETPSEquipmentSlot slot)
+{
+    TEnumAsByte<ETPSEquipmentHarnessSlot>* s = EquipmentHarnessMap.Find(slot);
+    if (s == nullptr) { return nullptr; }
+
+    UTPSMountPoint** mp = HarnessMountPointMap.Find(*s);
+
+    if (mp != nullptr)
+    {
+        return *mp;
+    }
+    return nullptr;
+}
+
+UTPSMountPoint* UTPSEquipmentManager::GetHarnessMountPointForGearSlot(const ETPSGearSlot slot)
+{
+    TEnumAsByte<ETPSEquipmentHarnessSlot>* s = GearHarnessMap.Find(slot);
     if (s == nullptr) { return nullptr; }
 
     UTPSMountPoint** mp = HarnessMountPointMap.Find(*s);

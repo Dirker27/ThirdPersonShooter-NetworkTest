@@ -19,7 +19,8 @@ void UTPSMountPoint::BindToParentSocket(USceneComponent* InParent, FName InSocke
     AddRelativeLocation(Offset.RelativeLocation);
     AddRelativeRotation(Offset.RelativeEulerRotation.Rotation());
 
-    UE_LOG(LogTemp, Log, TEXT("MountPoint attached to parent with Offset Location[%s]-Rotation[%s]."),
+    UE_LOG(LogTemp, Log, TEXT("MountPoint[%s] attached to parent with Offset Location[%s]-Rotation[%s]."),
+        *GetName(),
         *Offset.RelativeLocation.ToString(), *Offset.RelativeEulerRotation.ToString());
 }
 

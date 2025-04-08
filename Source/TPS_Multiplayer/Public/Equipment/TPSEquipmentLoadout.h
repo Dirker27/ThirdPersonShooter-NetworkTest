@@ -9,6 +9,9 @@
 
 #include "TPSEquipmentLoadout.generated.h"
 
+/**
+ * State object for a character's weapons, equipment, and gear.
+ */
 UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSEquipmentLoadout : public UDataAsset
 {
@@ -20,5 +23,5 @@ public:
     TMap<TEnumAsByte<ETPSEquipmentSlot>, TSubclassOf<ATPSEquipableItem>> EquipmentBySlot;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, TSubclassOf<ATPSEquipableItem>> PassiveEquipmentBySlot;
+    TMap<TEnumAsByte<ETPSGearSlot>, TSubclassOf<ATPSEquipableItem>> GearBySlot;
 };

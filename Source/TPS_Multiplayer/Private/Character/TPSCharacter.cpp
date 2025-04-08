@@ -7,7 +7,6 @@
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
-#include "UObject/ConstructorHelpers.h"
 
 #include "Player/TPSPlayerController.h"
 #include "Player/TPSPlayerState.h"

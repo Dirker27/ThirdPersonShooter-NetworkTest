@@ -61,7 +61,9 @@ void ATPSMountableActor::MountWithOffset(UTPSMountPoint* target, FTPSMountOffset
     }
 
     OnMount();
-    UE_LOG(LogTemp, Log, TEXT("Mounted to Target[%s]-[%s] with Offset[%s]."),
+    UE_LOG(LogTemp, Log, TEXT("Actor[%s] Mounted to Target[%s] Bone[%s]-[%s] with Offset[%s]."),
+        *GetName(),
+        *target->GetName(),
         *target->Target.ParentComponent.Get()->GetName(), *target->Target.SocketName.ToString(),
         *offset.RelativeLocation.ToString());
 }

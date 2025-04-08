@@ -28,9 +28,9 @@ protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 //  STATE
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
     TEnumAsByte<ETPSEquipmentSlot> ActiveEquipmentSlot;
@@ -38,9 +38,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
     TObjectPtr<UTPSEquipmentLoadout> Loadout;
 
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 //  CONFIGURATION
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 protected:
     //////////////////////////////////////////////////////
     // Target Mesh Configuration
@@ -59,28 +59,32 @@ protected:
 
     // EquipmentSlot -> HarnessSlot (when holstered)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
-    TMap<TEnumAsByte<ETPSEquipmentSlot>, TEnumAsByte<ETPSEquipmentHarnessSlot>> EquipmentHolsterMap;
+    TMap<TEnumAsByte<ETPSEquipmentSlot>, TEnumAsByte<ETPSEquipmentHarnessSlot>> EquipmentHarnessMap;
 
+    // EquipmentSlot -> HarnessSlot (when holstered)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
+    TMap<TEnumAsByte<ETPSGearSlot>, TEnumAsByte<ETPSEquipmentHarnessSlot>> GearHarnessMap;
 
-//~ ============================================================= ~//
-//  COMPONENTS
-//~ ============================================================= ~//
-public:
+//~ ======================================================================== ~//
+//  STORAGE
+//~ ======================================================================== ~//
+protected:
     // HarnessSlot -> MountPoint
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
     TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, UTPSMountPoint*> HarnessMountPointMap;
 
     // Equipment Instances
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
-    TMap<TEnumAsByte<ETPSEquipmentSlot>, ATPSEquipableItem*> EquipmentMap;
+    TMap<TEnumAsByte<ETPSEquipmentSlot>, ATPSEquipableItem*> EquipmentItems;
 
+    // Gear Instances
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
-    TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, ATPSEquipableItem*> PassiveEquipmentMap;
+    TMap<TEnumAsByte<ETPSGearSlot>, ATPSEquipableItem*> GearItems;
 
 
-//~ ============================================================= ~//
-//  PUBLIC OPERATIONS
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
+// PUBLIC OPERATIONS
+//~ ======================================================================== ~//
 public:
 
     //////////////////////////////////////////////////////
@@ -118,69 +122,56 @@ public:
     //   - Bound GAS abilities/attributes will be applied to owner's ASC.
     //   - If slot is occupied, that equipment item will be dropped.
     UFUNCTION(BlueprintCallable)
-    void PickupAndAssignEquipmentToSlot(ATPSEquipableItem* equipmentItem, ETPSEquipmentSlot slot);
+    void PickUpEquipmentItem(ATPSEquipableItem* equipmentItem, const ETPSEquipmentSlot slot);
+    UFUNCTION(BlueprintCallable)
+    void PickUpGearItem(ATPSEquipableItem* gearItem, const ETPSGearSlot slot);
+
     // Drops an equipment item from 
     UFUNCTION(BlueprintCallable)
-    void DropEquipmentFromSlot(ETPSEquipmentSlot slot);
+    void DropEquipmentItem(const ETPSEquipmentSlot slot);
+    UFUNCTION(BlueprintCallable)
+    void DropGearItem(const ETPSGearSlot slot);
     UFUNCTION(BlueprintCallable)
     void DropAll();
 
 
     UFUNCTION(BlueprintCallable)
-    void DestroyItemAtSlot(ETPSEquipmentSlot slot);
+    void DestroyEquipmentItem(const ETPSEquipmentSlot slot);
+    UFUNCTION(BlueprintCallable)
+    void DestroyGearItem(const ETPSGearSlot slot);
     UFUNCTION(BlueprintCallable)
     void DestroyAll();
 
 
-    UFUNCTION(BlueprintCallable)
-    void EquipPrimary();
-    UFUNCTION(BlueprintCallable)
-    void EquipSecondary();
-    UFUNCTION(BlueprintCallable)
-    void EquipTertiary();
-    UFUNCTION(BlueprintCallable)
-    void EquipLethalThrowable();
-    UFUNCTION(BlueprintCallable)
-    void EquipTacticalThrowable();
-
-
-    UFUNCTION(BlueprintCallable)
-    void WeaponSwap();
-    UFUNCTION(BlueprintCallable)
-    void EquipmentSwap();
-
 //~ ============================================================= ~//
 //  EQUIPMENT OPERATIONS
 //~ ============================================================= ~//
-protected:
-    UFUNCTION(BlueprintCallable)
-    void UnEquipActive();
-    UFUNCTION(BlueprintCallable)
-    void EquipAndArm(ETPSEquipmentSlot equipmentSlot);
-
-    UFUNCTION(BlueprintCallable)
-    void EquipItemToHolster(ATPSEquipableItem* item, ETPSEquipmentSlot slot);
-    UFUNCTION(BlueprintCallable)
-    void EquipToPrimaryWeaponHand(ATPSEquipableItem* item);
-    UFUNCTION(BlueprintCallable)
-    void EquipToSecondaryWeaponHand(ATPSEquipableItem* item);
-    UFUNCTION(BlueprintCallable)
-    void EquipToPrimaryHolster(ATPSEquipableItem* weapon);
-    UFUNCTION(BlueprintCallable)
-	void EquipToSecondaryHolster(ATPSEquipableItem* weapon);
-    UFUNCTION(BlueprintCallable)
-    void EquipToTacticalHolster(ATPSEquipableItem* weapon);
-    UFUNCTION(BlueprintCallable)
-	void EquipToLethalHolster(ATPSEquipableItem* weapon);
-    UFUNCTION(BlueprintCallable)
-    void EquipToBackHolster(ATPSEquipableItem* weapon);
-
 public:
     UFUNCTION(BlueprintCallable)
-    ATPSEquipableItem* GetItemFromEquipmentSlot(ETPSEquipmentSlot slot);
+    void UnEquipActive();
+
+    // TODO: Rename 'EquipItem'(?)
+    UFUNCTION(BlueprintCallable)
+    void EquipAndArm(const ETPSEquipmentSlot equipmentSlot);
+
+    UFUNCTION(BlueprintCallable)
+    void HolsterEquipmentItem(const ETPSEquipmentSlot slot);
+
+    // TODO: Rename 'GetItem'(?)
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    ATPSEquipableItem* GetItemFromEquipmentSlot(const ETPSEquipmentSlot slot);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    ATPSEquipableItem* GetGearItem(const ETPSGearSlot slot);
 
 private:
-    void InstantiateAndAssignEquipmentToSlot(TSubclassOf<ATPSEquipableItem>, ETPSEquipmentSlot slot);
+    void ConfigureHarnessSlots();
 
-    UTPSMountPoint* GetHolsterMountPointForEquipmentSlot(ETPSEquipmentSlot slot);
+    void InstantiateAndAssignEquipmentItemToSlot(TSubclassOf<ATPSEquipableItem>, const ETPSEquipmentSlot slot);
+    void InstantiateAndAssignGearItemToSlot(TSubclassOf<ATPSEquipableItem>, const ETPSGearSlot slot);
+
+    void EquipToPrimaryWeaponHand(ATPSEquipableItem* item);
+
+    UTPSMountPoint* GetHarnessMountPointForEquipmentSlot(const ETPSEquipmentSlot slot);
+    UTPSMountPoint* GetHarnessMountPointForGearSlot(const ETPSGearSlot slot);
 };

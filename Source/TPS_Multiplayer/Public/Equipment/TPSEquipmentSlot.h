@@ -7,6 +7,7 @@
 
 #include "TPSEquipmentSlot.generated.h"
 
+// TODO: Rename to WeaponSlot(?)
 UENUM(BlueprintType)
 enum ETPSEquipmentSlot : int
 {
@@ -15,11 +16,7 @@ enum ETPSEquipmentSlot : int
 	SecondaryWeapon,
 	TertiaryWeapon,
 	LethalEquipment,
-	TacticalEquipment,
-
-	Helmet,
-	PlateCarrier,
-	Pack
+	TacticalEquipment
 };
 
 static const char* ETPSEquipmentSlotToString(const ETPSEquipmentSlot slot) {
@@ -40,6 +37,36 @@ static const char* ETPSEquipmentSlotToString(const ETPSEquipmentSlot slot) {
 		return "UNSUPPORTED";
 	}
 }
+
+
+
+
+
+
+UENUM(BlueprintType)
+enum ETPSGearSlot : int
+{
+	Helmet,
+	PlateCarrier,
+	Pack
+};
+
+static const char* ETPSGearSlotToString(const ETPSGearSlot slot) {
+	switch (slot) {
+	case Helmet:
+		return "Helmet";
+	case PlateCarrier:
+		return "PlateCarrier";
+	case Pack:
+		return "Pack";
+	default:
+		return "UNSUPPORTED";
+	}
+}
+
+
+
+
 
 
 UENUM(BlueprintType)
