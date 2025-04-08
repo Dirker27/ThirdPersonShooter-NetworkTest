@@ -142,7 +142,7 @@ void UTPSEquipmentManager::HolsterEquipmentItem(const ETPSEquipmentSlot slot)
     UTPSMountPoint* mount = GetHarnessMountPointForEquipmentSlot(slot);
     if (!IsValid(mount) || !IsValid(item)) { return; }
 
-    item->MountWithOffset(mount, item->WeaponHolsterOffset);
+    item->Mount(mount);
     item->UnEquip();
 }
 

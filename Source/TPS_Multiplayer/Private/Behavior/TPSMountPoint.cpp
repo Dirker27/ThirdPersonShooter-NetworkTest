@@ -4,8 +4,8 @@
 
 UTPSMountPoint::UTPSMountPoint()
 {
-    bVisualizeComponent = true;
-    bHiddenInGame = false;
+    //bVisualizeComponent = true;
+    //bHiddenInGame = false;
     //SetIsReplicated(true);
 }
 
@@ -16,12 +16,12 @@ void UTPSMountPoint::BindToParentSocket(USceneComponent* InParent, FName InSocke
 
     SetupAttachment(InParent, InSocketName);
 
-    AddRelativeLocation(Offset.RelativeLocation);
-    AddRelativeRotation(Offset.RelativeEulerRotation.Rotation());
+    SetRelativeLocation(Offset.RelativeLocation);
+    SetRelativeRotation(Offset.RelativeRotation);
 
     UE_LOG(LogTemp, Log, TEXT("MountPoint[%s] attached to parent with Offset Location[%s]-Rotation[%s]."),
         *GetName(),
-        *Offset.RelativeLocation.ToString(), *Offset.RelativeEulerRotation.ToString());
+        *Offset.RelativeLocation.ToString(), *Offset.RelativeRotation.ToString());
 }
 
 

@@ -27,7 +27,7 @@ struct TPS_MULTIPLAYER_API FTPSMountOffset
     FVector RelativeLocation = FVector::Zero();
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
-    FVector RelativeEulerRotation = FVector::Zero();
+    FRotator RelativeRotation = FRotator::ZeroRotator;
 
     /*TPS_MULTIPLAYER_API static inline const FTPSMountOffset Zero = {
         FVector::Zero(),

@@ -29,17 +29,9 @@ protected:
 public:
     //- Configuration -----------------------------------=
     //
-    // Offset from Mount target
+    // Offset to apply to ALL mounting targets
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|Configuration")
-    FTPSMountOffset MountOffset;
-    //
-    // Should Rotate?
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|Configuration")
-    bool ShouldApplyRotation = true;
-    //
-    // Use initial offsets on Mount?
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|Configuration")
-    bool ShouldCaptureOffsetOnStart = true;
+    FTPSMountOffset GlobalMountOffset;
 
     //- State ---------------------------------------------=
     //

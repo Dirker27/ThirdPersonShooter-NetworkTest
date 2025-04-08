@@ -24,11 +24,6 @@ void ATPSMountableActor::BeginPlay()
     Super::BeginPlay();
 
     if (MountPoint.IsValid()) {
-        if (ShouldCaptureOffsetOnStart)
-        {
-            MountOffset.RelativeLocation = GetTransform().GetLocation();
-            MountOffset.RelativeLocation = GetTransform().GetRotation().Euler();
-        }
         Mount(MountPoint.Get());
     }
 }
@@ -42,7 +37,7 @@ void ATPSMountableActor::Tick(float DeltaSeconds)
 
 void ATPSMountableActor::Mount(UTPSMountPoint* target)
 {
-    MountWithOffset(target, MountOffset);
+    MountWithOffset(target, target->Offset);
 }
 
 void ATPSMountableActor::MountWithOffset(UTPSMountPoint* target, FTPSMountOffset offset)
@@ -51,17 +46,18 @@ void ATPSMountableActor::MountWithOffset(UTPSMountPoint* target, FTPSMountOffset
 
     MountPoint = target;
 
+    // Mount to Target Mesh/Bone
     AttachToComponent(
-        target,
-        FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+        target->Target.ParentComponent.Get(),
+        FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+        target->Target.SocketName);
 
-    SetActorRelativeLocation(offset.RelativeLocation);
-    if (ShouldApplyRotation) {
-        SetActorRelativeRotation(offset.RelativeEulerRotation.Rotation());
-    }
+    // Apply Offset
+    SetActorRelativeLocation(offset.RelativeLocation + GlobalMountOffset.RelativeLocation);
+    SetActorRelativeRotation(offset.RelativeRotation + GlobalMountOffset.RelativeRotation);
 
     OnMount();
-    UE_LOG(LogTemp, Log, TEXT("Actor[%s] Mounted to Target[%s] Bone[%s]-[%s] with Offset[%s]."),
+    UE_LOG(LogTemp, Log, TEXT("Mountable[%s] Mounted to Target[%s] Bone[%s]-[%s] with Offset[%s]."),
         *GetName(),
         *target->GetName(),
         *target->Target.ParentComponent.Get()->GetName(), *target->Target.SocketName.ToString(),
@@ -75,5 +71,6 @@ void ATPSMountableActor::UnMount()
     DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
     OnUnMount();
-    UE_LOG(LogTemp, Log, TEXT("Un-Mounted."));
+    UE_LOG(LogTemp, Log, TEXT("Mountable[%s] Un-Mounted."),
+        *GetName());
 }

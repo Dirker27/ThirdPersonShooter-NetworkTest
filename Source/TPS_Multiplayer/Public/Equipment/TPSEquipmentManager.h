@@ -90,7 +90,6 @@ public:
     //////////////////////////////////////////////////////
     // Startup and Binding
 
-    //UFUNCTION(BlueprintCallable)
     void BindToMesh(USkeletalMeshComponent* mesh);
 
     void BindToOwnerAbilitySystem(UAbilitySystemComponent* ownerAsc);
