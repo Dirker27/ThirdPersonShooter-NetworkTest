@@ -70,6 +70,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
     TObjectPtr<UTPSMountPoint> SecondaryWeaponHandMountPoint;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
+    TObjectPtr<UTPSMountPoint> SecondaryWeaponHandOffsetJoint;
+
     //////////////////////////////////////////////////////
     // State
 

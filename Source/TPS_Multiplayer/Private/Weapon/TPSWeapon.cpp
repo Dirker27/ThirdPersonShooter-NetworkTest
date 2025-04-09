@@ -14,6 +14,9 @@ ATPSWeapon::ATPSWeapon()
 
 	SecondaryWeaponHandMountPoint = CreateDefaultSubobject<UTPSMountPoint>(TEXT("Grip-SecondaryHand"));
 	SecondaryWeaponHandMountPoint->BindToParentSocket(Mesh);
+
+	SecondaryWeaponHandOffsetJoint = CreateDefaultSubobject<UTPSMountPoint>(TEXT("Grip-JointOffset"));
+	SecondaryWeaponHandOffsetJoint->BindToParentSocket(Mesh);
 }
 
 void ATPSWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
