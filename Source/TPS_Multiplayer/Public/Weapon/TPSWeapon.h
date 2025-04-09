@@ -15,8 +15,8 @@
 UDELEGATE(BlueprintAuthorityOnly, NetMulticast, Reliable)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformFire);
 
-UDELEGATE(BlueprintAuthorityOnly, NetMulticast, Reliable)
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformEquip);
+//UDELEGATE(BlueprintAuthorityOnly, NetMulticast, Reliable)
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformEquip);
 
 /**
  * An Instance of a Weapon in the World that can be fired, dropped, and picked up.
@@ -42,9 +42,25 @@ public:
     //UPROPERTY(BlueprintAssignable)
     //FPerformFire NotifyPerformFire;
 
-//~ ============================================================= ~//
+//~ ======================================================================= ~//
+//  COMPONENTS
+//~ ======================================================================== ~//
+public:
+    // UI Reticle
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
+    TObjectPtr<UTPSWeaponReticle> Reticle;
+
+    // Mount offset for WeaponHand
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
+    FTPSMountOffset PrimaryWeaponHandOffset = FTPSMountOffset();
+
+    // IK Target for SecondaryHand
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
+    TObjectPtr<UTPSMountPoint> SecondaryWeaponHandMountPoint;
+
+//~ ======================================================================= ~//
 //  ATTRIBUTES
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 public:
     //////////////////////////////////////////////////////
     // Identity
@@ -59,19 +75,6 @@ public:
     // Weapon Attributes (damage, spread, cycle rate, etc)
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPSWeapon|Configuration")
     TObjectPtr<UTPSWeaponConfiguration> Configuration;
-
-    // UI Reticle
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
-    TObjectPtr<UTPSWeaponReticle> Reticle;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
-    FTPSMountOffset PrimaryWeaponHandOffset = FTPSMountOffset();
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
-    TObjectPtr<UTPSMountPoint> SecondaryWeaponHandMountPoint;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
-    TObjectPtr<UTPSMountPoint> SecondaryWeaponHandOffsetJoint;
 
     //////////////////////////////////////////////////////
     // State
@@ -128,9 +131,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State")
     int SuccessiveFireCount;
 
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 //  BEHAVIOR
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 public:
     UFUNCTION(BlueprintCallable)
     void Fire();
@@ -150,32 +153,33 @@ public:
 
 private:
     UFUNCTION(BlueprintCallable)
-    void ApplyWeaponState(ETPSWeaponState newState);
+    void ApplyWeaponState(const ETPSWeaponState newState);
 
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 //  Equipable Overrides
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 public:
     virtual void StartUse() override;
     virtual void StopUse() override;
 	virtual void Equip() override;
     virtual void UnEquip() override;
 
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 //  Blueprint Extensions
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 public:
-    //- Transforms -----------------------------------------=
-    //
-    //- WeaponType
+    //////////////////////////////////////////////////////
+    // Transforms
+
+    // WeaponType
     UFUNCTION(BlueprintCallable, BlueprintPure)
     static FString WeaponTypeToFString(const ETPSWeaponType t) {
         return FString(ETPSWeaponTypeToString(t));
     };
-    //
-    //- WeaponState
+    
+    // WeaponState
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    static FString WeaponStateToFString(ETPSWeaponState state) {
+    static FString WeaponStateToFString(const ETPSWeaponState state) {
         return FString(ETPSWeaponStateToString(state));
     };
 };
