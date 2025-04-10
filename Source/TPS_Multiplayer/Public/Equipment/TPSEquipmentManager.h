@@ -73,11 +73,37 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
     TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, UTPSMountPoint*> HarnessMountPointMap;
 
-    // Equipment Instances
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
-    TMap<TEnumAsByte<ETPSEquipmentSlot>, ATPSEquipableItem*> EquipmentItems;
+    //////////////////////////////////////////////////////
+    // Equipment Item Instances
 
-    // Gear Instances
+    // Instances are stored as individual pointers b/c Map<>s are not
+    //   supported for replication.
+
+    // Owned Equipment Items (provide active GAS Effects and Usable actions)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
+    TArray<TEnumAsByte<ETPSEquipmentSlot>> PopulatedEquipmentSlots;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
+    TObjectPtr<ATPSEquipableItem> PrimaryWeaponInstance;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
+    TObjectPtr<ATPSEquipableItem> SecondaryWeaponInstance;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
+    TObjectPtr<ATPSEquipableItem> TertiaryWeaponInstance;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
+    TObjectPtr<ATPSEquipableItem> LethalEquipmentInstance;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
+    TObjectPtr<ATPSEquipableItem> TacticalEquipmentInstance;
+
+    //////////////////////////////////////////////////////
+    // Gear Item Instances
+
+    // TODO: Convert this to use the Array<->Instance grouping (if we need to replicate these instances)
+
+    // Owned Gear Items (provide passive GAS Effects)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
     TMap<TEnumAsByte<ETPSGearSlot>, ATPSEquipableItem*> GearItems;
 

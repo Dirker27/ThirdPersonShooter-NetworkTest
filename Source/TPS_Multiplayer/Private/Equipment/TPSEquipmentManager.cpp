@@ -29,6 +29,12 @@ void UTPSEquipmentManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(UTPSEquipmentManager, ActiveEquipmentSlot);
+
+    DOREPLIFETIME(UTPSEquipmentManager, PrimaryWeaponInstance);
+    DOREPLIFETIME(UTPSEquipmentManager, SecondaryWeaponInstance);
+    DOREPLIFETIME(UTPSEquipmentManager, TertiaryWeaponInstance);
+    DOREPLIFETIME(UTPSEquipmentManager, LethalEquipmentInstance);
+    DOREPLIFETIME(UTPSEquipmentManager, TertiaryWeaponInstance);
 }
 
 void UTPSEquipmentManager::BeginPlay()
@@ -81,9 +87,10 @@ void UTPSEquipmentManager::BindToMesh(USkeletalMeshComponent* mesh)
 void UTPSEquipmentManager::BindToOwnerAbilitySystem(UAbilitySystemComponent* ownerAsc)
 {
     OwnerAsc = ownerAsc;
-    for (auto equipment : EquipmentItems)
+    for (auto equipmentSlot : PopulatedEquipmentSlots)
     {
-        equipment.Value->OwnerAsc = ownerAsc;
+        ATPSEquipableItem* item = GetItemFromEquipmentSlot(equipmentSlot);
+        item->OwnerAsc = ownerAsc;
     }
 
     for (auto gear : GearItems)
@@ -177,7 +184,27 @@ void UTPSEquipmentManager::PickUpEquipmentItem(ATPSEquipableItem* equipmentItem,
         DropEquipmentItem(slot);
     }
 
-    EquipmentItems.Add(slot, equipmentItem);
+
+    switch (slot)
+    {
+    case PrimaryWeapon:
+        PrimaryWeaponInstance = equipmentItem;
+        break;
+    case SecondaryWeapon:
+        SecondaryWeaponInstance = equipmentItem;
+        break;
+    case TertiaryWeapon:
+        TertiaryWeaponInstance = equipmentItem;
+        break;
+    case LethalEquipment:
+        LethalEquipmentInstance = equipmentItem;
+        break;
+    case TacticalEquipment:
+        TacticalEquipmentInstance = equipmentItem;
+        break;
+    }
+    PopulatedEquipmentSlots.Add(slot);
+
 
     equipmentItem->Pickup();
     equipmentItem->OwnerAsc = OwnerAsc;
@@ -207,7 +234,7 @@ void UTPSEquipmentManager::DropEquipmentItem(const ETPSEquipmentSlot slot)
     ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
 
     if (IsValid(item)) {
-        EquipmentItems.Remove(slot);
+        PopulatedEquipmentSlots.Remove(slot);
         item->Drop();
     }
 }
@@ -222,12 +249,12 @@ void UTPSEquipmentManager::DropGearItem(const ETPSGearSlot slot)
 }
 void UTPSEquipmentManager::DropAll()
 {
-    TArray<TEnumAsByte<ETPSEquipmentSlot>> activeSlots;
-    EquipmentItems.GetKeys(activeSlots);
-    for (ETPSEquipmentSlot slot : activeSlots)
+    for (ETPSEquipmentSlot slot : PopulatedEquipmentSlots)
     {
-        DropEquipmentItem(slot);
+        ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
+        item->Drop();
     }
+    PopulatedEquipmentSlots.Empty();
 
     TArray<TEnumAsByte<ETPSGearSlot>> activeGearSlots;
     GearItems.GetKeys(activeGearSlots);
@@ -241,17 +268,17 @@ void UTPSEquipmentManager::DropAll()
 
 void UTPSEquipmentManager::DestroyEquipmentItem(const ETPSEquipmentSlot slot)
 {
-    ATPSEquipableItem* item = nullptr;
+    ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
 
     if (IsValid(item))
     {
-        EquipmentItems.Remove(slot);
+        PopulatedEquipmentSlots.Remove(slot);
         item->Destroy();
     }
 }
 void UTPSEquipmentManager::DestroyGearItem(const ETPSGearSlot slot)
 {
-    ATPSEquipableItem* item = nullptr;
+    ATPSEquipableItem* item = GetGearItem(slot);
 
     if (IsValid(item))
     {
@@ -261,14 +288,12 @@ void UTPSEquipmentManager::DestroyGearItem(const ETPSGearSlot slot)
 }
 void UTPSEquipmentManager::DestroyAll()
 {
-    TArray<TEnumAsByte<ETPSEquipmentSlot>> activeSlots;
-    EquipmentItems.GetKeys(activeSlots);
-
-    for (ETPSEquipmentSlot slot : activeSlots)
+    for (ETPSEquipmentSlot slot : PopulatedEquipmentSlots)
     {
-        ATPSEquipableItem* item = EquipmentItems.FindAndRemoveChecked(slot);
+        ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
         item->Destroy();
     }
+    PopulatedEquipmentSlots.Empty();
 
     TArray<TEnumAsByte<ETPSGearSlot>> activeGearSlots;
     GearItems.GetKeys(activeGearSlots);
@@ -331,13 +356,21 @@ void UTPSEquipmentManager::UnEquipActive() {
 
 ATPSEquipableItem* UTPSEquipmentManager::GetItemFromEquipmentSlot(const ETPSEquipmentSlot slot)
 {
-    ATPSEquipableItem** item = EquipmentItems.Find(slot);
-
-    if (item != nullptr)
+    switch (slot)
     {
-        return *item;
+    case PrimaryWeapon:
+        return PrimaryWeaponInstance;
+    case SecondaryWeapon:
+        return SecondaryWeaponInstance;
+    case TertiaryWeapon:
+        return TertiaryWeaponInstance;
+    case LethalEquipment:
+        return LethalEquipmentInstance;
+    case TacticalEquipment:
+        return TacticalEquipmentInstance;
+    default:
+        return nullptr;
     }
-    return nullptr;
 }
 
 ATPSEquipableItem* UTPSEquipmentManager::GetGearItem(const ETPSGearSlot slot)
