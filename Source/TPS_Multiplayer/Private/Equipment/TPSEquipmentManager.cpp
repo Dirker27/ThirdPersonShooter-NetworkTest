@@ -411,7 +411,7 @@ void UTPSEquipmentManager::ConfigureHarnessSlots()
 
     EquipmentHarnessMap.Add(PrimaryWeapon, ChestHolster_Rifle);
     EquipmentHarnessMap.Add(SecondaryWeapon, WeaponBelt_Rear);
-    EquipmentHarnessMap.Add(TertiaryWeapon, BackHolster_Left);
+    EquipmentHarnessMap.Add(TertiaryWeapon, BackHolster_Right);
     EquipmentHarnessMap.Add(LethalEquipment, WeaponBelt_Left);
     EquipmentHarnessMap.Add(TacticalEquipment, WeaponBelt_Right);
 
