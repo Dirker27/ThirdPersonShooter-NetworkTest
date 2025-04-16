@@ -37,7 +37,7 @@ void ATPSMountableActor::Tick(float DeltaSeconds)
 
 void ATPSMountableActor::Mount(UTPSMountPoint* target)
 {
-    MountWithOffset(target, target->Offset);
+    MountWithOffset(target, FTPSMountOffset());
 }
 
 void ATPSMountableActor::MountWithOffset(UTPSMountPoint* target, FTPSMountOffset offset)
@@ -52,9 +52,15 @@ void ATPSMountableActor::MountWithOffset(UTPSMountPoint* target, FTPSMountOffset
         FAttachmentTransformRules::SnapToTargetNotIncludingScale,
         target->Target.SocketName);
 
-    // Apply Offset
-    SetActorRelativeLocation(offset.RelativeLocation + GlobalMountOffset.RelativeLocation);
-    SetActorRelativeRotation(offset.RelativeRotation + GlobalMountOffset.RelativeRotation);
+    // Apply Offsets
+    SetActorRelativeLocation(
+        offset.RelativeLocation
+        + target->Offset.RelativeLocation
+        + GlobalMountOffset.RelativeLocation);
+    SetActorRelativeRotation(
+        offset.RelativeRotation
+        + target->Offset.RelativeRotation
+        + GlobalMountOffset.RelativeRotation);
 
     OnMount();
     UE_LOG(LogTemp, Log, TEXT("Mountable[%s] Mounted to Target[%s] Bone[%s]-[%s] with Offset[%s]."),
