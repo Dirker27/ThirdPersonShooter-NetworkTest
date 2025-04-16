@@ -19,13 +19,18 @@ public:
     ATPSProjectileLauncher();
 
 public:
-    //- Configuration ------------------------------------=
-    //
-    //- Muzzle/LaunchPoint
+    ////////////////////////////////////////////////////////
+    // Configuration
+
+    // Muzzle / Projectile Launch Point
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
     TObjectPtr<UTPSMountPoint> Muzzle;
-    //
-    //- Fired Projectile
+    
+    // Shell Ejection Location / Direction
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+    TObjectPtr<UTPSMountPoint> ShellEjectPort;
+
+    // Fired Projectile
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
     TSubclassOf<ATPSProjectile> ProjectileTemplate;
 

@@ -174,6 +174,8 @@ void ATPSProjectile::SurfaceHit(AActor* sceneActor, FHitResult hit)
 		hit.GetComponent()->AddImpulseAtLocation(impulse, hit.Location, "None");
 	}
 
+	//Instigator->GetVelocity();
+
 	// TODO: Target Interface Execution
 
 	OnSurfaceHit(sceneActor, hit);

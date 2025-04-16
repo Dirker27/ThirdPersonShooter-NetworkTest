@@ -47,15 +47,15 @@ public:
 //~ ======================================================================== ~//
 public:
     // UI Reticle
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
     TObjectPtr<UTPSWeaponReticle> Reticle;
 
     // Mount offset for WeaponHand
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mountable|Configuration")
     FTPSMountOffset PrimaryWeaponHandOffset = FTPSMountOffset();
 
     // IK Target for SecondaryHand
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
     TObjectPtr<UTPSMountPoint> SecondaryWeaponHandMountPoint;
 
 //~ ======================================================================= ~//
@@ -66,43 +66,43 @@ public:
     // Identity
 
     // Weapon Type
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="TPSWeapon|Identity")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Identity")
     TEnumAsByte<ETPSWeaponType> Type;
 
     //////////////////////////////////////////////////////
     // Configuration
 
     // Weapon Attributes (damage, spread, cycle rate, etc)
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPSWeapon|Configuration")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")
     TObjectPtr<UTPSWeaponConfiguration> Configuration;
 
     //////////////////////////////////////////////////////
     // State
 
     // Ammo
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State", Replicated);
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", Replicated);
     int CurrentAmmunitionCount;
     //
     // State
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State", Replicated)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", Replicated)
     TEnumAsByte<ETPSWeaponState> CurrentWeaponState;
     //
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPSWeapon|State", Replicated)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "State", Replicated)
     TEnumAsByte<ETPSWeaponState> PreviousWeaponState;
     //
     // Is Currently Reloading
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State", Replicated)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", Replicated)
     bool IsReloading;
     //
     // Is Currently Firing
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State", Replicated)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", Replicated)
     bool IsFiring;
     //
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
     bool HasEverFired;
     //
     // Is Currently Aiming (Behavior / Aesthetic Modifier)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State", Replicated)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", Replicated)
     bool IsAiming;
     //
     // Should highlight / render display frame to Player.
@@ -113,22 +113,22 @@ public:
     // Fire Control States
 
     // Targeting
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State");
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State");
     FRotator TargetDirection;
     // Accuracy (Degrees of freedom in Pitch/Yaw)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State");
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State");
     FVector2D TargetAccuracyTolerance;
     //
     // Meter fire rate
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
     float TimeLastFired;
     //
     // Consume the trigger (single/burst mode)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
     bool HasTriggerCompleted;
     //
     // For burst-fire count
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSWeapon|State")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
     int SuccessiveFireCount;
 
 //~ ======================================================================== ~//
