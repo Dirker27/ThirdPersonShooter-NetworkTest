@@ -25,11 +25,14 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Actor", meta = (WorldContext = "worldContextObject", DeterminesOutputType = "actorClass"))
 	static ATPSCharacter* GetNearestPlayableCharacter(const UObject* worldContextObject, FVector location, float radius, TArray<AActor*> toIgnore);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static AActor* LineTrace(const UObject* WorldContextObject, const FVector startLoc, const FVector direction);
+
 	UFUNCTION(BlueprintCallable, Category = "Debug")
 	static void DrawDebugTrace(const UObject* WorldContextObject, const FVector startLoc, const FVector direction);
 	static void DrawDebugTrace(const UObject* WorldContextObject, const FVector startLoc, const FVector direction,
 		const FLinearColor traceColor, const FLinearColor hitColor, const float duration);
-
+		
 	// Calculates impulse in Joules from default unreal units
 	//  Velocity = cm/s
 	//  Mass = kg

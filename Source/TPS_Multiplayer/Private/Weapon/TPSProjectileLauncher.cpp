@@ -9,6 +9,9 @@ ATPSProjectileLauncher::ATPSProjectileLauncher()
 	Muzzle = CreateDefaultSubobject<UTPSMountPoint>(TEXT("Muzzle"));
 	Muzzle->SetupAttachment(Mesh);
 
+	ShellEjectPort = CreateDefaultSubobject<UTPSMountPoint>(TEXT("ShellEjectPort"));
+	ShellEjectPort->SetupAttachment(Mesh);
+
 	#if WITH_EDITORONLY_DATA
 	ArrowComponent->SetupAttachment(Muzzle);
 	#endif

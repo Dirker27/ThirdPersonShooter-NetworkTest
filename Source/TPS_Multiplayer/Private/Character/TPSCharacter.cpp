@@ -419,33 +419,6 @@ void ATPSCharacter::PerformDeath()
 }
 
 
-AActor* ATPSCharacter::LineTrace(const UObject* WorldContextObject) {
-	AActor* hitActor = NULL;
-
-	FVector startLoc = GetActorLocation();
-
-	FVector forward = GetActorForwardVector();
-	FVector endLoc = startLoc + (forward * 1000.f);
-
-	ETraceTypeQuery channel = TraceTypeQuery_MAX;
-	TArray<AActor*> actorsToIgnore;
-	EDrawDebugTrace::Type debugTrace = EDrawDebugTrace::Type::ForOneFrame;
-	FHitResult hitResult;
-
-	bool isHit = UKismetSystemLibrary::LineTraceSingle(WorldContextObject, startLoc, endLoc,
-		channel, false, actorsToIgnore, debugTrace,
-		hitResult,
-		true,
-		FLinearColor::Red, FLinearColor::Green, 5.f);
-
-	if (isHit) {
-		hitActor = hitResult.GetActor();
-	}
-
-	return hitActor;
-}
-
-
 //~ ============================================================= ~//
 //  Ability Extensions
 //~ ============================================================= ~//

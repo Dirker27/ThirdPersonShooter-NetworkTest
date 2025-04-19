@@ -58,6 +58,11 @@ void ATPSEquipableItem::BeginPlay()
 
 //- Pickup --//
 
+bool ATPSEquipableItem::CanPickup()
+{
+	return !IsOwned;
+}
+
 void ATPSEquipableItem::Pickup()
 {
 	IsOwned = true;

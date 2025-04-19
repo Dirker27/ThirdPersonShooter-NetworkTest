@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TPSGearItem.h"
 
 #include "Equipment/TPSEquipmentSlot.h"
 #include "Equipment/TPSEquipmentLoadout.h"
@@ -104,8 +105,8 @@ protected:
     // TODO: Convert this to use the Array<->Instance grouping (if we need to replicate these instances)
 
     // Owned Gear Items (provide passive GAS Effects)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
-    TMap<TEnumAsByte<ETPSGearSlot>, ATPSEquipableItem*> GearItems;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State", Replicated)
+    TArray<ATPSGearItem*> GearItems;
 
 
 //~ ======================================================================== ~//
@@ -148,8 +149,9 @@ public:
     //   - If slot is occupied, that equipment item will be dropped.
     UFUNCTION(BlueprintCallable)
     void PickUpEquipmentItem(ATPSEquipableItem* equipmentItem, const ETPSEquipmentSlot slot);
+
     UFUNCTION(BlueprintCallable)
-    void PickUpGearItem(ATPSEquipableItem* gearItem, const ETPSGearSlot slot);
+    void PickUpGearItem(ATPSGearItem* gearItem, const ETPSGearSlot slot);
 
     // Drops an equipment item from 
     UFUNCTION(BlueprintCallable)

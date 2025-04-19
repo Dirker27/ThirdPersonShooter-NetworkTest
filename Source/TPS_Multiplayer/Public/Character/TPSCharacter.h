@@ -362,11 +362,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnDeath();
 
-	// TODO: Perform from the Utility library
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	AActor* LineTrace(const UObject* WorldContextObject);
-
-
 //~ ============================================================= ~//
 //  ABILITY SYSTEM
 //~ ============================================================= ~//

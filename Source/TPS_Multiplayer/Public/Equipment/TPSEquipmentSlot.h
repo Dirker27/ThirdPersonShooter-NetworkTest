@@ -11,12 +11,12 @@
 UENUM(BlueprintType)
 enum ETPSEquipmentSlot : int
 {
-	None,
-	PrimaryWeapon,
-	SecondaryWeapon,
-	TertiaryWeapon,
-	LethalEquipment,
-	TacticalEquipment
+	None              = 0,
+	PrimaryWeapon     = 1,
+	SecondaryWeapon   = 2,
+	TertiaryWeapon    = 3,
+	LethalEquipment   = 4,
+	TacticalEquipment = 5
 };
 
 static const char* ETPSEquipmentSlotToString(const ETPSEquipmentSlot slot) {
@@ -42,21 +42,24 @@ static const char* ETPSEquipmentSlotToString(const ETPSEquipmentSlot slot) {
 
 
 
-
+static const int GEAR_SLOT_SIZE = 4;
 UENUM(BlueprintType)
 enum ETPSGearSlot : int
 {
-	Helmet,
-	PlateCarrier,
-	Pack
+	Headgear = 0,
+	Eyewear  = 1,
+	Vest     = 2,
+	Pack     = 3
 };
 
 static const char* ETPSGearSlotToString(const ETPSGearSlot slot) {
 	switch (slot) {
-	case Helmet:
+	case Headgear:
 		return "Helmet";
-	case PlateCarrier:
-		return "PlateCarrier";
+	case Eyewear:
+		return "Helmet";
+	case Vest:
+		return "Vest";
 	case Pack:
 		return "Pack";
 	default:
@@ -75,9 +78,10 @@ enum ETPSEquipmentHarnessSlot : int
 	PrimaryHand,
 	SecondaryHand,
 
-	Headgear,
+	Headgear_Cap,
+	Headgear_Eyes,
 	Backpack,
-	Vest,
+	Chestpiece,
 	Belt,
 
 	LegHolster_Left,
@@ -103,12 +107,14 @@ static const char* ETPSEquipmentHarnessSlotToString(const ETPSEquipmentHarnessSl
 	case SecondaryHand:
 		return "SecondaryWeaponHand";
 
-	case Headgear:
-		return "HeadGear";
+	case Headgear_Cap:
+		return "Headgear_Cap";
+	case Headgear_Eyes:
+		return "Headgear_Eyes";
 	case Backpack:
 		return "Backpack";
-	case Vest:
-		return "Vest";
+	case Chestpiece:
+		return "Chestpiece";
 	case Belt:
 		return "Belt";
 

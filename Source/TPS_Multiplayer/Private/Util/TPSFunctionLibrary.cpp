@@ -92,6 +92,31 @@ FVector UTPSFunctionLibrary::CalculateImpulseJoules(const FVector velocity, cons
     return impulseVector;
 }
 
+
+AActor* UTPSFunctionLibrary::LineTrace(const UObject* WorldContextObject, const FVector startLoc, const FVector direction) {
+    AActor* hitActor = NULL;
+
+    FVector endLoc = startLoc + (direction * 1000.f);
+
+    ETraceTypeQuery channel = TraceTypeQuery_MAX;
+    TArray<AActor*> actorsToIgnore;
+    EDrawDebugTrace::Type debugTrace = EDrawDebugTrace::Type::ForOneFrame;
+    FHitResult hitResult;
+
+    bool isHit = UKismetSystemLibrary::LineTraceSingle(WorldContextObject, startLoc, endLoc,
+        channel, false, actorsToIgnore, debugTrace,
+        hitResult,
+        true,
+        FLinearColor::Red, FLinearColor::Green, 5.f);
+
+    if (isHit) {
+        hitActor = hitResult.GetActor();
+    }
+
+    return hitActor;
+}
+
+
 void UTPSFunctionLibrary::DrawDebugTrace(const UObject* WorldContextObject, const FVector startLoc, const FVector direction)
 {
     UTPSFunctionLibrary::DrawDebugTrace(WorldContextObject, startLoc, direction,

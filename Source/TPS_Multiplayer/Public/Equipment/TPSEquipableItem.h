@@ -8,6 +8,7 @@
 #include "AbilitySystemComponent.h"
 #include "Behavior/TPSMountable.h"
 #include "Components/BoxComponent.h"
+#include "Equipment/TPSEquipmentSlot.h"
 
 #include "TPSEquipableItem.generated.h"
 
@@ -65,33 +66,37 @@ public:
     // Identity
 
     //- Name
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|Identity")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Identity")
     FString Name;
 
     /////////////////////////////////////////////////////////////////
     // Configuration
 
+    // Effects to be applied to the owning Pawn's ASC when equipped (active)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipable")
+    TEnumAsByte<ETPSEquipmentSlot> TargetSlot;
+
     // Effects to be applied to the owning Pawn's ASC when in inventory (passive)
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPS|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipable|Effects")
     TArray<TSubclassOf<UGameplayEffect>> PassiveEffects;
 
     // Effects to be applied to the owning Pawn's ASC when equipped (active)
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPS|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipable|Effects")
     TArray<TSubclassOf<UGameplayEffect>> ActiveEffects;
 
     // Offset to use when item is mounted to a Pawn. (not armed)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mountable|Configuration")
     FTPSMountOffset WeaponHolsterOffset = FTPSMountOffset();
 
     /////////////////////////////////////////////////////////////////
     // State
 
     // IsOwned by a Pawn
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Equippable|State", Replicated)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipable|State", Replicated)
     bool IsOwned;
     
     // IsEquipped by a Pawn
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS|Equippable|State", Replicated)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipable|State", Replicated)
     bool IsEquipped;
 
 //~ ========================================================================= ~//
@@ -104,6 +109,8 @@ public:
     // TODO: Move to IPickupable?
     UFUNCTION(BlueprintCallable)
     void Pickup();
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool CanPickup();
     UFUNCTION(BlueprintImplementableEvent)
     void OnPickup();
     virtual void PerformPickup() { OnPickup(); }
