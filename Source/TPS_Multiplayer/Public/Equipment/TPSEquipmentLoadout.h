@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 
-#include "Equipment/TPSEquipableItem.h"
-#include "Equipment/TPSEquipmentSlot.h"
+#include "Equipment/TPSGearItem.h"
+#include "Equipment/TPSGearSlot.h"
+#include "Weapon/TPSWeapon.h"
+#include "Weapon/TPSWeaponSlot.h"
 
 #include "TPSEquipmentLoadout.generated.h"
 
@@ -18,10 +20,9 @@ class TPS_MULTIPLAYER_API UTPSEquipmentLoadout : public UDataAsset
     GENERATED_BODY()
 
 public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TMap<TEnumAsByte<ETPSWeaponSlot>, TSubclassOf<ATPSWeapon>> WeaponsBySlot;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TMap<TEnumAsByte<ETPSEquipmentSlot>, TSubclassOf<ATPSEquipableItem>> EquipmentBySlot;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TMap<TEnumAsByte<ETPSGearSlot>, TSubclassOf<ATPSEquipableItem>> GearBySlot;
+    TMap<TEnumAsByte<ETPSGearSlot>, TSubclassOf<ATPSGearItem>> GearBySlot;
 };

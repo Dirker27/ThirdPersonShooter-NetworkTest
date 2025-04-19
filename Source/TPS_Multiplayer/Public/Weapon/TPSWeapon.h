@@ -6,6 +6,7 @@
 
 #include "Equipment/TPSEquipableItem.h"
 #include "Reticle/TPSReticle.h"
+#include "Weapon/TPSWeaponSlot.h"
 #include "Weapon/TPSWeaponType.h"
 #include "Weapon/TPSWeaponConfiguration.h"
 #include "Weapon/TPSWeaponState.h"
@@ -71,6 +72,10 @@ public:
 
     //////////////////////////////////////////////////////
     // Configuration
+
+    // Effects to be applied to the owning Pawn's ASC when equipped (active)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipable|Configuration")
+    TEnumAsByte<ETPSWeaponSlot> TargetSlot;
 
     // Weapon Attributes (damage, spread, cycle rate, etc)
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")

@@ -7,6 +7,7 @@
 
 #include "Equipment/TPSEquipmentSlot.h"
 #include "Equipment/TPSEquipmentLoadout.h"
+#include "Weapon/TPSWeaponSlot.h"
 
 #include "TPSEquipmentManager.generated.h"
 
@@ -34,7 +35,7 @@ protected:
 //~ ======================================================================== ~//
 public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
-    TEnumAsByte<ETPSEquipmentSlot> ActiveEquipmentSlot;
+    TEnumAsByte<ETPSWeaponSlot> ActiveEquipmentSlot;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
     TObjectPtr<UTPSEquipmentLoadout> Loadout;
@@ -60,7 +61,7 @@ protected:
 
     // EquipmentSlot -> HarnessSlot (when holstered)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
-    TMap<TEnumAsByte<ETPSEquipmentSlot>, TEnumAsByte<ETPSEquipmentHarnessSlot>> EquipmentHarnessMap;
+    TMap<TEnumAsByte<ETPSWeaponSlot>, TEnumAsByte<ETPSEquipmentHarnessSlot>> EquipmentHarnessMap;
 
     // EquipmentSlot -> HarnessSlot (when holstered)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
@@ -82,7 +83,7 @@ protected:
 
     // Owned Equipment Items (provide active GAS Effects and Usable actions)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
-    TArray<TEnumAsByte<ETPSEquipmentSlot>> PopulatedEquipmentSlots;
+    TArray<TEnumAsByte<ETPSWeaponSlot>> PopulatedEquipmentSlots;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
     TObjectPtr<ATPSEquipableItem> PrimaryWeaponInstance;
@@ -148,14 +149,14 @@ public:
     //   - Bound GAS abilities/attributes will be applied to owner's ASC.
     //   - If slot is occupied, that equipment item will be dropped.
     UFUNCTION(BlueprintCallable)
-    void PickUpEquipmentItem(ATPSEquipableItem* equipmentItem, const ETPSEquipmentSlot slot);
+    void PickUpEquipmentItem(ATPSEquipableItem* equipmentItem, const ETPSWeaponSlot slot);
 
     UFUNCTION(BlueprintCallable)
     void PickUpGearItem(ATPSGearItem* gearItem, const ETPSGearSlot slot);
 
     // Drops an equipment item from 
     UFUNCTION(BlueprintCallable)
-    void DropEquipmentItem(const ETPSEquipmentSlot slot);
+    void DropEquipmentItem(const ETPSWeaponSlot slot);
     UFUNCTION(BlueprintCallable)
     void DropGearItem(const ETPSGearSlot slot);
     UFUNCTION(BlueprintCallable)
@@ -163,7 +164,7 @@ public:
 
 
     UFUNCTION(BlueprintCallable)
-    void DestroyEquipmentItem(const ETPSEquipmentSlot slot);
+    void DestroyEquipmentItem(const ETPSWeaponSlot slot);
     UFUNCTION(BlueprintCallable)
     void DestroyGearItem(const ETPSGearSlot slot);
     UFUNCTION(BlueprintCallable)
@@ -179,14 +180,14 @@ public:
 
     // TODO: Rename 'EquipItem'(?)
     UFUNCTION(BlueprintCallable)
-    void EquipAndArm(const ETPSEquipmentSlot equipmentSlot);
+    void EquipAndArm(const ETPSWeaponSlot equipmentSlot);
 
     UFUNCTION(BlueprintCallable)
-    void HolsterEquipmentItem(const ETPSEquipmentSlot slot);
+    void HolsterEquipmentItem(const ETPSWeaponSlot slot);
 
     // TODO: Rename 'GetItem'(?)
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    ATPSEquipableItem* GetItemFromEquipmentSlot(const ETPSEquipmentSlot slot);
+    ATPSEquipableItem* GetItemFromEquipmentSlot(const ETPSWeaponSlot slot);
 
     UFUNCTION(BlueprintCallable, BlueprintPure)
     ATPSEquipableItem* GetGearItem(const ETPSGearSlot slot);
@@ -194,11 +195,11 @@ public:
 private:
     void ConfigureHarnessSlots();
 
-    void InstantiateAndAssignEquipmentItemToSlot(TSubclassOf<ATPSEquipableItem>, const ETPSEquipmentSlot slot);
+    void InstantiateAndAssignEquipmentItemToSlot(TSubclassOf<ATPSEquipableItem>, const ETPSWeaponSlot slot);
     void InstantiateAndAssignGearItemToSlot(TSubclassOf<ATPSEquipableItem>, const ETPSGearSlot slot);
 
     void EquipToPrimaryWeaponHand(ATPSEquipableItem* item);
 
-    UTPSMountPoint* GetHarnessMountPointForEquipmentSlot(const ETPSEquipmentSlot slot);
+    UTPSMountPoint* GetHarnessMountPointForEquipmentSlot(const ETPSWeaponSlot slot);
     UTPSMountPoint* GetHarnessMountPointForGearSlot(const ETPSGearSlot slot);
 };

@@ -3,74 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
 
 #include "TPSEquipmentSlot.generated.h"
-
-// TODO: Rename to WeaponSlot(?)
-UENUM(BlueprintType)
-enum ETPSEquipmentSlot : int
-{
-	None              = 0,
-	PrimaryWeapon     = 1,
-	SecondaryWeapon   = 2,
-	TertiaryWeapon    = 3,
-	LethalEquipment   = 4,
-	TacticalEquipment = 5
-};
-
-static const char* ETPSEquipmentSlotToString(const ETPSEquipmentSlot slot) {
-	switch (slot) {
-	case None:
-		return "None";
-	case PrimaryWeapon:
-		return "PrimaryWeapon";
-	case SecondaryWeapon:
-		return "SecondaryWeapon";
-	case TertiaryWeapon:
-		return "TertiaryWeapon";
-	case LethalEquipment:
-		return "LethalEquipment";
-	case TacticalEquipment:
-		return "TacticalEquipment";
-	default:
-		return "UNSUPPORTED";
-	}
-}
-
-
-
-
-
-static const int GEAR_SLOT_SIZE = 4;
-UENUM(BlueprintType)
-enum ETPSGearSlot : int
-{
-	Headgear = 0,
-	Eyewear  = 1,
-	Vest     = 2,
-	Pack     = 3
-};
-
-static const char* ETPSGearSlotToString(const ETPSGearSlot slot) {
-	switch (slot) {
-	case Headgear:
-		return "Helmet";
-	case Eyewear:
-		return "Helmet";
-	case Vest:
-		return "Vest";
-	case Pack:
-		return "Pack";
-	default:
-		return "UNSUPPORTED";
-	}
-}
-
-
-
-
-
 
 UENUM(BlueprintType)
 enum ETPSEquipmentHarnessSlot : int

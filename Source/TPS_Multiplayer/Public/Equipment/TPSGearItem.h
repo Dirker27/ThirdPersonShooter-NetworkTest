@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Equipment/TPSEquipableItem.h"
+#include "Equipment/TPSGearSlot.h"
 
 #include "TPSGearItem.generated.h"
 
@@ -15,7 +16,6 @@ class TPS_MULTIPLAYER_API ATPSGearItem : public ATPSEquipableItem
 
 public:
 	ATPSGearItem();
-
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="EquipableItem|Configuration")
 	TEnumAsByte<ETPSGearSlot> GearSlot;

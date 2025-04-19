@@ -117,10 +117,10 @@ void UTPSEquipmentManager::InstantiateLoadout()
 {
     if (!IsValid(Loadout)) { return; }
 
-    for (auto entry : Loadout->EquipmentBySlot)
+    for (auto entry : Loadout->WeaponsBySlot)
     {
         if (IsValid(entry.Value)) {
-            UE_LOG(LogTemp, Log, TEXT("Instantiating Equipment[%hs]..."), ETPSEquipmentSlotToString(entry.Key));
+            UE_LOG(LogTemp, Log, TEXT("Instantiating Weapon[%hs]..."), ETPSWeaponSlotToString(entry.Key));
             InstantiateAndAssignEquipmentItemToSlot(entry.Value, entry.Key);
         }
     }
@@ -136,7 +136,7 @@ void UTPSEquipmentManager::InstantiateLoadout()
 
 
 
-void UTPSEquipmentManager::InstantiateAndAssignEquipmentItemToSlot(TSubclassOf<ATPSEquipableItem> templ, const ETPSEquipmentSlot slot)
+void UTPSEquipmentManager::InstantiateAndAssignEquipmentItemToSlot(TSubclassOf<ATPSEquipableItem> templ, const ETPSWeaponSlot slot)
 {
     ATPSEquipableItem* item = GetWorld()->SpawnActor<ATPSEquipableItem>(templ);
     PickUpEquipmentItem(item, slot);
@@ -151,7 +151,7 @@ void UTPSEquipmentManager::InstantiateAndAssignGearItemToSlot(TSubclassOf<ATPSEq
 
 
 
-void UTPSEquipmentManager::HolsterEquipmentItem(const ETPSEquipmentSlot slot)
+void UTPSEquipmentManager::HolsterEquipmentItem(const ETPSWeaponSlot slot)
 {
     ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
     UTPSMountPoint* mount = GetHarnessMountPointForEquipmentSlot(slot);
@@ -184,7 +184,7 @@ void UTPSEquipmentManager::EquipToPrimaryWeaponHand(ATPSEquipableItem* item)
 
 
 
-void UTPSEquipmentManager::PickUpEquipmentItem(ATPSEquipableItem* equipmentItem, const ETPSEquipmentSlot slot)
+void UTPSEquipmentManager::PickUpEquipmentItem(ATPSEquipableItem* equipmentItem, const ETPSWeaponSlot slot)
 {
     if (!IsValid(equipmentItem)) { return; }
 
@@ -247,7 +247,7 @@ void UTPSEquipmentManager::PickUpGearItem(ATPSGearItem* gearItem, const ETPSGear
 
 
 
-void UTPSEquipmentManager::DropEquipmentItem(const ETPSEquipmentSlot slot)
+void UTPSEquipmentManager::DropEquipmentItem(const ETPSWeaponSlot slot)
 {
     ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
 
@@ -267,7 +267,7 @@ void UTPSEquipmentManager::DropGearItem(const ETPSGearSlot slot)
 }
 void UTPSEquipmentManager::DropAll()
 {
-    for (ETPSEquipmentSlot slot : PopulatedEquipmentSlots)
+    for (ETPSWeaponSlot slot : PopulatedEquipmentSlots)
     {
         ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
         item->Drop();
@@ -286,7 +286,7 @@ void UTPSEquipmentManager::DropAll()
 
 
 
-void UTPSEquipmentManager::DestroyEquipmentItem(const ETPSEquipmentSlot slot)
+void UTPSEquipmentManager::DestroyEquipmentItem(const ETPSWeaponSlot slot)
 {
     ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
 
@@ -308,7 +308,7 @@ void UTPSEquipmentManager::DestroyGearItem(const ETPSGearSlot slot)
 }
 void UTPSEquipmentManager::DestroyAll()
 {
-    for (ETPSEquipmentSlot slot : PopulatedEquipmentSlots)
+    for (ETPSWeaponSlot slot : PopulatedEquipmentSlots)
     {
         ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
         item->Destroy();
@@ -350,7 +350,7 @@ void UTPSEquipmentManager::UnReady()
 
 
 
-void UTPSEquipmentManager::EquipAndArm(ETPSEquipmentSlot equipmentSlot) {
+void UTPSEquipmentManager::EquipAndArm(ETPSWeaponSlot equipmentSlot) {
     ATPSEquipableItem* item = GetItemFromEquipmentSlot(equipmentSlot);
 
     if (item) {
@@ -361,7 +361,7 @@ void UTPSEquipmentManager::EquipAndArm(ETPSEquipmentSlot equipmentSlot) {
 }
 
 void UTPSEquipmentManager::UnEquipActive() {
-    if (ActiveEquipmentSlot == ETPSEquipmentSlot::None) { return; }
+    if (ActiveEquipmentSlot == ETPSWeaponSlot::None) { return; }
 
     ATPSEquipableItem* item = GetItemFromEquipmentSlot(ActiveEquipmentSlot);
     if (IsValid(item)) {
@@ -369,13 +369,13 @@ void UTPSEquipmentManager::UnEquipActive() {
         HolsterEquipmentItem(ActiveEquipmentSlot);
     }
 
-    ActiveEquipmentSlot = ETPSEquipmentSlot::None;
+    ActiveEquipmentSlot = ETPSWeaponSlot::None;
 }
 
 
 
 
-ATPSEquipableItem* UTPSEquipmentManager::GetItemFromEquipmentSlot(const ETPSEquipmentSlot slot)
+ATPSEquipableItem* UTPSEquipmentManager::GetItemFromEquipmentSlot(const ETPSWeaponSlot slot)
 {
     switch (slot)
     {
@@ -438,7 +438,7 @@ void UTPSEquipmentManager::ConfigureHarnessSlots()
 }
 
 
-UTPSMountPoint* UTPSEquipmentManager::GetHarnessMountPointForEquipmentSlot(const ETPSEquipmentSlot slot)
+UTPSMountPoint* UTPSEquipmentManager::GetHarnessMountPointForEquipmentSlot(const ETPSWeaponSlot slot)
 {
     TEnumAsByte<ETPSEquipmentHarnessSlot>* s = EquipmentHarnessMap.Find(slot);
     if (s == nullptr) { return nullptr; }

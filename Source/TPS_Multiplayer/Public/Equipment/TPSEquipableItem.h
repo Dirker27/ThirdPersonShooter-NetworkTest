@@ -6,9 +6,9 @@
 #include "Components/ArrowComponent.h"
 
 #include "AbilitySystemComponent.h"
-#include "Behavior/TPSMountable.h"
 #include "Components/BoxComponent.h"
-#include "Equipment/TPSEquipmentSlot.h"
+
+#include "Behavior/TPSMountable.h"
 
 #include "TPSEquipableItem.generated.h"
 
@@ -71,10 +71,6 @@ public:
 
     /////////////////////////////////////////////////////////////////
     // Configuration
-
-    // Effects to be applied to the owning Pawn's ASC when equipped (active)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipable")
-    TEnumAsByte<ETPSEquipmentSlot> TargetSlot;
 
     // Effects to be applied to the owning Pawn's ASC when in inventory (passive)
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipable|Effects")
