@@ -6,7 +6,8 @@
 
 #include "TPSWeaponSlot.generated.h"
 
-// TODO: Rename to WeaponSlot(?)
+static const int WEAPON_SLOT_SIZE = 6;
+
 UENUM(BlueprintType)
 enum ETPSWeaponSlot : int
 {

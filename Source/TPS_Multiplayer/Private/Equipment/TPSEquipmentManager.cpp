@@ -25,6 +25,7 @@ UTPSEquipmentManager::UTPSEquipmentManager(const FObjectInitializer& ObjectIniti
         );
     }
 
+    WeaponItems.SetNum(WEAPON_SLOT_SIZE);
     GearItems.SetNum(GEAR_SLOT_SIZE);
 }
 
@@ -33,12 +34,7 @@ void UTPSEquipmentManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
     DOREPLIFETIME(UTPSEquipmentManager, ActiveEquipmentSlot);
 
-    DOREPLIFETIME(UTPSEquipmentManager, PrimaryWeaponInstance);
-    DOREPLIFETIME(UTPSEquipmentManager, SecondaryWeaponInstance);
-    DOREPLIFETIME(UTPSEquipmentManager, TertiaryWeaponInstance);
-    DOREPLIFETIME(UTPSEquipmentManager, LethalEquipmentInstance);
-    DOREPLIFETIME(UTPSEquipmentManager, TacticalEquipmentInstance);
-
+    DOREPLIFETIME(UTPSEquipmentManager, WeaponItems);
     DOREPLIFETIME(UTPSEquipmentManager, GearItems);
 }
 
@@ -92,10 +88,13 @@ void UTPSEquipmentManager::BindToMesh(USkeletalMeshComponent* mesh)
 void UTPSEquipmentManager::BindToOwnerAbilitySystem(UAbilitySystemComponent* ownerAsc)
 {
     OwnerAsc = ownerAsc;
-    for (auto equipmentSlot : PopulatedEquipmentSlots)
+
+    for (auto weapon : WeaponItems)
     {
-        ATPSEquipableItem* item = GetItemFromEquipmentSlot(equipmentSlot);
-        item->OwnerAsc = ownerAsc;
+        if (weapon != nullptr)
+        {
+            weapon->OwnerAsc = ownerAsc;
+        }
     }
 
     for (auto gear : GearItems)
@@ -121,7 +120,7 @@ void UTPSEquipmentManager::InstantiateLoadout()
     {
         if (IsValid(entry.Value)) {
             UE_LOG(LogTemp, Log, TEXT("Instantiating Weapon[%hs]..."), ETPSWeaponSlotToString(entry.Key));
-            InstantiateAndAssignEquipmentItemToSlot(entry.Value, entry.Key);
+            InstantiateWeaponAndAssignToSlot(entry.Value, entry.Key);
         }
     }
 
@@ -129,20 +128,20 @@ void UTPSEquipmentManager::InstantiateLoadout()
     {
         if (IsValid(entry.Value)) {
             UE_LOG(LogTemp, Log, TEXT("Instantiating Gear[%hs]..."), ETPSGearSlotToString(entry.Key));
-            InstantiateAndAssignGearItemToSlot(entry.Value, entry.Key);
+            InstantiateGearItemAndAssignToSlot(entry.Value, entry.Key);
         }
     }
 }
 
 
 
-void UTPSEquipmentManager::InstantiateAndAssignEquipmentItemToSlot(TSubclassOf<ATPSEquipableItem> templ, const ETPSWeaponSlot slot)
+void UTPSEquipmentManager::InstantiateWeaponAndAssignToSlot(TSubclassOf<ATPSWeapon> templ, const ETPSWeaponSlot slot)
 {
-    ATPSEquipableItem* item = GetWorld()->SpawnActor<ATPSEquipableItem>(templ);
-    PickUpEquipmentItem(item, slot);
+    ATPSWeapon* weapon = GetWorld()->SpawnActor<ATPSWeapon>(templ);
+    PickUpWeapon(weapon, slot);
 }
 
-void UTPSEquipmentManager::InstantiateAndAssignGearItemToSlot(TSubclassOf<ATPSEquipableItem> templ, const ETPSGearSlot slot)
+void UTPSEquipmentManager::InstantiateGearItemAndAssignToSlot(TSubclassOf<ATPSGearItem> templ, const ETPSGearSlot slot)
 {
     ATPSGearItem* item = GetWorld()->SpawnActor<ATPSGearItem>(templ);
     PickUpGearItem(item, slot);
@@ -153,7 +152,7 @@ void UTPSEquipmentManager::InstantiateAndAssignGearItemToSlot(TSubclassOf<ATPSEq
 
 void UTPSEquipmentManager::HolsterEquipmentItem(const ETPSWeaponSlot slot)
 {
-    ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
+    ATPSEquipableItem* item = GetWeapon(slot);
     UTPSMountPoint* mount = GetHarnessMountPointForEquipmentSlot(slot);
     if (!IsValid(mount) || !IsValid(item)) { return; }
 
@@ -184,42 +183,24 @@ void UTPSEquipmentManager::EquipToPrimaryWeaponHand(ATPSEquipableItem* item)
 
 
 
-void UTPSEquipmentManager::PickUpEquipmentItem(ATPSEquipableItem* equipmentItem, const ETPSWeaponSlot slot)
+void UTPSEquipmentManager::PickUpWeapon(ATPSWeapon* weapon, const ETPSWeaponSlot slot)
 {
-    if (!IsValid(equipmentItem)) { return; }
+    if (!IsValid(weapon)) { return; }
 
-    ATPSEquipableItem* existingItem = GetItemFromEquipmentSlot(slot);
+    ATPSEquipableItem* existingItem = GetWeapon(slot);
     if (IsValid(existingItem))
     {
-        DropEquipmentItem(slot);
+        DropWeaponFromSlot(slot);
     }
 
-    switch (slot)
-    {
-    case PrimaryWeapon:
-        PrimaryWeaponInstance = equipmentItem;
-        break;
-    case SecondaryWeapon:
-        SecondaryWeaponInstance = equipmentItem;
-        break;
-    case TertiaryWeapon:
-        TertiaryWeaponInstance = equipmentItem;
-        break;
-    case LethalEquipment:
-        LethalEquipmentInstance = equipmentItem;
-        break;
-    case TacticalEquipment:
-        TacticalEquipmentInstance = equipmentItem;
-        break;
-    }
-    PopulatedEquipmentSlots.Add(slot);
+    WeaponItems[slot] = weapon;
 
-    equipmentItem->Pickup();
-    equipmentItem->OwnerAsc = OwnerAsc;
+    weapon->Pickup();
+    weapon->OwnerAsc = OwnerAsc;
 
     if (slot == ActiveEquipmentSlot)
     {
-        EquipToPrimaryWeaponHand(equipmentItem);
+        EquipToPrimaryWeaponHand(weapon);
     }
     else
     {
@@ -234,7 +215,7 @@ void UTPSEquipmentManager::PickUpGearItem(ATPSGearItem* gearItem, const ETPSGear
     ATPSEquipableItem* existingItem = GetGearItem(slot);
     if (IsValid(existingItem))
     {
-        DropGearItem(slot);
+        DropGearFromSlot(slot);
     }
 
     GearItems[slot] = gearItem;
@@ -247,34 +228,35 @@ void UTPSEquipmentManager::PickUpGearItem(ATPSGearItem* gearItem, const ETPSGear
 
 
 
-void UTPSEquipmentManager::DropEquipmentItem(const ETPSWeaponSlot slot)
+void UTPSEquipmentManager::DropWeaponFromSlot(const ETPSWeaponSlot slot)
 {
-    ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
+    ATPSEquipableItem* item = GetWeapon(slot);
 
     if (IsValid(item)) {
-        PopulatedEquipmentSlots.Remove(slot);
         item->Drop();
     }
+    WeaponItems[slot] = nullptr;
 }
-void UTPSEquipmentManager::DropGearItem(const ETPSGearSlot slot)
+void UTPSEquipmentManager::DropGearFromSlot(const ETPSGearSlot slot)
 {
     ATPSEquipableItem* item = GetGearItem(slot);
 
     if (IsValid(item)) {
-        GearItems[slot] = nullptr;
         item->Drop();
     }
+    GearItems[slot] = nullptr;
 }
 void UTPSEquipmentManager::DropAll()
 {
-    for (ETPSWeaponSlot slot : PopulatedEquipmentSlots)
+    for (ATPSWeapon* weapon : WeaponItems)
     {
-        ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
-        item->Drop();
+        if (IsValid(weapon))
+        {
+            weapon->Drop();
+        }
     }
-    PopulatedEquipmentSlots.Empty();
+    WeaponItems.Empty(WEAPON_SLOT_SIZE);
 
-    TArray<TEnumAsByte<ETPSGearSlot>> activeGearSlots;
     for (ATPSGearItem* item : GearItems)
     {
         if (IsValid(item)) {
@@ -286,15 +268,15 @@ void UTPSEquipmentManager::DropAll()
 
 
 
-void UTPSEquipmentManager::DestroyEquipmentItem(const ETPSWeaponSlot slot)
+void UTPSEquipmentManager::DestroyWeapon(const ETPSWeaponSlot slot)
 {
-    ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
+    ATPSEquipableItem* item = GetWeapon(slot);
 
     if (IsValid(item))
     {
-        PopulatedEquipmentSlots.Remove(slot);
         item->Destroy();
     }
+    WeaponItems[slot] = nullptr;
 }
 void UTPSEquipmentManager::DestroyGearItem(const ETPSGearSlot slot)
 {
@@ -302,18 +284,20 @@ void UTPSEquipmentManager::DestroyGearItem(const ETPSGearSlot slot)
 
     if (IsValid(item))
     {
-        GearItems[slot] = nullptr;
         item->Destroy();
     }
+    GearItems[slot] = nullptr;
 }
 void UTPSEquipmentManager::DestroyAll()
 {
-    for (ETPSWeaponSlot slot : PopulatedEquipmentSlots)
+    for (ATPSWeapon* weapon : WeaponItems)
     {
-        ATPSEquipableItem* item = GetItemFromEquipmentSlot(slot);
-        item->Destroy();
+        if (IsValid(weapon))
+        {
+            weapon->Destroy();
+        }
     }
-    PopulatedEquipmentSlots.Empty();
+    WeaponItems.Empty(WEAPON_SLOT_SIZE);
 
     TArray<TEnumAsByte<ETPSGearSlot>> activeGearSlots;
     for (ATPSGearItem* item : GearItems)
@@ -341,7 +325,7 @@ void UTPSEquipmentManager::Ready()
 
 void UTPSEquipmentManager::UnReady()
 {
-    ATPSEquipableItem* activeItem = GetItemFromEquipmentSlot(ActiveEquipmentSlot);
+    ATPSEquipableItem* activeItem = GetWeapon(ActiveEquipmentSlot);
 
     HolsterEquipmentItem(ActiveEquipmentSlot);
 }
@@ -351,7 +335,7 @@ void UTPSEquipmentManager::UnReady()
 
 
 void UTPSEquipmentManager::EquipAndArm(ETPSWeaponSlot equipmentSlot) {
-    ATPSEquipableItem* item = GetItemFromEquipmentSlot(equipmentSlot);
+    ATPSEquipableItem* item = GetWeapon(equipmentSlot);
 
     if (item) {
         EquipToPrimaryWeaponHand(item);
@@ -363,7 +347,7 @@ void UTPSEquipmentManager::EquipAndArm(ETPSWeaponSlot equipmentSlot) {
 void UTPSEquipmentManager::UnEquipActive() {
     if (ActiveEquipmentSlot == ETPSWeaponSlot::None) { return; }
 
-    ATPSEquipableItem* item = GetItemFromEquipmentSlot(ActiveEquipmentSlot);
+    ATPSEquipableItem* item = GetWeapon(ActiveEquipmentSlot);
     if (IsValid(item)) {
         item->UnEquip();
         HolsterEquipmentItem(ActiveEquipmentSlot);
@@ -375,26 +359,12 @@ void UTPSEquipmentManager::UnEquipActive() {
 
 
 
-ATPSEquipableItem* UTPSEquipmentManager::GetItemFromEquipmentSlot(const ETPSWeaponSlot slot)
+ATPSWeapon* UTPSEquipmentManager::GetWeapon(const ETPSWeaponSlot slot)
 {
-    switch (slot)
-    {
-    case PrimaryWeapon:
-        return PrimaryWeaponInstance;
-    case SecondaryWeapon:
-        return SecondaryWeaponInstance;
-    case TertiaryWeapon:
-        return TertiaryWeaponInstance;
-    case LethalEquipment:
-        return LethalEquipmentInstance;
-    case TacticalEquipment:
-        return TacticalEquipmentInstance;
-    default:
-        return nullptr;
-    }
+    return WeaponItems[slot];
 }
 
-ATPSEquipableItem* UTPSEquipmentManager::GetGearItem(const ETPSGearSlot slot)
+ATPSGearItem* UTPSEquipmentManager::GetGearItem(const ETPSGearSlot slot)
 {
     return GearItems[slot];
 }

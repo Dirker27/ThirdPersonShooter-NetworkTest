@@ -78,34 +78,12 @@ protected:
     //////////////////////////////////////////////////////
     // Equipment Item Instances
 
-    // Instances are stored as individual pointers b/c Map<>s are not
-    //   supported for replication.
-
-    // Owned Equipment Items (provide active GAS Effects and Usable actions)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
-    TArray<TEnumAsByte<ETPSWeaponSlot>> PopulatedEquipmentSlots;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
-    TObjectPtr<ATPSEquipableItem> PrimaryWeaponInstance;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
-    TObjectPtr<ATPSEquipableItem> SecondaryWeaponInstance;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
-    TObjectPtr<ATPSEquipableItem> TertiaryWeaponInstance;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
-    TObjectPtr<ATPSEquipableItem> LethalEquipmentInstance;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State", Replicated)
-    TObjectPtr<ATPSEquipableItem> TacticalEquipmentInstance;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State", Replicated)
+    TArray<ATPSWeapon*> WeaponItems;
 
     //////////////////////////////////////////////////////
     // Gear Item Instances
 
-    // TODO: Convert this to use the Array<->Instance grouping (if we need to replicate these instances)
-
-    // Owned Gear Items (provide passive GAS Effects)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State", Replicated)
     TArray<ATPSGearItem*> GearItems;
 
@@ -149,22 +127,22 @@ public:
     //   - Bound GAS abilities/attributes will be applied to owner's ASC.
     //   - If slot is occupied, that equipment item will be dropped.
     UFUNCTION(BlueprintCallable)
-    void PickUpEquipmentItem(ATPSEquipableItem* equipmentItem, const ETPSWeaponSlot slot);
+    void PickUpWeapon(ATPSWeapon* weapon, const ETPSWeaponSlot slot);
 
     UFUNCTION(BlueprintCallable)
     void PickUpGearItem(ATPSGearItem* gearItem, const ETPSGearSlot slot);
 
     // Drops an equipment item from 
     UFUNCTION(BlueprintCallable)
-    void DropEquipmentItem(const ETPSWeaponSlot slot);
+    void DropWeaponFromSlot(const ETPSWeaponSlot slot);
     UFUNCTION(BlueprintCallable)
-    void DropGearItem(const ETPSGearSlot slot);
+    void DropGearFromSlot(const ETPSGearSlot slot);
     UFUNCTION(BlueprintCallable)
     void DropAll();
 
 
     UFUNCTION(BlueprintCallable)
-    void DestroyEquipmentItem(const ETPSWeaponSlot slot);
+    void DestroyWeapon(const ETPSWeaponSlot slot);
     UFUNCTION(BlueprintCallable)
     void DestroyGearItem(const ETPSGearSlot slot);
     UFUNCTION(BlueprintCallable)
@@ -185,18 +163,17 @@ public:
     UFUNCTION(BlueprintCallable)
     void HolsterEquipmentItem(const ETPSWeaponSlot slot);
 
-    // TODO: Rename 'GetItem'(?)
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    ATPSEquipableItem* GetItemFromEquipmentSlot(const ETPSWeaponSlot slot);
+    ATPSWeapon* GetWeapon(const ETPSWeaponSlot slot);
 
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    ATPSEquipableItem* GetGearItem(const ETPSGearSlot slot);
+    ATPSGearItem* GetGearItem(const ETPSGearSlot slot);
 
 private:
     void ConfigureHarnessSlots();
 
-    void InstantiateAndAssignEquipmentItemToSlot(TSubclassOf<ATPSEquipableItem>, const ETPSWeaponSlot slot);
-    void InstantiateAndAssignGearItemToSlot(TSubclassOf<ATPSEquipableItem>, const ETPSGearSlot slot);
+    void InstantiateWeaponAndAssignToSlot(TSubclassOf<ATPSWeapon>, const ETPSWeaponSlot slot);
+    void InstantiateGearItemAndAssignToSlot(TSubclassOf<ATPSGearItem>, const ETPSGearSlot slot);
 
     void EquipToPrimaryWeaponHand(ATPSEquipableItem* item);
 

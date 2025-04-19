@@ -61,7 +61,7 @@ public:
 
 //~ ======================================================================= ~//
 //  ATTRIBUTES
-//~ ======================================================================== ~//
+//~ ======================================================================= ~//
 public:
     //////////////////////////////////////////////////////
     // Identity
@@ -75,7 +75,7 @@ public:
 
     // Effects to be applied to the owning Pawn's ASC when equipped (active)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipable|Configuration")
-    TEnumAsByte<ETPSWeaponSlot> TargetSlot;
+    TEnumAsByte<ETPSWeaponSlot> WeaponSlot;
 
     // Weapon Attributes (damage, spread, cycle rate, etc)
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")

@@ -241,7 +241,7 @@ ATPSWeapon* ATPSCharacter::GetEquippedWeapon() const
 {
 	if (EquipmentManager->ActiveEquipmentSlot == None) { return nullptr; }
 
-	return Cast<ATPSWeapon>(EquipmentManager->GetItemFromEquipmentSlot(EquipmentManager->ActiveEquipmentSlot));
+	return Cast<ATPSWeapon>(EquipmentManager->GetWeapon(EquipmentManager->ActiveEquipmentSlot));
 }
 
 //~ ============================================================= ~//
