@@ -40,6 +40,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|State")
     TObjectPtr<UTPSEquipmentLoadout> Loadout;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipmentManager|State")
+    bool IsReadied;
+
 //~ ======================================================================== ~//
 //  CONFIGURATION
 //~ ======================================================================== ~//
@@ -136,15 +139,15 @@ public:
     UFUNCTION(BlueprintCallable)
     void DropWeaponFromSlot(const ETPSWeaponSlot slot);
     UFUNCTION(BlueprintCallable)
-    void DropGearFromSlot(const ETPSGearSlot slot);
+    void DropGearItemFromSlot(const ETPSGearSlot slot);
     UFUNCTION(BlueprintCallable)
     void DropAll();
 
 
     UFUNCTION(BlueprintCallable)
-    void DestroyWeapon(const ETPSWeaponSlot slot);
+    void DestroyWeaponAtSlot(const ETPSWeaponSlot slot);
     UFUNCTION(BlueprintCallable)
-    void DestroyGearItem(const ETPSGearSlot slot);
+    void DestroyGearItemAtSlot(const ETPSGearSlot slot);
     UFUNCTION(BlueprintCallable)
     void DestroyAll();
 
@@ -153,15 +156,16 @@ public:
 //  EQUIPMENT OPERATIONS
 //~ ============================================================= ~//
 public:
-    UFUNCTION(BlueprintCallable)
-    void UnEquipActive();
 
-    // TODO: Rename 'EquipItem'(?)
+    // Equip a Weapon assigned to given slot.
+    //  - Weapon must already be picked up and registered in inventory.
+    //  - Applies Weapon's active effects to owner's ASC.
     UFUNCTION(BlueprintCallable)
-    void EquipAndArm(const ETPSWeaponSlot equipmentSlot);
+    void EquipWeapon(const ETPSWeaponSlot equipmentSlot);
 
+    // Un-Equips a Weapon at the registered slot. to the mapped EquipmentHarness slot.
     UFUNCTION(BlueprintCallable)
-    void HolsterEquipmentItem(const ETPSWeaponSlot slot);
+    void HolsterWeapon(const ETPSWeaponSlot slot);
 
     UFUNCTION(BlueprintCallable, BlueprintPure)
     ATPSWeapon* GetWeapon(const ETPSWeaponSlot slot);
