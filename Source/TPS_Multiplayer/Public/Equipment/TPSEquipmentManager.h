@@ -181,6 +181,11 @@ private:
 
     void EquipToPrimaryWeaponHand(ATPSEquipableItem* item);
 
+    void ApplyActiveItemEffectsToOwner(ATPSEquipableItem* item);
+    void RemoveActiveItemEffectsFromOwner(ATPSEquipableItem* item);
+    void ApplyPassiveItemEffectsToOwner(ATPSEquipableItem* item);
+    void RemovePassiveItemEffectsFromOwner(ATPSEquipableItem* item);
+
     UTPSMountPoint* GetHarnessMountPointForEquipmentSlot(const ETPSWeaponSlot slot);
     UTPSMountPoint* GetHarnessMountPointForGearSlot(const ETPSGearSlot slot);
 };

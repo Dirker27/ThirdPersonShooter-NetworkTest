@@ -579,7 +579,7 @@ void ATPSCharacter::SetupInitialAbilitiesAndEffects()
 	if (IsValid(InitialGameplayEffect)) {
 		asc->ApplyGameplayEffectToSelf(
 			InitialGameplayEffect->GetDefaultObject<UGameplayEffect>(),
-			0,
+			1,
 			asc->MakeEffectContext());
 	}
 

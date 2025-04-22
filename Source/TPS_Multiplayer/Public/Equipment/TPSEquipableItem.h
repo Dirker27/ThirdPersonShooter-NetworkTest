@@ -72,13 +72,13 @@ public:
     /////////////////////////////////////////////////////////////////
     // Configuration
 
+        // Effects to be applied to the owning Pawn's ASC when equipped (active)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipable|Effects")
+    TArray<TSubclassOf<UGameplayEffect>> ActiveEffects;
+
     // Effects to be applied to the owning Pawn's ASC when in inventory (passive)
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipable|Effects")
     TArray<TSubclassOf<UGameplayEffect>> PassiveEffects;
-
-    // Effects to be applied to the owning Pawn's ASC when equipped (active)
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipable|Effects")
-    TArray<TSubclassOf<UGameplayEffect>> ActiveEffects;
 
     // Offset to use when item is mounted to a Pawn. (not armed)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mountable|Configuration")
@@ -86,6 +86,12 @@ public:
 
     /////////////////////////////////////////////////////////////////
     // State
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipable|Effects")
+    TArray<FActiveGameplayEffectHandle> AppliedActiveEffectHandles;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipable|Effects")
+    TArray<FActiveGameplayEffectHandle> AppliedPassiveEffectHandles;
 
     // IsOwned by a Pawn
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipable|State", Replicated)

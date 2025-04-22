@@ -3,6 +3,8 @@
 #include "Equipment/TPSEquipmentManager.h"
 
 #include "Net/UnrealNetwork.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayEffect.h"
 
 #include "Behavior/TPSMountPoint.h"
 #include "Character/TPSCharacter.h"
@@ -159,16 +161,15 @@ void UTPSEquipmentManager::PickUpWeapon(ATPSWeapon* weapon, const ETPSWeaponSlot
         DropWeaponFromSlot(slot);
     }
 
-    // TODO: [PC-138] Apply weapon's passive effects(?).
-
     WeaponItems[slot] = weapon;
 
     weapon->Pickup();
     weapon->OwnerAsc = OwnerAsc;
+    ApplyPassiveItemEffectsToOwner(weapon);
 
     if (slot == ActiveEquipmentSlot)
     {
-        EquipToPrimaryWeaponHand(weapon);
+        EquipWeapon(ActiveEquipmentSlot);
     }
     else
     {
@@ -186,12 +187,11 @@ void UTPSEquipmentManager::PickUpGearItem(ATPSGearItem* gearItem, const ETPSGear
         DropGearItemFromSlot(slot);
     }
 
-    // TODO: [PC-138] Apply gear item's passive effects.
-
     GearItems[slot] = gearItem;
 
     gearItem->Pickup();
     gearItem->OwnerAsc = OwnerAsc;
+    ApplyPassiveItemEffectsToOwner(gearItem);
 
     gearItem->Mount(GetHarnessMountPointForGearSlot(slot));
 }
@@ -202,12 +202,12 @@ void UTPSEquipmentManager::PickUpGearItem(ATPSGearItem* gearItem, const ETPSGear
 
 void UTPSEquipmentManager::DropWeaponFromSlot(const ETPSWeaponSlot slot)
 {
-    ATPSEquipableItem* item = GetWeapon(slot);
+    ATPSEquipableItem* weapon = GetWeapon(slot);
 
-    if (IsValid(item)) {
-        item->Drop();
-
-        // TODO: [PC-138] Un-apply weapon's passive effects.
+    if (IsValid(weapon)) {
+        weapon->Drop();
+        RemoveActiveItemEffectsFromOwner(weapon);
+        RemovePassiveItemEffectsFromOwner(weapon);
     }
     WeaponItems[slot] = nullptr;
 }
@@ -217,8 +217,8 @@ void UTPSEquipmentManager::DropGearItemFromSlot(const ETPSGearSlot slot)
 
     if (IsValid(item)) {
         item->Drop();
-
-        // TODO: [PC-138] Un-apply gear item's passive effects.
+        RemoveActiveItemEffectsFromOwner(item);
+        RemovePassiveItemEffectsFromOwner(item);
     }
     GearItems[slot] = nullptr;
 
@@ -235,6 +235,8 @@ void UTPSEquipmentManager::DropAll()
         if (IsValid(weapon))
         {
             weapon->Drop();
+            RemoveActiveItemEffectsFromOwner(weapon);
+            RemovePassiveItemEffectsFromOwner(weapon);
         }
         WeaponItems[slotIndex] = nullptr;
     }
@@ -244,6 +246,8 @@ void UTPSEquipmentManager::DropAll()
         ATPSGearItem* item = GearItems[slotIndex];
         if (IsValid(item)) {
             item->Drop();
+            RemoveActiveItemEffectsFromOwner(item);
+            RemovePassiveItemEffectsFromOwner(item);
         }
         GearItems[slotIndex] = nullptr;
     }
@@ -260,6 +264,8 @@ void UTPSEquipmentManager::DestroyWeaponAtSlot(const ETPSWeaponSlot slot)
     if (IsValid(item))
     {
         item->Destroy();
+        RemoveActiveItemEffectsFromOwner(item);
+        RemovePassiveItemEffectsFromOwner(item);
     }
     WeaponItems[slot] = nullptr;
 
@@ -275,6 +281,8 @@ void UTPSEquipmentManager::DestroyGearItemAtSlot(const ETPSGearSlot slot)
     if (IsValid(item))
     {
         item->Destroy();
+        RemoveActiveItemEffectsFromOwner(item);
+        RemovePassiveItemEffectsFromOwner(item);
     }
     GearItems[slot] = nullptr;
 }
@@ -286,6 +294,8 @@ void UTPSEquipmentManager::DestroyAll()
         if (IsValid(weapon))
         {
             weapon->Destroy();
+            RemoveActiveItemEffectsFromOwner(weapon);
+            RemovePassiveItemEffectsFromOwner(weapon);
         }
         WeaponItems[slotIndex] = nullptr;
     }
@@ -295,6 +305,8 @@ void UTPSEquipmentManager::DestroyAll()
         ATPSGearItem* item = GearItems[slotIndex];
         if (IsValid(item)) {
             item->Destroy();
+            RemoveActiveItemEffectsFromOwner(item);
+            RemovePassiveItemEffectsFromOwner(item);
         }
         GearItems[slotIndex] = nullptr;
     }
@@ -335,11 +347,11 @@ void UTPSEquipmentManager::EquipWeapon(ETPSWeaponSlot equipmentSlot) {
     {
         HolsterWeapon(ActiveEquipmentSlot);
     }
+    ActiveEquipmentSlot = equipmentSlot;
 
-    // TODO: [PC-138] Apply weapon's active effects.
+    ApplyActiveItemEffectsToOwner(item);
 
     EquipToPrimaryWeaponHand(item);
-    ActiveEquipmentSlot = equipmentSlot;
     item->Equip();
 }
 
@@ -349,7 +361,7 @@ void UTPSEquipmentManager::HolsterWeapon(const ETPSWeaponSlot slot)
     UTPSMountPoint* mount = GetHarnessMountPointForEquipmentSlot(slot);
     if (!IsValid(mount) || !IsValid(item)) { return; }
 
-    // TODO: [PC-138] Un-apply weapon's active effects.
+    RemoveActiveItemEffectsFromOwner(item);
 
     item->MountWithOffset(mount, item->WeaponHolsterOffset);
     item->UnEquip();
@@ -378,7 +390,47 @@ void UTPSEquipmentManager::EquipToPrimaryWeaponHand(ATPSEquipableItem* item)
 
 
 
+void UTPSEquipmentManager::ApplyActiveItemEffectsToOwner(ATPSEquipableItem* item)
+{
+    for (auto effect : item->ActiveEffects)
+    {
+        FActiveGameplayEffectHandle handle = OwnerAsc->ApplyGameplayEffectToSelf(
+            effect->GetDefaultObject<UGameplayEffect>(),
+            1,
+            OwnerAsc->MakeEffectContext());
 
+        item->AppliedActiveEffectHandles.Add(handle);
+    }
+}
+void UTPSEquipmentManager::ApplyPassiveItemEffectsToOwner(ATPSEquipableItem* item)
+{
+    for (auto effect : item->PassiveEffects)
+    {
+        FActiveGameplayEffectHandle handle = OwnerAsc->ApplyGameplayEffectToSelf(
+            effect->GetDefaultObject<UGameplayEffect>(),
+            1,
+            OwnerAsc->MakeEffectContext());
+
+        item->AppliedPassiveEffectHandles.Add(handle);
+    }
+}
+void UTPSEquipmentManager::RemoveActiveItemEffectsFromOwner(ATPSEquipableItem* item)
+{
+    for (auto effectHandle : item->AppliedActiveEffectHandles)
+    {
+        OwnerAsc->RemoveActiveGameplayEffect(effectHandle);
+    }
+    item->AppliedActiveEffectHandles.Empty();
+}
+void UTPSEquipmentManager::RemovePassiveItemEffectsFromOwner(ATPSEquipableItem* item)
+{
+    for (auto effectHandle : item->AppliedPassiveEffectHandles)
+    {
+        OwnerAsc->RemoveActiveGameplayEffect(effectHandle);
+    }
+    item->AppliedPassiveEffectHandles.Empty();
+}
+ 
 
 
 void UTPSEquipmentManager::ConfigureHarnessSlots()
