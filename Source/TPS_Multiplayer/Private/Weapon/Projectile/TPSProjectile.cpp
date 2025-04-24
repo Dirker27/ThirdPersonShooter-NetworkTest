@@ -50,26 +50,17 @@ void ATPSProjectile::Tick(float deltaSeconds)
 		ATPSCharacter* character = Cast<ATPSCharacter>(hitActor);
 		if (IsValid(character))
 		{
-			UE_LOG(LogTemp, Log, TEXT("Hit Character: [%s]"), *character->Name);
+			//UE_LOG(LogTemp, Log, TEXT("Hit Character: [%s]"), *character->Name);
 			CharacterHit(character, hitResult);
 
 			// Apply Damage & Effects
 			if (HasAuthority())
 			{
-				//FPointDamageEvent event = FPointDamageEvent();
-				//event.Damage = 1.0f;
-				//event.HitInfo = hitResult;
-
-				//character->TakeDamage(1.f, event, nullptr, nullptr);
-
 				for (TSubclassOf<UGameplayEffect> e: AppliedEffects)
 				{
 					UAbilitySystemComponent* asc = character->GetAbilitySystemComponent();
-					if (IsValid(asc)) {
-						//FGameplayTagContainer tags;
-						//e->GetAssetRegistryTags();
-						//asc->RemoveActiveEffectsWithTags(tags);
-
+					if (IsValid(asc)) 
+					{
 						FGameplayEffectContextHandle context = asc->MakeEffectContext();
 						FGameplayEffectSpecHandle spec = asc->MakeOutgoingSpec(e, 1.f, context);
 						asc->ApplyGameplayEffectSpecToSelf(*spec.Data.Get(), asc->GetPredictionKeyForNewAction());
@@ -79,7 +70,7 @@ void ATPSProjectile::Tick(float deltaSeconds)
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("Hit Surface: [%s]"), *hitActor->GetHumanReadableName());
+			//UE_LOG(LogTemp, Log, TEXT("Hit Surface: [%s]"), *hitActor->GetHumanReadableName());
 			SurfaceHit(hitActor, hitResult);
 		}
 

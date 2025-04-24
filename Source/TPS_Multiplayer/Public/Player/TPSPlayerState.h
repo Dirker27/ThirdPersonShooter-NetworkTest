@@ -9,10 +9,6 @@
 #include "AbilitySystemComponent.h"
 #include "GAS/GASAbilitySet.h"
 
-#include "GAS/Attributes/StandardAttributeSet.h"
-#include "GAS/Attributes/CharacterHealthAttributeSet.h"
-#include "GAS/Attributes/WeaponAttributeSet.h"
-
 #include "TPSPlayerState.generated.h"
 
 
@@ -34,30 +30,30 @@ protected:
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override; // IAbilitySystemInterface
 
-	//UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
-	//UStandardAttributeSet* StandardAttributes{ nullptr };
-
-	//UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
-    //UCharacterHealthAttributeSet* CharacterHealthAttributes{ nullptr };
-
-    //UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
-    //UWeaponAttributeSet* WeaponAttributes{ nullptr };
-
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
 	UAbilitySystemComponent* AbilitySystemComponent{ nullptr };
 
 	////////////////////////////////////////////////////////
-	// Initialization (Grant Abilities to System)
+	// GAS Initialization
 protected:
 	void SetupInitialAbilitiesAndEffects();
 
-	UPROPERTY(EditDefaultsOnly, Category = "TPSCharacter|Abilities")
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	UAbilitySet* InitialAbilitySet{ nullptr };
 
 	// Gameplay Effect used to initialize attribute values on spawn.
-	UPROPERTY(EditDefaultsOnly, Category = "TPSCharacter|Abilities")
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<UGameplayEffect> InitialGameplayEffect;
 
 	TArray<FGameplayAbilitySpecHandle> InitiallyGrantedAbilitySpecHandles;
+
+	////////////////////////////////////////////////////////
+	// Input Routing
+public:
+	UPROPERTY(EditAnywhere)
+	UInputMappingContext* InputMappingContext{ nullptr };
+
+	UPROPERTY(EditAnywhere)
+	FAbilityInputBindings AbilityInputBindings;
 };

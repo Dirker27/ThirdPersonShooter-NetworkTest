@@ -2,14 +2,13 @@
 
 #include "Player/TPSPlayerState.h"
 
+#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
+
 ATPSPlayerState::ATPSPlayerState() {
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
-
-	//StandardAttributes = CreateDefaultSubobject<UStandardAttributeSet>(TEXT("StandardAttributes"));
-	//CharacterHealthAttributes = CreateDefaultSubobject<UCharacterHealthAttributeSet>(TEXT("HealthAttributes"));
-	//WeaponAttributes = CreateDefaultSubobject<UWeaponAttributeSet>(TEXT("WeaponAttributes"));
 
 	NetUpdateFrequency = 30.0f;
 }
@@ -36,7 +35,6 @@ UAbilitySystemComponent* ATPSPlayerState::GetAbilitySystemComponent() const {
 
 
 
-
 // Should only be called from SERVER when initializing.
 void ATPSPlayerState::SetupInitialAbilitiesAndEffects() {
 	UE_LOG(LogTemp, Log, TEXT("Initializing ASC for PlayerState[%s]..."), *GetPlayerName());
@@ -45,12 +43,6 @@ void ATPSPlayerState::SetupInitialAbilitiesAndEffects() {
 	if (!IsValid(asc)) {
 		return;
 	}
-	/*asc->GetGameplayAttributeValueChangeDelegate(UCharacterHealthAttributeSet::GetHealthAttribute())
-		.AddUObject(this, &ThisClass::OnHealthAttributeChanged);
-	asc->GetGameplayAttributeValueChangeDelegate(UCharacterHealthAttributeSet::GetArmorAttribute())
-		.AddUObject(this, &ThisClass::OnArmorAttributeChanged);
-	asc->GetGameplayAttributeValueChangeDelegate(UStandardAttributeSet::GetMovementSpeedModifierAttribute())
-		.AddUObject(this, &ThisClass::OnMovementAttributeChanged);*/
 
 	//- Grant default abilities ---------------------------=
 	//

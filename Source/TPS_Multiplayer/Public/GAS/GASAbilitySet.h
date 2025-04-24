@@ -30,8 +30,6 @@ enum class EAbilityInput : uint8
 
 	// Weapon Handling
 	Reload,
-
-	// Inventory
 	EquipPrimary,
 	EquipSecondary,
 	EquipTertiary,
@@ -39,6 +37,15 @@ enum class EAbilityInput : uint8
 	EquipTacticalEquipment,
 	UnEquip,
 
+	// Possession
+	PossessTarget,
+	PossessMenu,
+
+	// Inventory Management
+	PickupItem,
+	DropItem,
+
+	// System
 	PauseMenu,
 	InGameMenu,
 

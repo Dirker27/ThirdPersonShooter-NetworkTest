@@ -7,6 +7,8 @@
 
 #include "TPSConstants.generated.h"
 
+static const FLinearColor TEXT_COLOR_ABILITY_LOG = FLinearColor::Yellow;
+
 UCLASS()
 class TPS_MULTIPLAYER_API UTPSConstants : public UObject
 {

@@ -406,11 +406,11 @@ protected:
 protected:
 	void SetupInitialAbilitiesAndEffects();
 
-	UPROPERTY(EditDefaultsOnly, Category = "TPSCharacter|Abilities")
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	UAbilitySet* InitialAbilitySet{ nullptr };
 
 	// Gameplay Effect used to initialize attribute values on spawn.
-	UPROPERTY(EditDefaultsOnly, Category = "TPSCharacter|Abilities")
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<UGameplayEffect> InitialGameplayEffect;
 
 	TArray<FGameplayAbilitySpecHandle> InitiallyGrantedAbilitySpecHandles;
@@ -426,11 +426,11 @@ protected:
 
 	////////////////////////////////////////////////////////
 	// Input Routing
-protected:
-	UPROPERTY(EditAnywhere, Category = "TPSCharacter|Input|Binding")
-	UInputMappingContext* InputMappingContext{ nullptr };
+private:
+	UEnhancedInputComponent* EnhancedInput;
 
-	UPROPERTY(EditDefaultsOnly, Category = "TPSCharacter|Input|Binding")
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Input|Binding")
 	FAbilityInputBindings AbilityInputBindings;
 
 	// Bind Input->ASC
@@ -443,10 +443,10 @@ protected:
 //  INVENTORY SYSTEM
 //~ ============================================================= ~//
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPSCharacter|Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory")
 	TObjectPtr<UTPSEquipmentManager> EquipmentManager;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPSCharacter|Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory")
 	TObjectPtr<UTPSCharacterInventory> Inventory;
 
 
