@@ -17,6 +17,8 @@ class TPS_MULTIPLAYER_API ATPSPlayerState : public APlayerState, public IAbility
 {
 	GENERATED_BODY()
 
+	friend class TPSPlayerController;
+
 public:
 	ATPSPlayerState();
 	~ATPSPlayerState();
@@ -56,4 +58,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FAbilityInputBindings AbilityInputBindings;
+
+	// Input -> ASC wiring (bound by PlayerController)
+	void AbilityInputBindingPressedHandler(EAbilityInput abilityInput);
+	void AbilityInputBindingReleasedHandler(EAbilityInput abilityInput);
 };

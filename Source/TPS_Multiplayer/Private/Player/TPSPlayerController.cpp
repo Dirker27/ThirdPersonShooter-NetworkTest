@@ -3,8 +3,11 @@
 
 #include "Player/TPSPlayerController.h"
 
+#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
 #include "Game/TPSGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/TPSPlayerState.h"
 #include "Util/TPSFunctionLibrary.h"
 
 ATPSPlayerController::ATPSPlayerController()
@@ -44,6 +47,50 @@ void ATPSPlayerController::NotifyPawnDeath()
 	RequestRespawn();
 }
 
+
+
+void ATPSPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::SetupInputComponent()"));
+
+	BindInputToPlayerStateASC();
+}
+
+void ATPSPlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::OnRep_PlayerState()"));
+
+	BindInputToPlayerStateASC();
+}
+
+
+void ATPSPlayerController::BindInputToPlayerStateASC()
+{
+	ATPSPlayerState* playerState = GetPlayerState<ATPSPlayerState>();
+	UEnhancedInputComponent* enhancedInput = Cast<UEnhancedInputComponent>(InputComponent);
+
+	if (IsValid(playerState) && IsValid(enhancedInput)) {
+
+		if (HasAuthority())
+		{
+			UE_LOG(LogTemp, Log, TEXT("Binding Input for PlayerState[%s] from SERVER..."), *playerState->GetName());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Binding Input for PlayerState[%s]..."), *playerState->GetName());
+		}
+
+		for (const FAbilityInputToInputActionBinding& binding : playerState->AbilityInputBindings.Bindings)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Binding Input[%s]..."), *binding.InputAction->GetName());
+
+			enhancedInput->BindAction(binding.InputAction, ETriggerEvent::Started, playerState, &ATPSPlayerState::AbilityInputBindingPressedHandler, binding.AbilityInput);
+			enhancedInput->BindAction(binding.InputAction, ETriggerEvent::Completed, playerState, &ATPSPlayerState::AbilityInputBindingReleasedHandler, binding.AbilityInput);
+		}
+	}
+}
 
 
 //~ ====================================================================== ~//

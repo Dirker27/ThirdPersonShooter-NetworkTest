@@ -426,9 +426,6 @@ protected:
 
 	////////////////////////////////////////////////////////
 	// Input Routing
-private:
-	UEnhancedInputComponent* EnhancedInput;
-
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input|Binding")
 	FAbilityInputBindings AbilityInputBindings;

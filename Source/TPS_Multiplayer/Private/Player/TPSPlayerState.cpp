@@ -2,9 +2,6 @@
 
 #include "Player/TPSPlayerState.h"
 
-#include "EnhancedInputSubsystems.h"
-#include "EnhancedInputComponent.h"
-
 ATPSPlayerState::ATPSPlayerState() {
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
 	AbilitySystemComponent->SetIsReplicated(true);
@@ -32,6 +29,18 @@ UAbilitySystemComponent* ATPSPlayerState::GetAbilitySystemComponent() const {
 	return AbilitySystemComponent;
 }
 
+
+// EnhancedInput -> GAS plumbing
+void ATPSPlayerState::AbilityInputBindingPressedHandler(EAbilityInput abilityInput) {
+	UE_LOG(LogTemp, Log, TEXT("PlayerASC_OnInputPressed[%i]"), abilityInput);
+
+	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<uint32>(abilityInput));
+}
+void ATPSPlayerState::AbilityInputBindingReleasedHandler(EAbilityInput abilityInput) {
+	UE_LOG(LogTemp, Log, TEXT("PlayerASC_OnInputReleased[%i]"), abilityInput);
+
+	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<uint32>(abilityInput));
+}
 
 
 

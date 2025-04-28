@@ -193,18 +193,17 @@ void ATPSCharacter::SyncComponentsFromState()
 void ATPSCharacter::PossessedBy(AController* NewController) { // server
 	Super::PossessedBy(NewController);
 
-	// Initialize GAS
+	UE_LOG(LogTemp, Log, TEXT("Character::PossessedBy()"));
+
 	//BindToPlayerAbilitySystem();
-	//SetupInitialAbilitiesAndEffects();
 	SyncAttributesFromGAS();
 }
 void ATPSCharacter::OnRep_PlayerState() { // client
 	Super::OnRep_PlayerState();
 
-	UE_LOG(LogTemp, Log, TEXT("OnRep_PlayerState()"));
+	UE_LOG(LogTemp, Log, TEXT("Character::OnRep_PlayerState()"));
 
-	// Initialize GAS
-	BindToPlayerAbilitySystem();
+	//BindToPlayerAbilitySystem();
 	SyncAttributesFromGAS();
 }
 
@@ -623,19 +622,9 @@ void ATPSCharacter::SyncAttributesFromGAS()
 // Ability System Wiring (from TPSPlayerState)
 void ATPSCharacter::BindToPlayerAbilitySystem()
 {
-	if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) {
-
-		//EnhancedInput = Cast<UEnhancedInputComponent>(InputComponent);
-
-		if ((HasAuthority() || IsLocallyControlled()) && IsValid(EnhancedInput))
-		{
-			for (const FAbilityInputToInputActionBinding& binding : ps->AbilityInputBindings.Bindings)
-			{
-				EnhancedInput->BindAction(binding.InputAction, ETriggerEvent::Started, this, &ThisClass::AbilityInputBindingPressedHandler, binding.AbilityInput);
-				EnhancedInput->BindAction(binding.InputAction, ETriggerEvent::Completed, this, &ThisClass::AbilityInputBindingReleasedHandler, binding.AbilityInput);
-			}
-		}
-
+	if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) 
+	{
+		ps->GetAbilitySystemComponent()->SetAvatarActor(this);
 	}
 }
 
@@ -644,25 +633,12 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* playerInputCompon
 {
 	Super::SetupPlayerInputComponent(playerInputComponent);
 
-	EnhancedInput = Cast<UEnhancedInputComponent>(playerInputComponent);
-
-	if (IsValid(EnhancedInput)) {
+	if (UEnhancedInputComponent* enhancedInput = Cast<UEnhancedInputComponent>(playerInputComponent)) {
 		for (const FAbilityInputToInputActionBinding& binding : AbilityInputBindings.Bindings)
 		{
-			EnhancedInput->BindAction(binding.InputAction, ETriggerEvent::Started, this, &ThisClass::AbilityInputBindingPressedHandler, binding.AbilityInput);
-			EnhancedInput->BindAction(binding.InputAction, ETriggerEvent::Completed, this, &ThisClass::AbilityInputBindingReleasedHandler, binding.AbilityInput);
+			enhancedInput->BindAction(binding.InputAction, ETriggerEvent::Started, this, &ThisClass::AbilityInputBindingPressedHandler, binding.AbilityInput);
+			enhancedInput->BindAction(binding.InputAction, ETriggerEvent::Completed, this, &ThisClass::AbilityInputBindingReleasedHandler, binding.AbilityInput);
 		}
-
-		BindToPlayerAbilitySystem();
-
-		// Extend input to player's ASC
-		/*if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) {
-			for (const FAbilityInputToInputActionBinding& binding : ps->AbilityInputBindings.Bindings)
-			{
-				EnhancedInput->BindAction(binding.InputAction, ETriggerEvent::Started, this, &ThisClass::AbilityInputBindingPressedHandler, binding.AbilityInput);
-				EnhancedInput->BindAction(binding.InputAction, ETriggerEvent::Completed, this, &ThisClass::AbilityInputBindingReleasedHandler, binding.AbilityInput);
-			}
-		}*/
 	}
 }
 

@@ -8,6 +8,7 @@
 
 #include "Character/TPSCharacterState.h"
 #include "TPSControllerConfiguration.h"
+#include "GAS/GASAbilitySet.h"
 
 #include "TPSPlayerController.generated.h"
 
@@ -32,6 +33,14 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCameraComponent* ControllerCamera;
+
+
+	virtual void SetupInputComponent() override;
+
+	virtual void OnRep_PlayerState() override;
+
+	void BindInputToPlayerStateASC();
+
 
 //~ ==================================================================== ~//
 //  BEHAVIOR
