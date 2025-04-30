@@ -2,6 +2,7 @@
 
 #include "Weapon/TPSWeapon.h"
 
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 ATPSWeapon::ATPSWeapon()
@@ -115,7 +116,7 @@ void ATPSWeapon::Fire()
 
 	// apply state updates
 	CurrentAmmunitionCount--;
-	TimeLastFired = FApp::GetGameTime();
+	TimeLastFired = UGameplayStatics::GetTimeSeconds(this);
 	SuccessiveFireCount++;
 	HasEverFired = true;
 
@@ -152,7 +153,7 @@ bool ATPSWeapon::CanFire()
 
 	float cycleRateSeconds = 1.0f / Configuration -> CycleRate;
 
-	float currentGameTime = FApp::GetGameTime();
+	float currentGameTime = UGameplayStatics::GetTimeSeconds(this);
 	if (CurrentAmmunitionCount > 0
 		&& (currentGameTime - cycleRateSeconds) > TimeLastFired) {
 		return true;

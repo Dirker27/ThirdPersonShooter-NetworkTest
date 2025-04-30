@@ -27,14 +27,15 @@ protected:
 	virtual void BeginPlay() override;
 
 //~ ============================================================= ~//
-//  ABILITY SYSTEM WIRING
+//  ABILITY SYSTEM
 //~ ============================================================= ~//
-public:
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override; // IAbilitySystemInterface
-
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
 	UAbilitySystemComponent* AbilitySystemComponent{ nullptr };
+
+public:
+	// IAbilitySystemInterface
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
 
 	////////////////////////////////////////////////////////
 	// GAS Initialization
@@ -43,23 +44,16 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	UAbilitySet* InitialAbilitySet{ nullptr };
-
-	// Gameplay Effect used to initialize attribute values on spawn.
-	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
-	TSubclassOf<UGameplayEffect> InitialGameplayEffect;
-
 	TArray<FGameplayAbilitySpecHandle> InitiallyGrantedAbilitySpecHandles;
 
 	////////////////////////////////////////////////////////
 	// Input Routing
 public:
 	UPROPERTY(EditAnywhere)
-	UInputMappingContext* InputMappingContext{ nullptr };
-
-	UPROPERTY(EditAnywhere)
 	FAbilityInputBindings AbilityInputBindings;
 
 	// Input -> ASC wiring (bound by PlayerController)
+	void BindInputToASC(UEnhancedInputComponent* input);
 	void AbilityInputBindingPressedHandler(EAbilityInput abilityInput);
 	void AbilityInputBindingReleasedHandler(EAbilityInput abilityInput);
 };

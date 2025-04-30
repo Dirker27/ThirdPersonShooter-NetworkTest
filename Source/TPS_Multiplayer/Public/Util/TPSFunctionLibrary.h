@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/TPSCharacter.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+
+#include "Character/TPSCharacter.h"
+
 #include "TPSFunctionLibrary.generated.h"
 
 /**

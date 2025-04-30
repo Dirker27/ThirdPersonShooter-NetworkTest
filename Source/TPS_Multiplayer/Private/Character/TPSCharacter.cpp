@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GAS/TPSAbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
 
 #include "Player/TPSPlayerController.h"
@@ -33,7 +34,7 @@ ATPSCharacter::ATPSCharacter()
 
 	//- Ability System ------------------------------------=
 	//
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
+	AbilitySystemComponent = CreateDefaultSubobject<UTPSAbilitySystemComponent>(TEXT("ASC"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	//
@@ -181,7 +182,6 @@ void ATPSCharacter::Tick(float deltaTime)
 void ATPSCharacter::SyncComponentsFromState()
 {
 	UpdateCharacterSpeedForCurrentState();
-	UpdateInputContextForCurrentState();
 }
 
 
@@ -193,7 +193,14 @@ void ATPSCharacter::SyncComponentsFromState()
 void ATPSCharacter::PossessedBy(AController* NewController) { // server
 	Super::PossessedBy(NewController);
 
-	UE_LOG(LogTemp, Log, TEXT("Character::PossessedBy()"));
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character::PossessedBy()"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character::PossessedBy()"));
+	}
 
 	//BindToPlayerAbilitySystem();
 	SyncAttributesFromGAS();
@@ -201,10 +208,20 @@ void ATPSCharacter::PossessedBy(AController* NewController) { // server
 void ATPSCharacter::OnRep_PlayerState() { // client
 	Super::OnRep_PlayerState();
 
-	UE_LOG(LogTemp, Log, TEXT("Character::OnRep_PlayerState()"));
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character::OnRep_PlayerState()"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character::OnRep_PlayerState()"));
+	}
 
-	//BindToPlayerAbilitySystem();
-	SyncAttributesFromGAS();
+	if (ATPSPlayerState* playerState = GetPlayerState<ATPSPlayerState>())
+	{
+		UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(InputComponent);
+		playerState->BindInputToASC(input);
+	}
 }
 
 
@@ -236,7 +253,6 @@ FVector2D ATPSCharacter::GetCurrentAccuracyTolerance() const
 	return FVector2D(Configuration->BaseAccuracyTolerance, 
 					 Configuration->BaseAccuracyTolerance) / accuracyModifier;
 }
-
 
 ATPSWeapon* ATPSCharacter::GetEquippedWeapon() const
 {
@@ -357,24 +373,6 @@ float ATPSCharacter::UpdateCharacterSpeedForCurrentState()
 	return CurrentMaxWalkSpeed;
 }
 
-
-
-void ATPSCharacter::UpdateInputContextForCurrentState()
-{
-	/*player = GetPlayer()
-	if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
-		{
-			if (!InputMapping.IsNull())
-			{
-				InputSystem->AddMappingContext(InputMapping.LoadSynchronous(), Priority);
-			}
-		}
-	}*/
-}
-
-
 ETPSLocomotionState ATPSCharacter::EvaluateLocomotionStateForCurrentInput()
 {
 	// TODO: Make this follow a strategy pattern based on current CharacterState
@@ -422,6 +420,8 @@ void ATPSCharacter::PerformDeath()
 
 //~ ============================================================= ~//
 //  Ability Extensions
+//  - Update states dependent on ability activation. (IsBoosting, IsAiming, etc)
+//  - Extend to BP listeners
 //~ ============================================================= ~//
 
 // - BOOST -//
@@ -571,7 +571,7 @@ void ATPSCharacter::SetupInitialAbilitiesAndEffects()
 	//- Grant default abilities ---------------------------=
 	//
 	if (IsValid(InitialAbilitySet)) {
-		InitiallyGrantedAbilitySpecHandles.Append(
+		CharacterBasedAbilitySpecHandles.Append(
 			InitialAbilitySet->GrantAbilitiesToAbilitySystem(asc));
 	}
 
@@ -585,6 +585,10 @@ void ATPSCharacter::SetupInitialAbilitiesAndEffects()
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("ASC for Character[%s] initialized."), *Name);
+	for (auto ability : AbilitySystemComponent->GetActivatableAbilities())
+	{
+		UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
+	}
 }
 
 // Performed on Server
@@ -619,15 +623,6 @@ void ATPSCharacter::SyncAttributesFromGAS()
 }
 
 
-// Ability System Wiring (from TPSPlayerState)
-void ATPSCharacter::BindToPlayerAbilitySystem()
-{
-	if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) 
-	{
-		ps->GetAbilitySystemComponent()->SetAvatarActor(this);
-	}
-}
-
 // Called to bind functionality to input
 void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* playerInputComponent)
 {
@@ -639,31 +634,49 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* playerInputCompon
 			enhancedInput->BindAction(binding.InputAction, ETriggerEvent::Started, this, &ThisClass::AbilityInputBindingPressedHandler, binding.AbilityInput);
 			enhancedInput->BindAction(binding.InputAction, ETriggerEvent::Completed, this, &ThisClass::AbilityInputBindingReleasedHandler, binding.AbilityInput);
 		}
+
+		if (ATPSPlayerState* playerState = GetPlayerState<ATPSPlayerState>())
+		{
+			playerState->BindInputToASC(enhancedInput);
+		}
 	}
 }
 
 // EnhancedInput -> GAS plumbing
 void ATPSCharacter::AbilityInputBindingPressedHandler(EAbilityInput abilityInput) {
-	UE_LOG(LogTemp, Log, TEXT("OnInputPressed[%i]"), abilityInput);
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] CharacterASC::OnInputPressed[%i]"), abilityInput);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] CharacterASC::OnInputPressed[%i]"), abilityInput);
+	}
 
 	// Perform ability on local character
 	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<uint32>(abilityInput));
 
 	// Extend input to Player's ASC
-	if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) {
+	/*if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) {
 		ps->GetAbilitySystemComponent()->AbilityLocalInputPressed(static_cast<uint32>(abilityInput));
-	}
+	}*/
 }
 void ATPSCharacter::AbilityInputBindingReleasedHandler(EAbilityInput abilityInput) {
-	UE_LOG(LogTemp, Log, TEXT("OnInputReleased[%i]"), abilityInput);
-
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] CharacterASC::OnInputReleased[%i]"), abilityInput);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] CharacterASC::OnInputReleased[%i]"), abilityInput);
+	}
 	// Perform ability on local character
 	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<uint32>(abilityInput));
 
 	// Extend input to player's ASC
-	if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) {
+	/*if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) {
 		ps->GetAbilitySystemComponent()->AbilityLocalInputReleased(static_cast<uint32>(abilityInput));
-	}
+	}*/
 }
 
 

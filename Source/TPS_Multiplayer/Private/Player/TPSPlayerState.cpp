@@ -1,9 +1,15 @@
-// (C) ToasterCat Studios 2024
+// (C) ToasterCat Studios 2025
 
 #include "Player/TPSPlayerState.h"
 
-ATPSPlayerState::ATPSPlayerState() {
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
+#include "EnhancedInputComponent.h"
+#include "GAS/TPSAbilitySystemComponent.h"
+
+ATPSPlayerState::ATPSPlayerState()
+{
+	SetReplicates(true);
+
+	AbilitySystemComponent = CreateDefaultSubobject<UTPSAbilitySystemComponent>(TEXT("ASC"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
@@ -22,22 +28,53 @@ void ATPSPlayerState::BeginPlay() {
 		SetupInitialAbilitiesAndEffects();
 	}
 
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	AbilitySystemComponent->InitAbilityActorInfo(this, nullptr);
 }
 
-UAbilitySystemComponent* ATPSPlayerState::GetAbilitySystemComponent() const {
-	return AbilitySystemComponent;
-}
+void ATPSPlayerState::BindInputToASC(UEnhancedInputComponent* input)
+{
+	if (IsValid(input)) {
+		if (HasAuthority())
+		{
+			UE_LOG(LogTemp, Log, TEXT("[SERVER] Binding Input for PlayerState[%s]..."), *GetName());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("[CLIENT] Binding Input for PlayerState[%s]..."), *GetName());
+		}
 
+		for (const FAbilityInputToInputActionBinding& binding : AbilityInputBindings.Bindings)
+		{
+			UE_LOG(LogTemp, Log, TEXT("|-Binding Input[%s]..."), *binding.InputAction->GetName());
+
+			input->BindAction(binding.InputAction, ETriggerEvent::Started, this, &ATPSPlayerState::AbilityInputBindingPressedHandler, binding.AbilityInput);
+			input->BindAction(binding.InputAction, ETriggerEvent::Completed, this, &ATPSPlayerState::AbilityInputBindingReleasedHandler, binding.AbilityInput);
+		}
+	}
+}
 
 // EnhancedInput -> GAS plumbing
 void ATPSPlayerState::AbilityInputBindingPressedHandler(EAbilityInput abilityInput) {
-	UE_LOG(LogTemp, Log, TEXT("PlayerASC_OnInputPressed[%i]"), abilityInput);
+	if (HasAuthority())	
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] PlayerASC::OnInputPressed[%i]"), abilityInput);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] PlayerASC::OnInputPressed[%i]"), abilityInput);
+	}	
 
 	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<uint32>(abilityInput));
 }
 void ATPSPlayerState::AbilityInputBindingReleasedHandler(EAbilityInput abilityInput) {
-	UE_LOG(LogTemp, Log, TEXT("PlayerASC_OnInputReleased[%i]"), abilityInput);
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] PlayerASC::OnInputReleased[%i]"), abilityInput);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] PlayerASC::OnInputReleased[%i]"), abilityInput);
+	}
 
 	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<uint32>(abilityInput));
 }
@@ -60,14 +97,9 @@ void ATPSPlayerState::SetupInitialAbilitiesAndEffects() {
 			InitialAbilitySet->GrantAbilitiesToAbilitySystem(asc));
 	}
 
-	//- Initialize attributes -----------------------------=
-	//
-	if (IsValid(InitialGameplayEffect)) {
-		asc->ApplyGameplayEffectToSelf(
-			InitialGameplayEffect->GetDefaultObject<UGameplayEffect>(),
-			0,
-			asc->MakeEffectContext());
-	}
-
 	UE_LOG(LogTemp, Log, TEXT("ASC for PlayerState[%s] initialized."), *GetPlayerName());
+	for (auto ability : AbilitySystemComponent->GetActivatableAbilities())
+	{
+		UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
+	}
 }

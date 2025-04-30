@@ -14,14 +14,14 @@
 UENUM(BlueprintType)
 enum class EAbilityInput : uint8
 {
-	None,
-	Interact,
+	None     = 0 UMETA(DisplayName = "NONE"),
+	Interact = 1,
 
 	// Locomotion
-	Mantle,
-	Crouch,
-	Boost,
-	UnBoost,
+	Mantle  = 10,
+	Boost   = 12 UMETA(DisplayName = "Boost"),
+	UnBoost = 13 UMETA(DisplayName = "UnBoost"),
+	Crouch  = 14 UMETA(DisplayName = "Crouch"),
 
 	// Primary Actions
 	PrimaryAttack,
@@ -29,17 +29,17 @@ enum class EAbilityInput : uint8
 	Aim,
 
 	// Weapon Handling
-	Reload,
-	EquipPrimary,
-	EquipSecondary,
-	EquipTertiary,
-	EquipLethalEquipment,
-	EquipTacticalEquipment,
-	UnEquip,
+	UnEquip        = 30 UMETA(DisplayName = "EquipSlot0"),
+	EquipPrimary   = 31 UMETA(DisplayName = "EquipSlot1"),
+	EquipSecondary = 32 UMETA(DisplayName = "EquipSlot2"),
+	EquipTertiary  = 33 UMETA(DisplayName = "EquipSlot3"),
+	EquipLethalEquipment = 34 UMETA(DisplayName = "EquipSlot4"),
+	EquipTacticalEquipment = 35 UMETA(DisplayName = "EquipSlot5"),
+	Reload         = 36 UMETA(DisplayName = "Reload"),
 
 	// Possession
-	PossessTarget,
-	PossessMenu,
+	PossessTarget = 50 UMETA(DisplayName = "Possess"),
+	PossessMenu   = 51 UMETA(DisplayName = "PossessMenu"),
 
 	// Inventory Management
 	PickupItem,
@@ -51,7 +51,7 @@ enum class EAbilityInput : uint8
 
 	// Debug Abilities
 	StopTime,
-	SlowTime,
+	SlowTime  UMETA(DisplayName = "SlowTime"),
 	Respawn
 };
 

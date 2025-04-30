@@ -39,9 +39,9 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 //  COMPONENTS
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 public:
 	//- Display Widgets --------------------------------------=
 	//
@@ -57,9 +57,9 @@ public:
 	void FellOutOfWorld(const class UDamageType& dmgType) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 //  STATE
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 public:
 
 	//////////////////////////////////////////////////////
@@ -191,11 +191,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Render")
 	bool ShouldRenderDebugFrame = true;
 
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 //  Blueprint Extensions
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 public:
-
 	////////////////////////////////////////////////////////
 	// Ability Extensions
 	
@@ -303,9 +302,9 @@ public:
 	}
 
 
-//~ ================================================================ ~//
+//~ ======================================================================== ~//
 //  Character Business Logic
-//~ ================================================================ ~//
+//~ ======================================================================== ~//
 
 private:
 	// Called every frame.
@@ -347,10 +346,6 @@ public:
 	// Apply calculated MovementSpeed
 	UFUNCTION(BlueprintCallable)
 	float UpdateCharacterSpeedForCurrentState();
-	//
-	// Swap out available Input Actions
-	UFUNCTION(BlueprintCallable)
-	void UpdateInputContextForCurrentState();
 
 	UFUNCTION(BlueprintCallable)
 	bool IsActionActive() const;
@@ -362,9 +357,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnDeath();
 
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 //  ABILITY SYSTEM
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
 	UAbilitySystemComponent* AbilitySystemComponent{ nullptr };
@@ -406,20 +401,23 @@ protected:
 protected:
 	void SetupInitialAbilitiesAndEffects();
 
-	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
-	UAbilitySet* InitialAbilitySet{ nullptr };
-
 	// Gameplay Effect used to initialize attribute values on spawn.
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<UGameplayEffect> InitialGameplayEffect;
 
-	TArray<FGameplayAbilitySpecHandle> InitiallyGrantedAbilitySpecHandles;
+	// Abilities native to the player
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	UAbilitySet* InitialAbilitySet{ nullptr };
+	TArray<FGameplayAbilitySpecHandle> CharacterBasedAbilitySpecHandles;
+
+private:
+	void GrantPlayerBasedAbilities();
+	void RevokePlayerBasedAbilities();
+	TArray<FGameplayAbilitySpecHandle> PlayerBasedAbilitySpecHandles;
 
 	////////////////////////////////////////////////////////
 	// Controller Possession
 protected:
-	void BindToPlayerAbilitySystem();
-
 	// Bind to ASC in PlayerState
 	void PossessedBy(AController* NewController) override;
 	void OnRep_PlayerState() override;
@@ -436,9 +434,9 @@ protected:
 	void AbilityInputBindingReleasedHandler(EAbilityInput abilityInput);
 
 
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 //  INVENTORY SYSTEM
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory")
 	TObjectPtr<UTPSEquipmentManager> EquipmentManager;
@@ -447,9 +445,9 @@ public:
 	TObjectPtr<UTPSCharacterInventory> Inventory;
 
 
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 //  EVENT OVERRIDES
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 
 public:
 	// Use Actor's Eyes at Mesh Location for detection and docking sweeps
