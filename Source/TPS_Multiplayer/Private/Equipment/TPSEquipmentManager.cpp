@@ -70,8 +70,6 @@ void UTPSEquipmentManager::BindToMesh(USkeletalMeshComponent* mesh)
     TargetMesh = mesh;
 
     if (IsValid(mesh)) {
-        UE_LOG(LogTemp, Log, TEXT("Mounting Holsters..."));
-
         for (auto entry : HarnessMountPointMap)
         {
             FName* socket = HarnessSocketMap.Find(entry.Key);
@@ -384,7 +382,6 @@ void UTPSEquipmentManager::EquipToPrimaryWeaponHand(ATPSEquipableItem* item)
     {
         item->Mount(mp);
     }
-    UE_LOG(LogTemp, Log, TEXT("Weapon[%s] mounted to Primary Hand."), *item->GetName());
 }
 
 
@@ -430,7 +427,7 @@ void UTPSEquipmentManager::RemovePassiveItemEffectsFromOwner(ATPSEquipableItem* 
     }
     item->AppliedPassiveEffectHandles.Empty();
 }
- 
+
 
 
 void UTPSEquipmentManager::ConfigureHarnessSlots()

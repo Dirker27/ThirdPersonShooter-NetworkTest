@@ -14,6 +14,7 @@
 #include "Character/TPSLocomotionState.h"
 #include "Character/TPSCharacterState.h"
 #include "Equipment/TPSEquipmentManager.h"
+#include "GAS/TPSAbilitySystemComponent.h"
 #include "GAS/Attributes/CharacterHealthAttributeSet.h"
 #include "GAS/Attributes/StandardAttributeSet.h"
 #include "GAS/Attributes/WeaponAttributeSet.h"
@@ -362,13 +363,11 @@ public:
 //~ ======================================================================== ~//
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
-	UAbilitySystemComponent* AbilitySystemComponent{ nullptr };
+	UTPSAbilitySystemComponent* AbilitySystemComponent{ nullptr };
 
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override; // IAbilitySystemInterface
 
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UAbilitySystemComponent* GetPlayerAbilitySystemComponent() const;
 
 	////////////////////////////////////////////////////////
 	// GAS Attributes
@@ -396,6 +395,7 @@ protected:
 	void OnHealthAttributeChanged(const FOnAttributeChangeData&);
 	void OnMovementAttributeChanged(const FOnAttributeChangeData&);
 
+
 	////////////////////////////////////////////////////////
 	// Initialization (Grant Abilities to System)
 protected:
@@ -408,30 +408,45 @@ protected:
 	// Abilities native to the player
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	UAbilitySet* InitialAbilitySet{ nullptr };
-	TArray<FGameplayAbilitySpecHandle> CharacterBasedAbilitySpecHandles;
+	TArray<FGameplayAbilitySpecHandle> BaseAbilitySpecHandles;
 
+
+	////////////////////////////////////////////////////////
+	// Input Routing
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities|Input")
+	FAbilityInputBindings BaseAbilityInputBindings;
+
+	// Bind Input->ASC
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void BindAbilitiesToInputComponent(FAbilityInputBindings bindings);
+	void ReleaseAbilityBindingsFromInputComponent(FAbilityInputBindings bindings);
+	void AbilityInputBindingPressedHandler(EAbilityInput abilityInput);
+	void AbilityInputBindingReleasedHandler(EAbilityInput abilityInput);
+
+
+	////////////////////////////////////////////////////////
+	// Player-based abilities
 private:
 	void GrantPlayerBasedAbilities();
 	void RevokePlayerBasedAbilities();
-	TArray<FGameplayAbilitySpecHandle> PlayerBasedAbilitySpecHandles;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	TArray<FGameplayAbilitySpecHandle> GrantedPlayerBasedAbilitySpecHandles;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities|Input")
+	FAbilityInputBindings GrantedPlayerBasedInputBindings;
+
 
 	////////////////////////////////////////////////////////
 	// Controller Possession
 protected:
 	// Bind to ASC in PlayerState
-	void PossessedBy(AController* NewController) override;
-	void OnRep_PlayerState() override;
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void UnPossessed() override;
+	virtual void OnRep_PlayerState() override;
 
-	////////////////////////////////////////////////////////
-	// Input Routing
-protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Input|Binding")
-	FAbilityInputBindings AbilityInputBindings;
 
-	// Bind Input->ASC
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	void AbilityInputBindingPressedHandler(EAbilityInput abilityInput);
-	void AbilityInputBindingReleasedHandler(EAbilityInput abilityInput);
 
 
 //~ ======================================================================== ~//

@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 
+#include "GASAbilitySet.h"
+
 #include "TPSAbilitySystemComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FReceivedDamageDelegate, UTPSAbilitySystemComponent*, SourceASC, float, UnmitigatedDamage, float, MitigatedDamage);
@@ -27,4 +29,12 @@ public:
 	virtual void ReceiveDamage(UTPSAbilitySystemComponent* SourceASC, float UnmitigatedDamage, float MitigatedDamage);
 
 	virtual void AbilityLocalInputPressed(int32 InputID) override;
+
+
+	// Abilities CRUD
+	UFUNCTION(BlueprintCallable)
+	TArray<FGameplayAbilitySpecHandle> GrantAbilitiesFromAbilitySet(UAbilitySet* abilitySet);
+
+	UFUNCTION(BlueprintCallable)
+	void RevokeAbilitiesFromAbilitySystem(TArray<FGameplayAbilitySpecHandle> abilitySpecHandles);
 };

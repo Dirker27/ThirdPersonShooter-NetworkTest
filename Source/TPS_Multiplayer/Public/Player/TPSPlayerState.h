@@ -6,7 +6,6 @@
 #include "GameFramework/PlayerState.h"
 
 #include "AbilitySystemInterface.h"
-#include "AbilitySystemComponent.h"
 #include "GAS/GASAbilitySet.h"
 
 #include "TPSPlayerState.generated.h"
@@ -29,31 +28,19 @@ protected:
 //~ ============================================================= ~//
 //  ABILITY SYSTEM
 //~ ============================================================= ~//
-private:
-	UPROPERTY(VisibleAnywhere, Category = "Abilities")
-	UAbilitySystemComponent* AbilitySystemComponent{ nullptr };
 
 public:
 	// IAbilitySystemInterface
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	////////////////////////////////////////////////////////
-	// GAS Initialization
-protected:
-	void SetupInitialAbilitiesAndEffects();
-
-	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
-	UAbilitySet* InitialAbilitySet{ nullptr };
-	TArray<FGameplayAbilitySpecHandle> InitiallyGrantedAbilitySpecHandles;
-
-	////////////////////////////////////////////////////////
-	// Input Routing
+	// Player-Based Abilities
 public:
-	UPROPERTY(EditAnywhere)
-	FAbilityInputBindings AbilityInputBindings;
+	// Abilities that will be granted to controlled pawns on possession.
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	UAbilitySet* PlayerAbilitySet{ nullptr };
 
-	// Input -> ASC wiring (bound by PlayerController)
-	void BindInputToASC(UEnhancedInputComponent* input);
-	void AbilityInputBindingPressedHandler(EAbilityInput abilityInput);
-	void AbilityInputBindingReleasedHandler(EAbilityInput abilityInput);
+	// Control bindings for player-based abilities.
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	FAbilityInputBindings PlayerAbilityInputBindings;
 };

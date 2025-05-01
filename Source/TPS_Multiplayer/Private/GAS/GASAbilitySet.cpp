@@ -1,14 +1,14 @@
 #include "GAS/GASAbilitySet.h"
 
-TArray<FGameplayAbilitySpecHandle> UAbilitySet::GrantAbilitiesToAbilitySystem(UAbilitySystemComponent* AbilitySystemComponent) const {
-    check(AbilitySystemComponent);
+TArray<FGameplayAbilitySpecHandle> UAbilitySet::GrantAbilitiesToAbilitySystem(UAbilitySystemComponent* asc) const {
+    check(asc);
 
     TArray<FGameplayAbilitySpecHandle> handles;
     handles.Reserve(AbilitySetItems.Num());
 
     for (const auto abilitySetItem : AbilitySetItems)
     {
-        handles.AddUnique(AbilitySystemComponent->GiveAbility(
+        handles.AddUnique(asc->GiveAbility(
                 FGameplayAbilitySpec(
                     abilitySetItem.GameplayAbility,
                     9,
@@ -18,4 +18,11 @@ TArray<FGameplayAbilitySpecHandle> UAbilitySet::GrantAbilitiesToAbilitySystem(UA
     }
     
     return handles;
+}
+
+void UAbilitySet::RevokeAbilitiesFromAbilitySystem(UAbilitySystemComponent* asc, TArray<FGameplayAbilitySpecHandle> abilitySpecHandles) const
+{
+    for (const auto abilityHandle : abilitySpecHandles) {
+        asc->ClearAbility(abilityHandle);
+    }
 }

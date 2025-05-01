@@ -109,6 +109,10 @@ void ATPSCharacter::BeginPlay()
 		//EquipmentManager->EquipPrimary();
 
 		SetupInitialAbilitiesAndEffects();
+		if (ATPSPlayerState* playerState = GetPlayerState<ATPSPlayerState>())
+		{
+			GrantPlayerBasedAbilities();
+		}
 	}
 
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
@@ -195,34 +199,52 @@ void ATPSCharacter::PossessedBy(AController* NewController) { // server
 
 	if (HasAuthority())
 	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character::PossessedBy()"));
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character[%s]::PossessedBy()"), *GetName());
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character::PossessedBy()"));
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character[%s]::PossessedBy()"), *GetName());
 	}
 
-	//BindToPlayerAbilitySystem();
-	SyncAttributesFromGAS();
+	if (HasAuthority())
+	{
+		GrantPlayerBasedAbilities();
+	}
 }
 void ATPSCharacter::OnRep_PlayerState() { // client
 	Super::OnRep_PlayerState();
 
 	if (HasAuthority())
 	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character::OnRep_PlayerState()"));
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character[%s]::OnRep_PlayerState()"), *GetName());
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character::OnRep_PlayerState()"));
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character[%s]::OnRep_PlayerState()"), *GetName());
 	}
 
-	if (ATPSPlayerState* playerState = GetPlayerState<ATPSPlayerState>())
+	// A PlayerState was added (we were possesed)
+	/*if (ATPSPlayerState* playerState = GetPlayerState<ATPSPlayerState>())
 	{
-		UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(InputComponent);
-		playerState->BindInputToASC(input);
+		GrantPlayerBasedAbilities();
+		//BindAbilitiesToInputComponent(playerState->PlayerAbilityInputBindings);
+	}
+	// A PlayerState was removed (we were UnPossessed)
+	else
+	{
+		RevokePlayerBasedAbilities();
+		//ReleaseAbilityBindingsFromInputComponent(GrantedPlayerBasedInputBindings);
+	}*/
+}
+
+void ATPSCharacter::UnPossessed()
+{
+	if (HasAuthority())
+	{
+		RevokePlayerBasedAbilities();
 	}
 }
+
 
 
 //~ ============================================================= ~//
@@ -408,6 +430,16 @@ bool ATPSCharacter::IsActionActive() const {
 
 void ATPSCharacter::PerformDeath()
 {
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] XXXXXXXXXXXX CHARACTER DEATH [%s]-[%s] XXXXXXXXXXXX"), *GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] XXXXXXXXXXXX CHARACTER DEATH [%s]-[%s] XXXXXXXXXXXX"), *GetName());
+	}
+
+
 	ATPSPlayerController* controller = Cast<ATPSPlayerController>(GetController());
 	if (IsValid(controller))
 	{
@@ -546,12 +578,6 @@ UAbilitySystemComponent* ATPSCharacter::GetAbilitySystemComponent() const {
 	return AbilitySystemComponent;
 }
 
-// Return Player's ASC if possessed.
-UAbilitySystemComponent* ATPSCharacter::GetPlayerAbilitySystemComponent() const {
-	ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>();
-	return ps ? ps->GetAbilitySystemComponent() : nullptr;
-}
-
 // Should only be called from SERVER when initializing.
 void ATPSCharacter::SetupInitialAbilitiesAndEffects()
 {
@@ -571,7 +597,7 @@ void ATPSCharacter::SetupInitialAbilitiesAndEffects()
 	//- Grant default abilities ---------------------------=
 	//
 	if (IsValid(InitialAbilitySet)) {
-		CharacterBasedAbilitySpecHandles.Append(
+		BaseAbilitySpecHandles.Append(
 			InitialAbilitySet->GrantAbilitiesToAbilitySystem(asc));
 	}
 
@@ -628,18 +654,28 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* playerInputCompon
 {
 	Super::SetupPlayerInputComponent(playerInputComponent);
 
-	if (UEnhancedInputComponent* enhancedInput = Cast<UEnhancedInputComponent>(playerInputComponent)) {
-		for (const FAbilityInputToInputActionBinding& binding : AbilityInputBindings.Bindings)
+	BindAbilitiesToInputComponent(BaseAbilityInputBindings);
+	if (ATPSPlayerState* playerState = GetPlayerState<ATPSPlayerState>())
+	{
+		BindAbilitiesToInputComponent(playerState->PlayerAbilityInputBindings);
+		GrantedPlayerBasedInputBindings = playerState->PlayerAbilityInputBindings;
+	}
+}
+
+void ATPSCharacter::BindAbilitiesToInputComponent(FAbilityInputBindings bindings)
+{
+	if (UEnhancedInputComponent* enhancedInput = Cast<UEnhancedInputComponent>(InputComponent)) {
+		for (const FAbilityInputToInputActionBinding& binding : bindings.Bindings)
 		{
 			enhancedInput->BindAction(binding.InputAction, ETriggerEvent::Started, this, &ThisClass::AbilityInputBindingPressedHandler, binding.AbilityInput);
 			enhancedInput->BindAction(binding.InputAction, ETriggerEvent::Completed, this, &ThisClass::AbilityInputBindingReleasedHandler, binding.AbilityInput);
 		}
-
-		if (ATPSPlayerState* playerState = GetPlayerState<ATPSPlayerState>())
-		{
-			playerState->BindInputToASC(enhancedInput);
-		}
 	}
+}
+
+void ATPSCharacter::ReleaseAbilityBindingsFromInputComponent(FAbilityInputBindings bindings)
+{
+	// TODO: Might not be necessary? Does InputComponent deconstruct on UnPossess?
 }
 
 // EnhancedInput -> GAS plumbing
@@ -655,11 +691,6 @@ void ATPSCharacter::AbilityInputBindingPressedHandler(EAbilityInput abilityInput
 
 	// Perform ability on local character
 	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<uint32>(abilityInput));
-
-	// Extend input to Player's ASC
-	/*if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) {
-		ps->GetAbilitySystemComponent()->AbilityLocalInputPressed(static_cast<uint32>(abilityInput));
-	}*/
 }
 void ATPSCharacter::AbilityInputBindingReleasedHandler(EAbilityInput abilityInput) {
 	if (HasAuthority())
@@ -670,14 +701,47 @@ void ATPSCharacter::AbilityInputBindingReleasedHandler(EAbilityInput abilityInpu
 	{
 		UE_LOG(LogTemp, Log, TEXT("[CLIENT] CharacterASC::OnInputReleased[%i]"), abilityInput);
 	}
+
 	// Perform ability on local character
 	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<uint32>(abilityInput));
+}
 
-	// Extend input to player's ASC
-	/*if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>()) {
-		ps->GetAbilitySystemComponent()->AbilityLocalInputReleased(static_cast<uint32>(abilityInput));
+
+void ATPSCharacter::GrantPlayerBasedAbilities()
+{
+	UE_LOG(LogTemp, Log, TEXT("Granting player-based abilities to Character[%s] ASC..."), *GetName());
+
+	if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>())
+	{
+		GrantedPlayerBasedAbilitySpecHandles = AbilitySystemComponent->GrantAbilitiesFromAbilitySet(ps->PlayerAbilitySet);
+		BindAbilitiesToInputComponent(ps->PlayerAbilityInputBindings);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("ASC for Character[%s] updated."), *Name);
+	for (auto ability : AbilitySystemComponent->GetActivatableAbilities())
+	{
+		UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
+	}
+}
+
+void ATPSCharacter::RevokePlayerBasedAbilities()
+{
+	UE_LOG(LogTemp, Log, TEXT("Revoking player-based abilities from Character[%s] ASC..."), *GetName());
+
+	AbilitySystemComponent->RevokeAbilitiesFromAbilitySystem(GrantedPlayerBasedAbilitySpecHandles);
+	GrantedPlayerBasedAbilitySpecHandles.Empty();
+
+	ReleaseAbilityBindingsFromInputComponent(GrantedPlayerBasedInputBindings);
+	GrantedPlayerBasedInputBindings.Bindings.Empty();
+
+	/*UE_LOG(LogTemp, Log, TEXT("ASC for Character[%s] updated."), *Name);
+	for (auto ability : AbilitySystemComponent->GetActivatableAbilities())
+	{
+		UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
 	}*/
 }
+
+
 
 
 //~ ============================================================= ~//

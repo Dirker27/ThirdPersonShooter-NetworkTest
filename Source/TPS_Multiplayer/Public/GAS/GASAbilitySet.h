@@ -100,5 +100,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	TArray<FAbilitySystem> AbilitySetItems;
 
-	TArray<FGameplayAbilitySpecHandle> GrantAbilitiesToAbilitySystem(UAbilitySystemComponent* AbilitySystemComponent) const;
+	TArray<FGameplayAbilitySpecHandle> GrantAbilitiesToAbilitySystem(UAbilitySystemComponent* asc) const;
+
+	void RevokeAbilitiesFromAbilitySystem(UAbilitySystemComponent* asc, TArray<FGameplayAbilitySpecHandle> abilitySpecHandles) const;
 };
