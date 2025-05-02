@@ -10,6 +10,8 @@
  */
 void ATPSPlayerCameraManager::UpdateViewTarget(FTViewTarget& OutVT, float DeltaTime)
 {
+	Super::UpdateViewTarget(OutVT, DeltaTime);
+
 	/*
 	if ((PendingViewTarget.Target != NULL) && BlendParams.bLockOutgoing && OutVT.Equal(ViewTarget))
 	{
@@ -55,5 +57,4 @@ void ATPSPlayerCameraManager::UpdateViewTarget(FTViewTarget& OutVT, float DeltaT
 		Super::UpdateViewTarget(OutVT, DeltaTime);
 	}
 	*/
-	Super::UpdateViewTarget(OutVT, DeltaTime);
 }
