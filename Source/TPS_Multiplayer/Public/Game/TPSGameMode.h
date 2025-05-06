@@ -46,7 +46,6 @@ public:
 	// Respawn
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void RequestRespawn(ATPSPlayerController* playerController);
-	//virtual void RequestRespawn_Implementation(ATPSPlayerController* playerController);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool CanRespawn(ATPSPlayerController* playerController);

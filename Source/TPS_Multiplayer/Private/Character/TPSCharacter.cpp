@@ -409,9 +409,7 @@ void ATPSCharacter::PerformDeath()
 		UE_LOG(LogTemp, Log, TEXT("[CLIENT] XXXXXXXXXXXX CHARACTER DEATH [%s] XXXXXXXXXXXX"), *GetName());
 	}
 
-
-	ATPSPlayerController* controller = Cast<ATPSPlayerController>(GetController());
-	if (IsValid(controller))
+	if (ATPSPlayerController* controller = GetController<ATPSPlayerController>())
 	{
 		controller->NotifyPawnDeath();
 	}
@@ -598,6 +596,8 @@ void ATPSCharacter::UnPossessed()
 	{
 		AbilitySystem->RevokePlayerBasedAbilities();
 	}
+
+	Controller = nullptr; // why necessary? Controllers are not rep'd - passing ref would point to invalid.
 }
 
 

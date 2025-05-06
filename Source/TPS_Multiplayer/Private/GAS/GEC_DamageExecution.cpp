@@ -75,13 +75,26 @@ void UGEC_DamageExecution::Execute_Implementation(
 	UE_LOG(LogTemp, Log, TEXT("Applying Damage:[%.2f]-Mod:[%.2f] to Health[%.2f]-Armor[%.2f]"),
 		baseDmg, dmgModifier, targetHealth, targetArmor);
 
-	float appliedDmg = (baseDmg * dmgModifier) * (1 - (targetArmor/100));
-	if (appliedDmg < 0)
+	float armorMod = 1 - ((targetArmor / 100) * .9);
+	float appliedHealthDamage = (baseDmg * dmgModifier) * armorMod;
+	if (appliedHealthDamage < 0)
 	{
-		appliedDmg = 0;
+		appliedHealthDamage = 0;
 	}
+	float appliedArmorDamage = (baseDmg * dmgModifier) / 2;
 
-	UE_LOG(LogTemp, Log, TEXT("Applied Damage: [%.2f]"), appliedDmg);
+	float appliedStaminaDamage = (baseDmg * dmgModifier) / 4;
+
+
+
+	UE_LOG(LogTemp, Log, TEXT("Applied Damage: Health[%.2f]-Armor[%.2f]"), appliedHealthDamage, appliedArmorDamage);
 	// return
-	outExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().HealthProperty, EGameplayModOp::Additive, -appliedDmg));
+	outExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(
+		DamageStatics().HealthProperty, EGameplayModOp::Additive, -appliedHealthDamage));
+
+	outExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(
+		DamageStatics().ArmorProperty, EGameplayModOp::Additive, -appliedArmorDamage));
+
+	outExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(
+		DamageStatics().StaminaProperty, EGameplayModOp::Additive, -appliedStaminaDamage));
 }
