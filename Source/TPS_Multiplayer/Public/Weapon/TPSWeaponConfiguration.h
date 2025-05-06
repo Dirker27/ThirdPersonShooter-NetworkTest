@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Ammunition/TPSAmmunitionType.h"
-#include "Equipment/TPSEquipmentDefinition.h"
 
 #include "TPSWeaponConfiguration.generated.h"
 

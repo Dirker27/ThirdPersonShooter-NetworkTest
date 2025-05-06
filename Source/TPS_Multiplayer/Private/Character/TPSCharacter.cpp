@@ -2,8 +2,6 @@
 
 #include "Character/TPSCharacter.h"
 
-#include <Kismet/KismetSystemLibrary.h>
-#include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GAS/TPSAbilitySystemComponent.h"
@@ -28,15 +26,15 @@ ATPSCharacter::ATPSCharacter()
 	Inventory = CreateDefaultSubobject<UTPSCharacterInventory>(TEXT("Inventory"));
 	//
 	EquipmentManager = CreateDefaultSubobject<UTPSEquipmentManager>(TEXT("EquipmentManager"));
-	EquipmentManager->BindToMesh(GetMesh());
+	EquipmentManager->BindToMesh(GetMesh());  // <- Bind early to allow for visual adjustments to MountPoints
 
 
 
 	//- Ability System ------------------------------------=
 	//
-	AbilitySystemComponent = CreateDefaultSubobject<UTPSAbilitySystemComponent>(TEXT("ASC"));
-	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+	AbilitySystem = CreateDefaultSubobject<UTPSAbilitySystemComponent>(TEXT("AbilitySystem"));
+	AbilitySystem->SetIsReplicated(true);
+	AbilitySystem->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	//
 	StandardAttributes = CreateDefaultSubobject<UStandardAttributeSet>(TEXT("StandardAttributes"));
 	CharacterHealthAttributes = CreateDefaultSubobject<UCharacterHealthAttributeSet>(TEXT("HealthAttributes"));
@@ -102,27 +100,45 @@ void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	EquipmentManager->BindToOwnerAbilitySystem(GetAbilitySystemComponent());
+	// Init ASC
+	AbilitySystem->InitAbilityActorInfo(this, this); // <- required for all ASC consumers
+	if (HasAuthority())
+	{
+		SetupAbilitySystem();
+
+		// If pawn is spawned w/ a PlayerState, add these abilities immediately
+		//   ( PossessedBy() and OnRep_PlayerState() may not fire )
+		if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>())
+		{
+			AbilitySystem->GrantPlayerBasedAbilities(ps->PlayerAbilitySet);
+		}
+	}
+	
+	// Init EquipmentManager (consumes and distributes ASC)
+	EquipmentManager->BindToOwnerAbilitySystem(AbilitySystem);
 	if (HasAuthority())
 	{
 		EquipmentManager->Initialize();
-		//EquipmentManager->EquipPrimary();
-
-		SetupInitialAbilitiesAndEffects();
-		if (ATPSPlayerState* playerState = GetPlayerState<ATPSPlayerState>())
-		{
-			GrantPlayerBasedAbilities();
-		}
 	}
 
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	SyncAttributesFromGAS();
 }
 
 
-//~ ============================================================= ~//
+
+
+
+//~ ======================================================================== ~//
 //  GAME LOOP
-//~ ============================================================= ~//
+//  ---------
+//  - Sync locally-accessible attributes from GAS
+//  - Evaluate if current state should change for current controller input
+//  - Extend controller input to sub-components
+//  - If changes affect UI display, notify UI widgets - chains to UI::OnUpdate()
+//~ ======================================================================== ~//
+
+
+
 
 
 void ATPSCharacter::Tick(float deltaTime)
@@ -189,67 +205,13 @@ void ATPSCharacter::SyncComponentsFromState()
 }
 
 
-//~ ============================================================= ~//
-//  CONTROLLER POSSESSION
-//   - Link w/ PlayerState's ASC
-//~ ============================================================= ~//
-
-void ATPSCharacter::PossessedBy(AController* NewController) { // server
-	Super::PossessedBy(NewController);
-
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character[%s]::PossessedBy()"), *GetName());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character[%s]::PossessedBy()"), *GetName());
-	}
-
-	if (HasAuthority())
-	{
-		GrantPlayerBasedAbilities();
-	}
-}
-void ATPSCharacter::OnRep_PlayerState() { // client
-	Super::OnRep_PlayerState();
-
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character[%s]::OnRep_PlayerState()"), *GetName());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character[%s]::OnRep_PlayerState()"), *GetName());
-	}
-
-	// A PlayerState was added (we were possesed)
-	/*if (ATPSPlayerState* playerState = GetPlayerState<ATPSPlayerState>())
-	{
-		GrantPlayerBasedAbilities();
-		//BindAbilitiesToInputComponent(playerState->PlayerAbilityInputBindings);
-	}
-	// A PlayerState was removed (we were UnPossessed)
-	else
-	{
-		RevokePlayerBasedAbilities();
-		//ReleaseAbilityBindingsFromInputComponent(GrantedPlayerBasedInputBindings);
-	}*/
-}
-
-void ATPSCharacter::UnPossessed()
-{
-	if (HasAuthority())
-	{
-		RevokePlayerBasedAbilities();
-	}
-}
-
 
 
 //~ ============================================================= ~//
 //  SYNTHETIC GETTERS
 //~ ============================================================= ~//
+
+
 
 bool ATPSCharacter::IsAlive() const
 {
@@ -283,9 +245,18 @@ ATPSWeapon* ATPSCharacter::GetEquippedWeapon() const
 	return Cast<ATPSWeapon>(EquipmentManager->GetWeapon(EquipmentManager->ActiveEquipmentSlot));
 }
 
-//~ ============================================================= ~//
+
+
+
+//~ ======================================================================== ~//
 //  BEHAVIOR OPERATIONS
-//~ ============================================================= ~//
+//  -------------------
+//  - Determine if current states should be modified based on input
+//  - Define behavior on death
+//~ ======================================================================== ~//
+
+
+
 
 void ATPSCharacter::ApplyLocomotionState(const ETPSLocomotionState LocomotionState)
 {
@@ -379,9 +350,8 @@ float ATPSCharacter::UpdateCharacterSpeedForCurrentState()
 	float locomotionStateModifier = GetSpeedModifierForLocomotionState(CurrentLocomotionState);
 
 	// Set by GAS
-	UAbilitySystemComponent* asc = GetAbilitySystemComponent();
-	if (IsValid(asc)) {
-		MovementSpeedModifier = asc->GetNumericAttribute(UStandardAttributeSet::GetMovementSpeedModifierAttribute());
+	if (IsValid(AbilitySystem)) {
+		MovementSpeedModifier = AbilitySystem->GetNumericAttribute(UStandardAttributeSet::GetMovementSpeedModifierAttribute());
 	}
 
 	CurrentMaxWalkSpeed = baseSpeed * MovementSpeedModifier;
@@ -432,11 +402,11 @@ void ATPSCharacter::PerformDeath()
 {
 	if (HasAuthority())
 	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] XXXXXXXXXXXX CHARACTER DEATH [%s]-[%s] XXXXXXXXXXXX"), *GetName());
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] XXXXXXXXXXXX CHARACTER DEATH [%s] XXXXXXXXXXXX"), *GetName());
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] XXXXXXXXXXXX CHARACTER DEATH [%s]-[%s] XXXXXXXXXXXX"), *GetName());
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] XXXXXXXXXXXX CHARACTER DEATH [%s] XXXXXXXXXXXX"), *GetName());
 	}
 
 
@@ -450,11 +420,19 @@ void ATPSCharacter::PerformDeath()
 }
 
 
-//~ ============================================================= ~//
+
+
+
+
+//~ ======================================================================== ~//
 //  Ability Extensions
+//  ------------------
 //  - Update states dependent on ability activation. (IsBoosting, IsAiming, etc)
 //  - Extend to BP listeners
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
+
+
+
 
 // - BOOST -//
 
@@ -568,56 +546,109 @@ void ATPSCharacter::FellOutOfWorld(const class UDamageType& dmgType) {
 }
 
 
-//~ ============================================================= ~//
+
+
+
+//~ ======================================================================== ~//
+//  CONTROLLER POSSESSION
+//  ---------------------
+//  - Grant player-based abilities to AbilitySystem and bind to InputComponent
+//~ ======================================================================== ~//
+
+
+
+
+void ATPSCharacter::PossessedBy(AController* NewController) { // server
+	Super::PossessedBy(NewController);
+
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character[%s]::PossessedBy()"), *GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character[%s]::PossessedBy()"), *GetName());
+	}
+
+	if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>())
+	{
+		if (HasAuthority())
+		{
+			AbilitySystem->GrantPlayerBasedAbilities(ps->PlayerAbilitySet);
+		}
+	}
+}
+
+void ATPSCharacter::OnRep_PlayerState() { // client
+	Super::OnRep_PlayerState();
+
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character[%s]::OnRep_PlayerState()"), *GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character[%s]::OnRep_PlayerState()"), *GetName());
+	}
+}
+
+void ATPSCharacter::UnPossessed()
+{
+	if (HasAuthority())
+	{
+		AbilitySystem->RevokePlayerBasedAbilities();
+	}
+}
+
+
+
+
+
+
+//~ ======================================================================== ~//
 //  ABILITY SYSTEM
-//~ ============================================================= ~//
+//  --------------
+//  - Grant character-based abilities and apply initial effects
+//  - Bind InputComponent to mapped GameplayAbilities
+//  - Sync local attributes to GAS-driven attributes (health, movement speed, etc.)
+//  - Grant / Revoke player-based abilities (can only have 1 set)
+//~ ======================================================================== ~//
 
 
-// Return local Character's ASC.
+
+
+
+
+// Return local Character's AbilitySystem.
 UAbilitySystemComponent* ATPSCharacter::GetAbilitySystemComponent() const {
-	return AbilitySystemComponent;
+	return AbilitySystem;
 }
 
 // Should only be called from SERVER when initializing.
-void ATPSCharacter::SetupInitialAbilitiesAndEffects()
+void ATPSCharacter::SetupAbilitySystem()
 {
+	if (!IsValid(AbilitySystem)) { return; }
 	UE_LOG(LogTemp, Log, TEXT("Initializing ASC for Character[%s]..."), *Name);
 
-	UAbilitySystemComponent* asc = GetAbilitySystemComponent();
-	if (! IsValid(asc)) {
-		return;
-	}
-	asc->GetGameplayAttributeValueChangeDelegate(UCharacterHealthAttributeSet::GetHealthAttribute())
+	AbilitySystem->InitializeBaseAbilitiesAndEffects();
+
+	// Configure attributes (OnChange listeners)
+	AbilitySystem->GetGameplayAttributeValueChangeDelegate(UCharacterHealthAttributeSet::GetHealthAttribute())
 		.AddUObject(this, &ThisClass::OnHealthAttributeChanged);
-	asc->GetGameplayAttributeValueChangeDelegate(UCharacterHealthAttributeSet::GetArmorAttribute())
+	AbilitySystem->GetGameplayAttributeValueChangeDelegate(UCharacterHealthAttributeSet::GetArmorAttribute())
 		.AddUObject(this, &ThisClass::OnArmorAttributeChanged);
-	asc->GetGameplayAttributeValueChangeDelegate(UStandardAttributeSet::GetMovementSpeedModifierAttribute())
+	AbilitySystem->GetGameplayAttributeValueChangeDelegate(UStandardAttributeSet::GetMovementSpeedModifierAttribute())
 		.AddUObject(this, &ThisClass::OnMovementAttributeChanged);
 
-	//- Grant default abilities ---------------------------=
-	//
-	if (IsValid(InitialAbilitySet)) {
-		BaseAbilitySpecHandles.Append(
-			InitialAbilitySet->GrantAbilitiesToAbilitySystem(asc));
-	}
-
-	//- Initialize attributes -----------------------------=
-	//
-	if (IsValid(InitialGameplayEffect)) {
-		asc->ApplyGameplayEffectToSelf(
-			InitialGameplayEffect->GetDefaultObject<UGameplayEffect>(),
-			1,
-			asc->MakeEffectContext());
-	}
-
+	// Print
 	UE_LOG(LogTemp, Log, TEXT("ASC for Character[%s] initialized."), *Name);
-	for (auto ability : AbilitySystemComponent->GetActivatableAbilities())
+	for (auto ability : AbilitySystem->GetActivatableAbilities())
 	{
 		UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
 	}
 }
 
-// Performed on Server
+// OnChange listeners performed on SERVER
 void ATPSCharacter::OnArmorAttributeChanged(const FOnAttributeChangeData& data) {
 	CurrentArmor = data.NewValue;
 	ShouldNotify = true;
@@ -634,18 +665,15 @@ void ATPSCharacter::OnMovementAttributeChanged(const FOnAttributeChangeData& dat
 // Sync clients from Server-driven GAS updates.
 void ATPSCharacter::SyncAttributesFromGAS()
 {
-	UAbilitySystemComponent* asc = GetAbilitySystemComponent();
-	if (!IsValid(asc)) {
-		return;
-	}
+	if (!IsValid(AbilitySystem)) { return; }
 
-	CurrentHealth = asc->GetNumericAttribute(UCharacterHealthAttributeSet::GetHealthAttribute());
-	MaxHealth = asc->GetNumericAttribute(UCharacterHealthAttributeSet::GetHealthMaxAttribute());
+	CurrentHealth = AbilitySystem->GetNumericAttribute(UCharacterHealthAttributeSet::GetHealthAttribute());
+	MaxHealth = AbilitySystem->GetNumericAttribute(UCharacterHealthAttributeSet::GetHealthMaxAttribute());
 
-	CurrentArmor = asc->GetNumericAttribute(UCharacterHealthAttributeSet::GetArmorAttribute());
-	MaxArmor = asc->GetNumericAttribute(UCharacterHealthAttributeSet::GetArmorMaxAttribute());
+	CurrentArmor = AbilitySystem->GetNumericAttribute(UCharacterHealthAttributeSet::GetArmorAttribute());
+	MaxArmor = AbilitySystem->GetNumericAttribute(UCharacterHealthAttributeSet::GetArmorMaxAttribute());
 
-	MovementSpeedModifier = asc->GetNumericAttribute(UStandardAttributeSet::GetMovementSpeedModifierAttribute());
+	MovementSpeedModifier = AbilitySystem->GetNumericAttribute(UStandardAttributeSet::GetMovementSpeedModifierAttribute());
 }
 
 
@@ -654,99 +682,18 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* playerInputCompon
 {
 	Super::SetupPlayerInputComponent(playerInputComponent);
 
-	BindAbilitiesToInputComponent(BaseAbilityInputBindings);
-	if (ATPSPlayerState* playerState = GetPlayerState<ATPSPlayerState>())
-	{
-		BindAbilitiesToInputComponent(playerState->PlayerAbilityInputBindings);
-		GrantedPlayerBasedInputBindings = playerState->PlayerAbilityInputBindings;
-	}
-}
-
-void ATPSCharacter::BindAbilitiesToInputComponent(FAbilityInputBindings bindings)
-{
-	if (UEnhancedInputComponent* enhancedInput = Cast<UEnhancedInputComponent>(InputComponent)) {
-		for (const FAbilityInputToInputActionBinding& binding : bindings.Bindings)
-		{
-			enhancedInput->BindAction(binding.InputAction, ETriggerEvent::Started, this, &ThisClass::AbilityInputBindingPressedHandler, binding.AbilityInput);
-			enhancedInput->BindAction(binding.InputAction, ETriggerEvent::Completed, this, &ThisClass::AbilityInputBindingReleasedHandler, binding.AbilityInput);
-		}
-	}
-}
-
-void ATPSCharacter::ReleaseAbilityBindingsFromInputComponent(FAbilityInputBindings bindings)
-{
-	// TODO: Might not be necessary? Does InputComponent deconstruct on UnPossess?
-}
-
-// EnhancedInput -> GAS plumbing
-void ATPSCharacter::AbilityInputBindingPressedHandler(EAbilityInput abilityInput) {
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] CharacterASC::OnInputPressed[%i]"), abilityInput);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] CharacterASC::OnInputPressed[%i]"), abilityInput);
-	}
-
-	// Perform ability on local character
-	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<uint32>(abilityInput));
-}
-void ATPSCharacter::AbilityInputBindingReleasedHandler(EAbilityInput abilityInput) {
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] CharacterASC::OnInputReleased[%i]"), abilityInput);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] CharacterASC::OnInputReleased[%i]"), abilityInput);
-	}
-
-	// Perform ability on local character
-	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<uint32>(abilityInput));
-}
-
-
-void ATPSCharacter::GrantPlayerBasedAbilities()
-{
-	UE_LOG(LogTemp, Log, TEXT("Granting player-based abilities to Character[%s] ASC..."), *GetName());
-
-	if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>())
-	{
-		GrantedPlayerBasedAbilitySpecHandles = AbilitySystemComponent->GrantAbilitiesFromAbilitySet(ps->PlayerAbilitySet);
-		BindAbilitiesToInputComponent(ps->PlayerAbilityInputBindings);
-	}
-
-	UE_LOG(LogTemp, Log, TEXT("ASC for Character[%s] updated."), *Name);
-	for (auto ability : AbilitySystemComponent->GetActivatableAbilities())
-	{
-		UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
-	}
-}
-
-void ATPSCharacter::RevokePlayerBasedAbilities()
-{
-	UE_LOG(LogTemp, Log, TEXT("Revoking player-based abilities from Character[%s] ASC..."), *GetName());
-
-	AbilitySystemComponent->RevokeAbilitiesFromAbilitySystem(GrantedPlayerBasedAbilitySpecHandles);
-	GrantedPlayerBasedAbilitySpecHandles.Empty();
-
-	ReleaseAbilityBindingsFromInputComponent(GrantedPlayerBasedInputBindings);
-	GrantedPlayerBasedInputBindings.Bindings.Empty();
-
-	/*UE_LOG(LogTemp, Log, TEXT("ASC for Character[%s] updated."), *Name);
-	for (auto ability : AbilitySystemComponent->GetActivatableAbilities())
-	{
-		UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
-	}*/
+	UE_LOG(LogTemp, Log, TEXT("Character[%s]::SetupInputComponent()"), *GetName());
+	AbilitySystem->BindToInputComponent(Cast<UEnhancedInputComponent>(playerInputComponent));
 }
 
 
 
 
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
 //  MISC CONFIGURATION
-//~ ============================================================= ~//
+//~ ======================================================================== ~//
+
+
 
 
 // AI Enhancement - Detection FOV is rooted to Character's HEAD.
@@ -756,7 +703,7 @@ void ATPSCharacter::GetActorEyesViewPoint(FVector& Location, FRotator& Rotation)
 	Rotation = GetMesh()->GetSocketRotation(EyeSocketName);
 }
 
-// Apply generic damage to ASC
+// Apply generic damage to AbilitySystem
 /*float ATPSCharacter::TakeDamage(float damage, struct FDamageEvent const& event, AController* instigator, AActor* causer)
 {
 	UAbilitySystemComponent* asc = GetAbilitySystemComponent();
@@ -783,6 +730,8 @@ void ATPSCharacter::GetActorEyesViewPoint(FVector& Location, FRotator& Rotation)
 
 	return damage;
 }*/
+
+
 
 
 //~ ============================================================= ~//

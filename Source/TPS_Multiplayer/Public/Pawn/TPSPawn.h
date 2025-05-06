@@ -27,7 +27,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* inputComponent) override;
 
 #if WITH_EDITORONLY_DATA
 	/** Component shown in the editor only to indicate character facing */
@@ -40,9 +40,14 @@ protected:
 //~ ======================================================================== ~//
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
-	UTPSAbilitySystemComponent* AbilitySystemComponent{ nullptr };
+	UTPSAbilitySystemComponent* AbilitySystem { nullptr };
 
 public:
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override; // IAbilitySystemInterface
+	// IAbilitySystemInterface
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystem; }
 
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void UnPossessed() override;
+
+	virtual void OnRep_PlayerState() override;
 };

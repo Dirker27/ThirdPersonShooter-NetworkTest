@@ -40,7 +40,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	UAbilitySet* PlayerAbilitySet{ nullptr };
 
-	// Control bindings for player-based abilities.
-	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
-	FAbilityInputBindings PlayerAbilityInputBindings;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Input")
+	TArray<UInputMappingContext*> CharacterInputMappings;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	TArray<UInputMappingContext*> InputMappings;
 };

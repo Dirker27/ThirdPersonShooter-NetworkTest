@@ -73,7 +73,7 @@ public:
     //////////////////////////////////////////////////////
     // Configuration
 
-    // Effects to be applied to the owning Pawn's ASC when equipped (active)
+    // Effects to be applied to the owning Pawn's AbilitySystem when equipped (active)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipable|Configuration")
     TEnumAsByte<ETPSWeaponSlot> WeaponSlot;
 

@@ -1,4 +1,4 @@
-// (C) ToasterCat Studios 2024
+// (C) ToasterCat Studios 2025
 
 #pragma once
 
@@ -10,11 +10,11 @@
 UENUM(BlueprintType)
 enum ETPSLocomotionState : int
 {
-    Standing = 0,
-    Crouching = 1,
-    Prone = 2,
-    Sprinting = 3,
-    Ragdoll = 4
+    Standing  = 0 UMETA(DisplayName = "Standing"),
+    Crouching = 1 UMETA(DisplayName = "Crouching"),
+    Prone     = 2 UMETA(DisplayName = "Prone"),
+    Sprinting = 3 UMETA(DisplayName = "Sprinting"),
+    Ragdoll   = 4 UMETA(DisplayName = "Ragdoll")
 };
 
 

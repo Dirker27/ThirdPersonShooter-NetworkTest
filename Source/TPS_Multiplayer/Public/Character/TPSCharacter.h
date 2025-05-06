@@ -10,7 +10,6 @@
 #include "TPSCharacterConfiguration.h"
 #include "TPSCharacterInventory.h"
 
-#include "GAS/GASAbilitySet.h"
 #include "Character/TPSLocomotionState.h"
 #include "Character/TPSCharacterState.h"
 #include "Equipment/TPSEquipmentManager.h"
@@ -39,24 +38,23 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 
 //~ ======================================================================== ~//
 //  COMPONENTS
 //~ ======================================================================== ~//
 public:
-	//- Display Widgets --------------------------------------=
-	//
-	//- Broadcast Delegate
+	//////////////////////////////////////////////////////
+	// Display Widgets
+
+	// Broadcast Delegate
 	UPROPERTY(BlueprintAssignable)
 	FUpdateAttributeDisplay NotifyDisplayWidgets;
 private:
 	bool ShouldNotify = false;
 
-// UE Implementables
-public:
-	// Overrides
-	void FellOutOfWorld(const class UDamageType& dmgType) override;
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 
 //~ ======================================================================== ~//
 //  STATE
@@ -192,6 +190,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Render")
 	bool ShouldRenderDebugFrame = true;
 
+
+
+
 //~ ======================================================================== ~//
 //  Blueprint Extensions
 //~ ======================================================================== ~//
@@ -303,6 +304,7 @@ public:
 	}
 
 
+
 //~ ======================================================================== ~//
 //  Character Business Logic
 //~ ======================================================================== ~//
@@ -358,12 +360,27 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnDeath();
 
+
+
+
+//~ ======================================================================== ~//
+//  CONTROLLER POSSESSION
+//~ ======================================================================== ~//
+protected:
+	// Bind to AbilitySystem in PlayerState
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void UnPossessed() override;
+	virtual void OnRep_PlayerState() override;
+
+
+
+
 //~ ======================================================================== ~//
 //  ABILITY SYSTEM
 //~ ======================================================================== ~//
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
-	UTPSAbilitySystemComponent* AbilitySystemComponent{ nullptr };
+	UTPSAbilitySystemComponent* AbilitySystem{ nullptr };
 
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override; // IAbilitySystemInterface
@@ -396,57 +413,17 @@ protected:
 	void OnMovementAttributeChanged(const FOnAttributeChangeData&);
 
 
+
 	////////////////////////////////////////////////////////
 	// Initialization (Grant Abilities to System)
 protected:
-	void SetupInitialAbilitiesAndEffects();
-
-	// Gameplay Effect used to initialize attribute values on spawn.
-	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
-	TSubclassOf<UGameplayEffect> InitialGameplayEffect;
-
-	// Abilities native to the player
-	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
-	UAbilitySet* InitialAbilitySet{ nullptr };
-	TArray<FGameplayAbilitySpecHandle> BaseAbilitySpecHandles;
-
+	void SetupAbilitySystem();
 
 	////////////////////////////////////////////////////////
 	// Input Routing
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Abilities|Input")
-	FAbilityInputBindings BaseAbilityInputBindings;
-
-	// Bind Input->ASC
+	// Bind Input->AbilitySystem
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	void BindAbilitiesToInputComponent(FAbilityInputBindings bindings);
-	void ReleaseAbilityBindingsFromInputComponent(FAbilityInputBindings bindings);
-	void AbilityInputBindingPressedHandler(EAbilityInput abilityInput);
-	void AbilityInputBindingReleasedHandler(EAbilityInput abilityInput);
-
-
-	////////////////////////////////////////////////////////
-	// Player-based abilities
-private:
-	void GrantPlayerBasedAbilities();
-	void RevokePlayerBasedAbilities();
-
-	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
-	TArray<FGameplayAbilitySpecHandle> GrantedPlayerBasedAbilitySpecHandles;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Abilities|Input")
-	FAbilityInputBindings GrantedPlayerBasedInputBindings;
-
-
-	////////////////////////////////////////////////////////
-	// Controller Possession
-protected:
-	// Bind to ASC in PlayerState
-	virtual void PossessedBy(AController* NewController) override;
-	virtual void UnPossessed() override;
-	virtual void OnRep_PlayerState() override;
-
-
 
 
 //~ ======================================================================== ~//
@@ -461,14 +438,18 @@ public:
 
 
 //~ ======================================================================== ~//
-//  EVENT OVERRIDES
+//  MISC BEHAVIOR OVERRIDES
 //~ ======================================================================== ~//
 
 public:
-	// Use Actor's Eyes at Mesh Location for detection and docking sweeps
+	// Use Actor's Eyes at Mesh Location for detection and docking sweeps.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration")
 	FName EyeSocketName;
 	virtual void GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const override;
+
+	// Activate Ragdoll and die when outside world boundaries. (impl'd in BP)
+	virtual void FellOutOfWorld(const class UDamageType& dmgType) override;
+
 
 	// Apply damage via Ability System (if present)
 	//virtual float TakeDamage(float damage, struct FDamageEvent const& event, AController* instigator, AActor* causer) override;

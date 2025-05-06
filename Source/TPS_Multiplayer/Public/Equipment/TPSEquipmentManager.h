@@ -14,8 +14,8 @@
 /*
  * Manages a Pawn's Equipment Items
  *  - Mounts visible Actors to Mesh (EquipmentHarness)
- *  - Applies Equipment GAS Abilities/Effects to owning Pawn's ASC
- *  - Attaches owner's ASC to Equipment/Weapons to extend abilities
+ *  - Applies Equipment GAS Abilities/Effects to owning Pawn's AbilitySystem
+ *  - Attaches owner's AbilitySystem to Equipment/Weapons to extend abilities
  */
 UCLASS()
 class TPS_MULTIPLAYER_API UTPSEquipmentManager : public UActorComponent
@@ -54,7 +54,7 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
     TWeakObjectPtr<USkeletalMeshComponent> TargetMesh;
 
-    // Owner's ASC (integrates to equipment w/ owner GAS) - Bound on Startup
+    // Owner's AbilitySystem (integrates to equipment w/ owner GAS) - Bound on Startup
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
     TWeakObjectPtr<UAbilitySystemComponent> OwnerAsc;
 
@@ -127,7 +127,7 @@ public:
     // Drop / Pickup Items
 
     // Pick up a new item and bind it to the designated equipment slot.
-    //   - Bound GAS abilities/attributes will be applied to owner's ASC.
+    //   - Bound GAS abilities/attributes will be applied to owner's AbilitySystem.
     //   - If slot is occupied, that equipment item will be dropped.
     UFUNCTION(BlueprintCallable)
     void PickUpWeapon(ATPSWeapon* weapon, const ETPSWeaponSlot slot);
@@ -159,7 +159,7 @@ public:
 
     // Equip a Weapon assigned to given slot.
     //  - Weapon must already be picked up and registered in inventory.
-    //  - Applies Weapon's active effects to owner's ASC.
+    //  - Applies Weapon's active effects to owner's AbilitySystem.
     UFUNCTION(BlueprintCallable)
     void EquipWeapon(const ETPSWeaponSlot equipmentSlot);
 

@@ -1,5 +1,6 @@
 #include "GAS/GASAbilitySet.h"
 
+/*
 TArray<FGameplayAbilitySpecHandle> UAbilitySet::GrantAbilitiesToAbilitySystem(UAbilitySystemComponent* asc) const {
     check(asc);
 
@@ -26,3 +27,4 @@ void UAbilitySet::RevokeAbilitiesFromAbilitySystem(UAbilitySystemComponent* asc,
         asc->ClearAbility(abilityHandle);
     }
 }
+*/

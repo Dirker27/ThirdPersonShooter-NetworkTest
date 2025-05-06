@@ -72,11 +72,11 @@ public:
     /////////////////////////////////////////////////////////////////
     // Configuration
 
-        // Effects to be applied to the owning Pawn's ASC when equipped (active)
+        // Effects to be applied to the owning Pawn's AbilitySystem when equipped (active)
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipable|Effects")
     TArray<TSubclassOf<UGameplayEffect>> ActiveEffects;
 
-    // Effects to be applied to the owning Pawn's ASC when in inventory (passive)
+    // Effects to be applied to the owning Pawn's AbilitySystem when in inventory (passive)
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipable|Effects")
     TArray<TSubclassOf<UGameplayEffect>> PassiveEffects;
 
