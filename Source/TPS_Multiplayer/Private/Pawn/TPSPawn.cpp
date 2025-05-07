@@ -48,7 +48,7 @@ void ATPSPawn::SetupPlayerInputComponent(UInputComponent* inputComponent)
 	// Don't use parent's setup. We just want DefaultPawn's functions, not its
 	//   control mappings. (flying pawn w/ camera pitch+yaw)
 
-	AbilitySystem->BindToInputComponent(Cast<UEnhancedInputComponent>(inputComponent));
+	AbilitySystem->BindToInputComponent(inputComponent);
 }
 
 

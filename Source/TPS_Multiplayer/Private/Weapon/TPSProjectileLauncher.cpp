@@ -30,14 +30,19 @@ void ATPSProjectileLauncher::StopUse()
 void ATPSProjectileLauncher::PerformFire()
 {
 	if (HasAuthority()) {
+		FProjectileLaunchInfo launchInfo = FProjectileLaunchInfo();
+
 		// Adjust the shooter's aim.
 		FRotator adjustedDirection = TargetDirection;
 		FVector2D noise = CalculateAccuracyNoise();
 		adjustedDirection.Add(noise.X, noise.Y, 0);
 
 		FVector debugVector = adjustedDirection.Vector() * 400;
-		UTPSFunctionLibrary::DrawDebugTrace(this, Muzzle->GetComponentTransform().GetLocation(), debugVector,
-			FLinearColor::Yellow, FLinearColor::Red, 2.f);
+		if (ShowDebugTrace)
+		{
+			UTPSFunctionLibrary::DrawDebugTrace(this, Muzzle->GetComponentTransform().GetLocation(), debugVector,
+				FLinearColor::Yellow, FLinearColor::Red, 2.f);
+		}
 
 		int projectileCount = 1;
 		if (Configuration->ProjectileBehavior == Spread)
@@ -52,18 +57,32 @@ void ATPSProjectileLauncher::PerformFire()
 			spreadDirection.Add(noise.X, noise.Y, 0);
 
 			debugVector = spreadDirection.Vector() * 200;
-			UTPSFunctionLibrary::DrawDebugTrace(this, Muzzle->GetComponentTransform().GetLocation(), debugVector,
-				FLinearColor::Gray, FLinearColor::Red, 2.f);
-			
-			LaunchProjectile(spreadDirection);
+			if (ShowDebugTrace)
+			{
+				UTPSFunctionLibrary::DrawDebugTrace(this, Muzzle->GetComponentTransform().GetLocation(), debugVector,
+					FLinearColor::Gray, FLinearColor::Red, 2.f);
+			}
+
+			if (ATPSProjectile* projectile = LaunchProjectile(spreadDirection))
+			{
+				launchInfo.ProjectilePaths.Add(projectile->GetTransform().GetRotation().GetForwardVector());
+			}
 		}
+
+		OnFire(launchInfo);
 	}
 }
 
-// TODO: This should be a MultiCast RPC for replication.
-void ATPSProjectileLauncher::LaunchProjectile(FRotator targetDirection)
+/*void ATPSProjectileLauncher::OnFire_Implementation(const FVector projectilePath)
 {
-	if (!IsValid(ProjectileTemplate)) { return; }
+	
+}*/
+
+
+// TODO: This should be a MultiCast RPC for replication.
+ATPSProjectile* ATPSProjectileLauncher::LaunchProjectile(FRotator targetDirection)
+{
+	if (!IsValid(ProjectileTemplate)) { return nullptr; }
 
 	ATPSProjectile* p = GetWorld()->SpawnActor<ATPSProjectile>(ProjectileTemplate,
 		Muzzle->GetComponentTransform().GetLocation(), targetDirection);
@@ -79,6 +98,8 @@ void ATPSProjectileLauncher::LaunchProjectile(FRotator targetDirection)
 	if (IsValid(p)) {
 		p->Launch();
 	}
+
+	return p;
 }
 
 

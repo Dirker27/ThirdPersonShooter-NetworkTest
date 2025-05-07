@@ -142,9 +142,6 @@ public:
 public:
     UFUNCTION(BlueprintCallable)
     void Fire();
-    UFUNCTION(BlueprintImplementableEvent)
-    void OnFire();
-
     virtual void PerformFire() { UE_LOG(LogTemp, Log, TEXT("Weapon::PerformFire()")); };
 
     UFUNCTION(BlueprintCallable, BlueprintPure)

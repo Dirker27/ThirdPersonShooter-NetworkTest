@@ -683,7 +683,7 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* playerInputCompon
 	Super::SetupPlayerInputComponent(playerInputComponent);
 
 	UE_LOG(LogTemp, Log, TEXT("Character[%s]::SetupInputComponent()"), *GetName());
-	AbilitySystem->BindToInputComponent(Cast<UEnhancedInputComponent>(playerInputComponent));
+	AbilitySystem->BindToInputComponent(playerInputComponent);
 }
 
 

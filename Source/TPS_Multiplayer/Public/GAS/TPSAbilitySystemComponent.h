@@ -94,7 +94,7 @@ private:
 //  INPUT ROUTING
 //~ ======================================================================== ~//
 public:
-	void BindToInputComponent(UEnhancedInputComponent* inputComponent);
+	virtual void BindToInputComponent(UInputComponent* inputComponent) override;
 	void ReleaseAbilityBindingsFromInputComponent(UEnhancedInputComponent* inputComponent);
 
 private:

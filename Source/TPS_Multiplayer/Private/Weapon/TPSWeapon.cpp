@@ -140,8 +140,6 @@ void ATPSWeapon::Fire()
 	{
 		HasTriggerCompleted = true;
 	}
-
-	OnFire();
 }
 
 bool ATPSWeapon::CanFire()

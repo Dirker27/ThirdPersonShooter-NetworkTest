@@ -10,6 +10,17 @@
 
 #include "TPSProjectileLauncher.generated.h"
 
+USTRUCT(BlueprintType)
+struct FProjectileLaunchInfo
+{
+    GENERATED_BODY()
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    TArray<FVector> ProjectilePaths;
+};
+
+
+
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSProjectileLauncher : public ATPSWeapon
 {
@@ -30,17 +41,26 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
     TObjectPtr<UTPSMountPoint> ShellEjectPort;
 
-    // Fired Projectile
+    // Projectile Definition
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
     TSubclassOf<ATPSProjectile> ProjectileTemplate;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+    bool ShowDebugTrace = false;
+
 
 //~ ============================================================= ~//
 //  BEHAVIOR
 //~ ============================================================= ~//
 public:
+    UFUNCTION(BlueprintImplementableEvent)
+    void OnFire(const FProjectileLaunchInfo& launchInfo);
+
+
     UFUNCTION(BlueprintCallable)
-    void LaunchProjectile(FRotator target);
+    ATPSProjectile* LaunchProjectile(FRotator target);
     virtual void PerformFire() override; // Wired to ^
+
 
     //- Usable ------------------------------------------=
     //

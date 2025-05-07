@@ -119,7 +119,7 @@ bool ATPSProjectile::DetectCollisionByLineTrace(const float deltaSeconds, FHitRe
 	if (ShowCollisionTrace)
 	{
 		isHit = UKismetSystemLibrary::LineTraceSingle(this, startLoc, endLoc,
-			channel, false, actorsToIgnore, debugTrace,
+			channel, false, actorsToIgnore, EDrawDebugTrace::Type::ForDuration,
 			outHitResult,
 			true,
 			FLinearColor::Green, FLinearColor::Red, 0.5f);
@@ -127,7 +127,7 @@ bool ATPSProjectile::DetectCollisionByLineTrace(const float deltaSeconds, FHitRe
 	else
 	{
 		isHit = UKismetSystemLibrary::LineTraceSingle(this, startLoc, endLoc,
-			channel, false, actorsToIgnore, debugTrace,
+			channel, false, actorsToIgnore, EDrawDebugTrace::None,
 			outHitResult,
 			true);
 	}

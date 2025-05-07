@@ -85,7 +85,7 @@ public:
     //
     // Show Debug Collision Trace
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSProjectile|Configuration")
-    bool ShowCollisionTrace = true;
+    bool ShowCollisionTrace = false;
 
 
     //- State --------------------------------------------=

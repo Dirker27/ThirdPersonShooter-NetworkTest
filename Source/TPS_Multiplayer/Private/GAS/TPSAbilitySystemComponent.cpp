@@ -126,16 +126,17 @@ void UTPSAbilitySystemComponent::RevokeAbilities(TArray<FGameplayAbilitySpecHand
 
 
 
-void UTPSAbilitySystemComponent::BindToInputComponent(UEnhancedInputComponent* inputComponent)
+void UTPSAbilitySystemComponent::BindToInputComponent(UInputComponent* inputComponent)
 {
-    if (!IsValid(inputComponent) || !IsValid(InputBindings)) { return; }
+    UEnhancedInputComponent* enhacedInput = Cast<UEnhancedInputComponent>(inputComponent);
+    if (!IsValid(enhacedInput) || !IsValid(InputBindings)) { return; }
 
     UE_LOG(LogTemp, Log, TEXT("Binding ASC to Owner's InputComponent..."));
 
     for (const FAbilityInputToInputActionBinding& binding : InputBindings->Bindings)
     {
-        inputComponent->BindAction(binding.InputAction, ETriggerEvent::Started, this, &ThisClass::AbilityInputBindingPressedHandler, binding.AbilityInput);
-        inputComponent->BindAction(binding.InputAction, ETriggerEvent::Completed, this, &ThisClass::AbilityInputBindingReleasedHandler, binding.AbilityInput);
+        enhacedInput->BindAction(binding.InputAction, ETriggerEvent::Started, this, &ThisClass::AbilityInputBindingPressedHandler, binding.AbilityInput);
+        enhacedInput->BindAction(binding.InputAction, ETriggerEvent::Completed, this, &ThisClass::AbilityInputBindingReleasedHandler, binding.AbilityInput);
     }
 }
 
