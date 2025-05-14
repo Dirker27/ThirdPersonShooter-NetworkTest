@@ -1,4 +1,4 @@
-// (C) ToasterCat Studios 2024
+// (C) ToasterCat Studios 2025
 
 #pragma once
 
@@ -38,7 +38,7 @@ public:
 public:
 	// Abilities that will be granted to controlled pawns on possession.
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
-	UAbilitySet* PlayerAbilitySet{ nullptr };
+	UAbilitySet* PlayerAbilitySet { nullptr };
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Input")
 	TArray<UInputMappingContext*> CharacterInputMappings;

@@ -42,15 +42,12 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FVector HitDecalSize;
 
-public:
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    TWeakObjectPtr<UAbilitySystemComponent> OwnerAsc;
-
 //~ ============================================================= ~//
 //  ATTRIBUTES
 //~ ============================================================= ~//
 public:
-    //- Identity -----------------------------------------=
+    ////////////////////////////////////////////////////////
+    // Identity
     
     // Name
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSProjectile|Identity")
@@ -61,7 +58,8 @@ public:
     TEnumAsByte<ETPSAmmunitionType> Type;
 
 
-    //- Configuration ------------------------------------=
+    ////////////////////////////////////////////////////////
+    // Configuration
     
     // Initial Launch Velocity [m/s]
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSProjectile|Configuration")
@@ -88,11 +86,16 @@ public:
     bool ShowCollisionTrace = false;
 
 
-    //- State --------------------------------------------=
+    ////////////////////////////////////////////////////////
+    // State
     
     // EquipmentOwner (who shot me?)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSProjectile|State")
     ATPSCharacter* OwningCharacter;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    TWeakObjectPtr<UAbilitySystemComponent> OwnerAsc;
+
     // Lifetime
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPSProjectile|State")
     float ElapsedLifetimeSeconds;
