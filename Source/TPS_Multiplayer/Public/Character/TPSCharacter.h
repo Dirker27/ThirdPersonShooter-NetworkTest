@@ -331,6 +331,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RevertLocomotionState();
 
+	UFUNCTION(BlueprintCallable)
+	void InterruptIdle();
 
 	////////////////////////////////////////////////////////
 	// Business Logic

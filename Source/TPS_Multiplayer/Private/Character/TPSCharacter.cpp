@@ -303,6 +303,13 @@ void ATPSCharacter::RevertCharacterState() {
 	ApplyCharacterState(PreviousCharacterState);
 }
 
+void ATPSCharacter::InterruptIdle()
+{
+	IdleSeconds = 0;
+}
+
+
+
 /**
  * https://www.notion.so/Game-Design-Document-GDD-670fda60cfeb41a089970b8fd240acaa?pvs=4#c31b4f8df636457b9783b951d60ecf03
  */
