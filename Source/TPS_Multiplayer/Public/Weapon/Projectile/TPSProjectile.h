@@ -36,6 +36,8 @@ protected:
     TObjectPtr<UArrowComponent> ArrowComponent;
 #endif
 
+    // Simple Decal to apply to target surface/character on hit.
+    //   Will OVERRIDE any applied impact effects if set.
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<UMaterial*> HitDecals;
 
