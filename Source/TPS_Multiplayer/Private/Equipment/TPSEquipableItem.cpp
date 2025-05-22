@@ -81,6 +81,9 @@ void ATPSEquipableItem::Drop()
 	IsOwned = false;
 	IsEquipped = false;
 
+	SetOwner(nullptr);
+	SetInstigator(nullptr);
+
 	EnableWorldCollision();
 
 	PerformDrop();

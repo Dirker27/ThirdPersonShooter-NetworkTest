@@ -22,7 +22,7 @@
 #include "TPSCharacter.generated.h"
 
 UDELEGATE(BlueprintAuthorityOnly)
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUpdateAttributeDisplay);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUpdateCharacterAttributeDisplay);
 
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSCharacter : public ACharacter, public IAbilitySystemInterface
@@ -50,7 +50,7 @@ public:
 
 	// Broadcast Delegate
 	UPROPERTY(BlueprintAssignable)
-	FUpdateAttributeDisplay NotifyDisplayWidgets;
+	FUpdateCharacterAttributeDisplay NotifyDisplayWidgets;
 private:
 	bool ShouldNotify = false;
 

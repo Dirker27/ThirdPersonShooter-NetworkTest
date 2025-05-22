@@ -12,6 +12,8 @@
 
 #include "TPSPlayerState.generated.h"
 
+UDELEGATE(BlueprintAuthorityOnly)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUpdatePlayerStateDisplay);
 
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSPlayerState : public APlayerState, public IAbilitySystemInterface
@@ -26,16 +28,26 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+
+//~ ======================================================================== ~//
+//  COMPONENTS
+//~ ======================================================================== ~//
+public:
+	//////////////////////////////////////////////////////
+	// Display Widgets
+
+	// Broadcast Delegate
+	UPROPERTY(BlueprintAssignable)
+	FUpdatePlayerStateDisplay NotifyDisplayWidgets;
+private:
+	bool ShouldNotify = false;
+
 
 //~ ======================================================================== ~//
 //  ATTRIBUTES
 //~ ======================================================================== ~//
 public:
-	////////////////////////////////////////////////////////
-	// Identity
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString ClanTag;
-
 
 	////////////////////////////////////////////////////////
 	// State
@@ -71,4 +83,17 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
 	TArray<UInputMappingContext*> InputMappings;
+
+
+//~ ======================================================================== ~//
+//  PUBLIC OPERATIONS
+//~ ======================================================================== ~//
+public:
+	//////////////////////////////////////////////////////
+	// Reporting
+
+	// Broadcast Delegate
+	UFUNCTION(BlueprintCallable)
+	void ReportProjectileHit(FHitResult hit);
+
 };

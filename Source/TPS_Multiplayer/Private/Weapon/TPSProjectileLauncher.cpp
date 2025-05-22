@@ -79,8 +79,8 @@ void ATPSProjectileLauncher::LaunchProjectiles_Multicast_Implementation(const TA
 		ATPSProjectile* p = GetWorld()->SpawnActor<ATPSProjectile>(ProjectileTemplate,
 			Muzzle->GetComponentTransform().GetLocation(), trajectory);
 
-		p->SetReplicates(true);
-		p->SetReplicateMovement(true);
+		p->SetOwner(GetOwner());
+		p->SetInstigator(GetInstigator());
 
 		if (IsValid(OwnerAsc.Get()))
 		{

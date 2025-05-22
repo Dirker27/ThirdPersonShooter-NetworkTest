@@ -150,9 +150,8 @@ void ATPSCharacter::Tick(float deltaTime)
 	SyncAttributesFromGAS();
 	//
 	// Sync Character direction from Controller
-
 	FRotator vr = GetViewRotation();
-	if (vr != GetActorRotation()) // Guards against "noise" where client only sees controller when input is active
+	if (vr != GetActorRotation()) // Guards against "noise" where remote client only sees controller value when input is active
 	{
 		TargetLookRotation = vr;
 	}

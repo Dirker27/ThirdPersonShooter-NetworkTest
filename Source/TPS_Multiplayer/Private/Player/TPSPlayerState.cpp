@@ -18,6 +18,17 @@ void ATPSPlayerState::BeginPlay() {
 	Super::BeginPlay();
 }
 
+void ATPSPlayerState::Tick(float DeltaSeconds)
+{
+	//- Broadcast to UI Listeners -----------------------=
+	//
+	if (ShouldNotify) {
+		NotifyDisplayWidgets.Broadcast();
+		ShouldNotify = false;
+	}
+}
+
+
 UAbilitySystemComponent* ATPSPlayerState::GetAbilitySystemComponent() const
 {
 	if (ATPSCharacter* character = Cast<ATPSCharacter>(GetPawn()))
@@ -26,3 +37,10 @@ UAbilitySystemComponent* ATPSPlayerState::GetAbilitySystemComponent() const
 	}
 	return nullptr;
 }
+
+
+void ATPSPlayerState::ReportProjectileHit(FHitResult hit)
+{
+	ShouldNotify = true;
+}
+
