@@ -36,10 +36,10 @@ void ATPSProjectile::BeginPlay()
 	ElapsedLifetimeSeconds = 0;
 }
 
-bool ATPSProjectile::IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTarget, const FVector& SrcLocation) const
+/*bool ATPSProjectile::IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTarget, const FVector& SrcLocation) const
 {
 	return !IsOwnedBy(ViewTarget);
-}
+}*/
 
 void ATPSProjectile::Tick(float deltaSeconds)
 {

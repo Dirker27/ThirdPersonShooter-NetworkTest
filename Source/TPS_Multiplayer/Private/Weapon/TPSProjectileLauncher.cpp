@@ -29,72 +29,72 @@ void ATPSProjectileLauncher::StopUse()
 
 void ATPSProjectileLauncher::PerformFire()
 {
-	if (HasAuthority()) {
-		FProjectileLaunchInfo launchInfo = FProjectileLaunchInfo();
+	// Adjust the shooter's aim.
+	FRotator adjustedDirection = TargetDirection;
+	FVector2D noise = CalculateAccuracyNoise();
+	adjustedDirection.Add(noise.X, noise.Y, 0);
 
-		// Adjust the shooter's aim.
-		FRotator adjustedDirection = TargetDirection;
-		FVector2D noise = CalculateAccuracyNoise();
-		adjustedDirection.Add(noise.X, noise.Y, 0);
-
+	if (ShowDebugTrace)
+	{
 		FVector debugVector = adjustedDirection.Vector() * 400;
+		UTPSFunctionLibrary::DrawDebugTrace(this, Muzzle->GetComponentTransform().GetLocation(), debugVector,
+			FLinearColor::Yellow, FLinearColor::Red, 2.f);
+	}
+
+	int projectileCount = 1;
+	if (Configuration->ProjectileBehavior == Spread)
+	{
+		projectileCount = Configuration->SpreadCount;
+	}
+
+	TArray<FRotator> targetTrajectories;
+	for (int i = 0; i < projectileCount; i++)
+	{
+		// Adjust the weapon's spread.
+		FRotator spreadDirection = adjustedDirection;
+		noise = CalculateSpreadNoise();
+		spreadDirection.Add(noise.X, noise.Y, 0);
+
 		if (ShowDebugTrace)
 		{
+			FVector debugVector = spreadDirection.Vector() * 200;
 			UTPSFunctionLibrary::DrawDebugTrace(this, Muzzle->GetComponentTransform().GetLocation(), debugVector,
-				FLinearColor::Yellow, FLinearColor::Red, 2.f);
+				FLinearColor::Gray, FLinearColor::Red, 2.f);
 		}
 
-		int projectileCount = 1;
-		if (Configuration->ProjectileBehavior == Spread)
-		{
-			projectileCount = Configuration->SpreadCount;
-		}
-		for (int i = 0; i < projectileCount; i++)
-		{
-			// Adjust the weapon's spread.
-			FRotator spreadDirection = adjustedDirection;
-			noise = CalculateSpreadNoise();
-			spreadDirection.Add(noise.X, noise.Y, 0);
-
-			debugVector = spreadDirection.Vector() * 200;
-			if (ShowDebugTrace)
-			{
-				UTPSFunctionLibrary::DrawDebugTrace(this, Muzzle->GetComponentTransform().GetLocation(), debugVector,
-					FLinearColor::Gray, FLinearColor::Red, 2.f);
-			}
-
-			if (ATPSProjectile* projectile = LaunchProjectile(spreadDirection))
-			{
-				launchInfo.ProjectilePaths.Add(projectile->GetTransform().GetRotation().GetForwardVector());
-			}
-		}
-
-		OnFire(launchInfo);
+		targetTrajectories.Add(spreadDirection);
 	}
+
+	LaunchProjectiles_Multicast(targetTrajectories);
 }
 
 
-// TODO: This should be a MultiCast RPC for replication.
-ATPSProjectile* ATPSProjectileLauncher::LaunchProjectile(FRotator targetDirection)
+void ATPSProjectileLauncher::LaunchProjectiles_Multicast_Implementation(const TArray<FRotator> &trajectories)
 {
-	if (!IsValid(ProjectileTemplate)) { return nullptr; }
+	if (!IsValid(ProjectileTemplate)) { return; }
 
-	ATPSProjectile* p = GetWorld()->SpawnActor<ATPSProjectile>(ProjectileTemplate,
-		Muzzle->GetComponentTransform().GetLocation(), targetDirection);
-
-	p->SetReplicates(true);
-	p->SetReplicateMovement(true);
-
-	if (IsValid(OwnerAsc.Get()))
+	FProjectileLaunchInfo launchInfo = FProjectileLaunchInfo();
+	for (auto trajectory : trajectories)
 	{
-		p->OwnerAsc = OwnerAsc;
-	}
+		ATPSProjectile* p = GetWorld()->SpawnActor<ATPSProjectile>(ProjectileTemplate,
+			Muzzle->GetComponentTransform().GetLocation(), trajectory);
 
-	if (IsValid(p)) {
-		p->Launch();
-	}
+		p->SetReplicates(true);
+		p->SetReplicateMovement(true);
 
-	return p;
+		if (IsValid(OwnerAsc.Get()))
+		{
+			p->OwnerAsc = OwnerAsc;
+		}
+
+		if (IsValid(p)) {
+			p->Launch();
+		}
+
+		launchInfo.ProjectilePaths.Add(trajectory.Vector());
+	}
+	
+	OnFirePerformed(launchInfo);
 }
 
 

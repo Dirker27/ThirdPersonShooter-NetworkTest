@@ -150,9 +150,12 @@ void ATPSCharacter::Tick(float deltaTime)
 	SyncAttributesFromGAS();
 	//
 	// Sync Character direction from Controller
-	//if (HasAuthority()) {
-		TargetLookRotation = GetViewRotation();
-	//}
+
+	FRotator vr = GetViewRotation();
+	if (vr != GetActorRotation()) // Guards against "noise" where client only sees controller when input is active
+	{
+		TargetLookRotation = vr;
+	}
 
 	//- Extend Input to Weapons -------------------------=
 	//
@@ -167,8 +170,10 @@ void ATPSCharacter::Tick(float deltaTime)
 		{
 			if (weapon->CanFire())
 			{
-				weapon->Fire();
-				OnFirePerformed();
+				if (HasAuthority()) {
+					weapon->Fire();
+					OnFirePerformed();
+				}
 			}
 		}
 	}

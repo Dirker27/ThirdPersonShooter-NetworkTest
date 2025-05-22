@@ -13,9 +13,6 @@
 
 #include "TPSWeapon.generated.h"
 
-UDELEGATE(NetMulticast, Reliable)
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformFire);
-
 /**
  * An Instance of a Weapon in the World that can be fired, dropped, and picked up.
  */
@@ -111,7 +108,7 @@ public:
     // Fire Control States
 
     // Targeting
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State");
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", Replicated);
     FRotator TargetDirection;
     // Accuracy (Degrees of freedom in Pitch/Yaw)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State");

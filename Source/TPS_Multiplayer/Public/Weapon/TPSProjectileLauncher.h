@@ -21,6 +21,9 @@ struct FProjectileLaunchInfo
 
 
 
+//UDELEGATE(NetMulticast, Reliable)
+//DECLARE_MULTICAST_DELEGATE_OneParam(FLaunchProjectile, FRotator);
+
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSProjectileLauncher : public ATPSWeapon
 {
@@ -53,12 +56,14 @@ public:
 //  BEHAVIOR
 //~ ============================================================= ~//
 public:
+
+    // TODO: Move to Base Weapon
     UFUNCTION(BlueprintImplementableEvent)
-    void OnFire(const FProjectileLaunchInfo& launchInfo);
+    void OnFirePerformed(const FProjectileLaunchInfo& launchInfo);
 
 
-    UFUNCTION(BlueprintCallable)
-    ATPSProjectile* LaunchProjectile(FRotator target);
+    UFUNCTION(NetMulticast, Reliable)
+    void LaunchProjectiles_Multicast(const TArray<FRotator> &trajectories);
     virtual void PerformFire() override; // Wired to ^
 
 

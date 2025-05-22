@@ -23,6 +23,8 @@ void ATPSWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 	DOREPLIFETIME(ATPSWeapon, MountPoint);
 
+	//DOREPLIFETIME(ATPSWeapon, TargetDirection);
+
 	DOREPLIFETIME(ATPSWeapon, CurrentAmmunitionCount);
 	DOREPLIFETIME(ATPSWeapon, IsReloading);
 	DOREPLIFETIME(ATPSWeapon, IsAiming);

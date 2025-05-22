@@ -24,7 +24,7 @@ public:
 protected:
     virtual void BeginPlay() override;
     virtual void Tick(float deltaSeconds) override;
-    virtual bool IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTarget, const FVector& SrcLocation) const override;
+    //virtual bool IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTarget, const FVector& SrcLocation) const override;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<USphereComponent> CollisionComponent;
