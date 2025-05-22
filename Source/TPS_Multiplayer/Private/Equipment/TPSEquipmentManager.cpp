@@ -118,7 +118,9 @@ void UTPSEquipmentManager::InstantiateLoadout()
     for (auto entry : Loadout->WeaponsBySlot)
     {
         if (IsValid(entry.Value)) {
-            UE_LOG(LogTemp, Log, TEXT("Instantiating Weapon[%hs]..."), ETPSWeaponSlotToString(entry.Key));
+            UE_LOG(LogTemp, Log, TEXT("[%s] Instantiating Weapon[%hs]..."),
+                *GetOwner()->GetName(),
+                ETPSWeaponSlotToString(entry.Key));
             InstantiateWeaponAndAssignToSlot(entry.Value, entry.Key);
         }
     }
@@ -126,7 +128,10 @@ void UTPSEquipmentManager::InstantiateLoadout()
     for (auto entry : Loadout->GearBySlot)
     {
         if (IsValid(entry.Value)) {
-            UE_LOG(LogTemp, Log, TEXT("Instantiating Gear[%hs]..."), ETPSGearSlotToString(entry.Key));
+            UE_LOG(LogTemp, Log, TEXT("[%s] Instantiating Gear[%hs]..."),
+                *GetOwner()->GetName(), 
+                ETPSGearSlotToString(entry.Key));
+            
             InstantiateGearItemAndAssignToSlot(entry.Value, entry.Key);
         }
     }

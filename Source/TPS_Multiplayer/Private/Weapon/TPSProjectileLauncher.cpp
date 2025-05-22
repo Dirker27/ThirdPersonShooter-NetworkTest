@@ -73,11 +73,6 @@ void ATPSProjectileLauncher::PerformFire()
 	}
 }
 
-/*void ATPSProjectileLauncher::OnFire_Implementation(const FVector projectilePath)
-{
-	
-}*/
-
 
 // TODO: This should be a MultiCast RPC for replication.
 ATPSProjectile* ATPSProjectileLauncher::LaunchProjectile(FRotator targetDirection)

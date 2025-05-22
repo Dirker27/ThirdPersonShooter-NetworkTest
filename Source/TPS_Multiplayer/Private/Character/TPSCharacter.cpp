@@ -150,9 +150,9 @@ void ATPSCharacter::Tick(float deltaTime)
 	SyncAttributesFromGAS();
 	//
 	// Sync Character direction from Controller
-	if (HasAuthority()) {
+	//if (HasAuthority()) {
 		TargetLookRotation = GetViewRotation();
-	}
+	//}
 
 	//- Extend Input to Weapons -------------------------=
 	//

@@ -3,7 +3,6 @@
 #include "Weapon/Projectile/TPSProjectile.h"
 
 #include "Character/TPSCharacter.h"
-#include "Engine/DamageEvents.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Util/TPSFunctionLibrary.h"
 
@@ -35,6 +34,11 @@ void ATPSProjectile::BeginPlay()
 	Super::BeginPlay();
 
 	ElapsedLifetimeSeconds = 0;
+}
+
+bool ATPSProjectile::IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTarget, const FVector& SrcLocation) const
+{
+	return !IsOwnedBy(ViewTarget);
 }
 
 void ATPSProjectile::Tick(float deltaSeconds)
@@ -74,14 +78,19 @@ void ATPSProjectile::Tick(float deltaSeconds)
 			SurfaceHit(hitActor, hitResult);
 		}
 
-		if (ShouldDestroyOnHit)
+
+
+		if (HasAuthority())
 		{
-			Destroy();
-		}
-		else
-		{
-			FVector forward = GetVelocity() / OnHitVelocityDamper;
-			CollisionComponent->SetPhysicsLinearVelocity(forward, false, "None");
+			if (ShouldDestroyOnHit)
+			{
+				Destroy();
+			}
+			else
+			{
+				FVector forward = GetVelocity() / OnHitVelocityDamper;
+				CollisionComponent->SetPhysicsLinearVelocity(forward, false, "None");
+			}
 		}
 	}
 

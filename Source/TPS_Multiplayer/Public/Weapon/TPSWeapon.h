@@ -13,11 +13,8 @@
 
 #include "TPSWeapon.generated.h"
 
-UDELEGATE(BlueprintAuthorityOnly, NetMulticast, Reliable)
+UDELEGATE(NetMulticast, Reliable)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformFire);
-
-//UDELEGATE(BlueprintAuthorityOnly, NetMulticast, Reliable)
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformEquip);
 
 /**
  * An Instance of a Weapon in the World that can be fired, dropped, and picked up.
@@ -38,10 +35,6 @@ protected:
     virtual void Tick(float DeltaTime) override;
     virtual void BeginDestroy() override;
 
-public:
-    //- Broadcast Delegate
-    //UPROPERTY(BlueprintAssignable)
-    //FPerformFire NotifyPerformFire;
 
 //~ ======================================================================= ~//
 //  COMPONENTS
