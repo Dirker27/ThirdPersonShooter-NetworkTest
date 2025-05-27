@@ -160,7 +160,7 @@ void ATPSCharacter::Tick(float deltaTime)
 	//
 	// Extend targeting data to current weapon
 	ATPSWeapon* weapon = GetEquippedWeapon();
-	if (IsValid(weapon))
+	if (IsValid(weapon) && CurrentCharacterState == Combat)
 	{
 		weapon->TargetDirection = TargetLookRotation;
 		weapon->TargetAccuracyTolerance = GetCurrentAccuracyTolerance();
