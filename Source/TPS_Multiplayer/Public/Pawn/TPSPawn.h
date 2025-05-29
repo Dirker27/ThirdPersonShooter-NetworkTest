@@ -28,12 +28,40 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(UInputComponent* inputComponent) override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 #if WITH_EDITORONLY_DATA
 	/** Component shown in the editor only to indicate character facing */
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UArrowComponent> ArrowComponent;
 #endif
+
+
+//~ ======================================================================== ~//
+//  STATE
+//~ ======================================================================== ~//
+protected:
+	// Should Target Location drive Target Rotation?
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
+	bool IsTargetingLocation;
+	// Target Location - Provided by LOCAL Controller (Not Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
+	FVector TargetLookLocation;
+	// Current Look Location - Iterps to TargetLocation
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
+	FVector CurrentLookLocation;
+	// Target Rotation - Derived from Target Location (Replicated to peer clients)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
+	FRotator TargetLookRotation;
+
+
+//~ ======================================================================== ~//
+//  PUBLIC OPERATIONS
+//~ ======================================================================== ~//
+public:
+	UFUNCTION(BlueprintCallable)
+	void SetTargetLocation(FVector targetLocation) { TargetLookLocation = targetLocation; }
+
 
 //~ ======================================================================== ~//
 //  ABILITY SYSTEM

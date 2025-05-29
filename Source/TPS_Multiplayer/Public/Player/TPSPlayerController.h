@@ -8,9 +8,12 @@
 
 #include "Character/TPSCharacterState.h"
 #include "TPSControllerConfiguration.h"
+#include "Character/TPSCharacter.h"
 #include "GAS/GASAbilitySet.h"
 
 #include "TPSPlayerController.generated.h"
+
+class ATPSPawn;
 
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSPlayerController : public APlayerController
@@ -20,32 +23,42 @@ class TPS_MULTIPLAYER_API ATPSPlayerController : public APlayerController
 public:
 	ATPSPlayerController();
 
-	// Show DEBUG view to local player.
-	UPROPERTY(BlueprintReadOnly)
-	bool IsDebugEnabled = false;
-
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 //~ ==================================================================== ~//
 //  COMPONENTS
 //~ ==================================================================== ~//
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UCameraComponent* ControllerCamera;
-
-
 	virtual void SetupInputComponent() override;
-
 	virtual void OnRep_PlayerState() override;
 
-	void BindInputToPlayerStateASC();
-
-
 //~ ==================================================================== ~//
-//  BEHAVIOR
+//  ATTRIBUTES
 //~ ==================================================================== ~//
 public:
+
+	////////////////////////////////////////////////////////
+	// State
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+	TObjectPtr<ATPSCharacter> PossessedCharacter;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+	TObjectPtr<ATPSPawn> PossessedPawn;
+
+	// Disables Camera->Character Rotation
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsFreeCam;
+
+//~ ==================================================================== ~//
+//  BEHAVIOR OPERATIONS
+//~ ==================================================================== ~//
+public:
+	FVector GetCameraTargetLocation() const;
+
 	void NotifyPawnDeath();
 
 	UFUNCTION(Server, Reliable, Category = "Pawn|Respawn")
@@ -56,6 +69,11 @@ public:
 
 	UFUNCTION(Server, Reliable, Category = "Pawn|Possess")
 	void UnPossessCurrentPawn();
+
+
+	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnUnPossess() override;
+
 
 
 //~ ==================================================================== ~//
@@ -117,9 +135,14 @@ public:
 
 
 //~ ==================================================================== ~//
-//  CONFIGURATION
+//  LOCAL PLAYER CONFIGURATION
+//  - Should Show Debug
+//  - Overridden States
 //~ ==================================================================== ~//
 public:
+	// Show DEBUG view to local player.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsDebugEnabled = false;
 
 	UFUNCTION(BlueprintCallable)
 	void BindConsoleCallbacks();

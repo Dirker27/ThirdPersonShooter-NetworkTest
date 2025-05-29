@@ -117,6 +117,25 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Locomotion")
 	TEnumAsByte<ETPSLocomotionState> PreviousLocomotionState;
 	//
+	//
+	// Should Target Location drive Target Rotation?
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
+	bool IsTargetingLocation;
+	//
+	// Target Location - Provided by LOCAL Controller (Not Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
+	FVector TargetLookLocation;
+	// Current Look Location - Iterps to TargetLocation
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
+	FVector CurrentLookLocation;
+	// Interp rate for CurrentLookLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
+	float LookTargetInterpRate = 0.7f;
+	//
+	// Target Rotation - Derived from Target Location (Replicated to peer clients)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
+	FRotator TargetLookRotation;
+	//
 	// IsAlive (Synthetic)
 	//   True if Character is not Incapacitated.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -148,9 +167,6 @@ public:
 	////////////////////////////////////////////////////////
 	// Controller Input
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
-	FRotator TargetLookRotation;
-	//
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
 	bool IsBoosting;
 	//
@@ -333,6 +349,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void InterruptIdle();
+
+	UFUNCTION(BlueprintCallable)
+	void SetTargetLocation(FVector targetLocation);
+
 
 	////////////////////////////////////////////////////////
 	// Business Logic

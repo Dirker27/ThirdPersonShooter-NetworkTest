@@ -2,6 +2,7 @@
 
 #include "Pawn/TPSPawn.h"
 
+#include "Net/UnrealNetwork.h"
 #include "Player/TPSPlayerState.h"
 
 ATPSPawn::ATPSPawn()
@@ -29,6 +30,14 @@ ATPSPawn::~ATPSPawn()
 {
 	// destruct
 }
+
+void ATPSPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATPSPawn, TargetLookRotation);
+}
+
 
 void ATPSPawn::BeginPlay()
 {

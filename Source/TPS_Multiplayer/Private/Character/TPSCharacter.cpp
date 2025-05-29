@@ -3,6 +3,7 @@
 #include "Character/TPSCharacter.h"
 
 #include "EnhancedInputComponent.h"
+#include "VectorTypes.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GAS/TPSAbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -93,6 +94,7 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ATPSCharacter, IsInteracting);
 	DOREPLIFETIME(ATPSCharacter, IsInMenu);
 
+	//DOREPLIFETIME(ATPSCharacter, TargetLookLocation);
 	DOREPLIFETIME(ATPSCharacter, TargetLookRotation);
 }
 
@@ -122,6 +124,9 @@ void ATPSCharacter::BeginPlay()
 	}
 
 	SyncAttributesFromGAS();
+
+
+	CurrentLookLocation = TargetLookLocation;
 }
 
 
@@ -148,13 +153,38 @@ void ATPSCharacter::Tick(float deltaTime)
 	//- Sync State from Input ----------------------------=
 	//
 	SyncAttributesFromGAS();
-	//
-	// Sync Character direction from Controller
-	FRotator vr = GetViewRotation();
-	if (vr != GetActorRotation()) // Guards against "noise" where remote client only sees controller value when input is active
+
+
+
+
+
+	if (IsLocallyControlled())
 	{
-		TargetLookRotation = vr;
+		IsTargetingLocation = true;
 	}
+	else
+	{
+		IsTargetingLocation = false;
+	}
+
+	CurrentLookLocation = FMath::Lerp(CurrentLookLocation, TargetLookLocation, LookTargetInterpRate);
+
+	// Sync Character direction from Controller
+	if (IsTargetingLocation) {
+		FVector delta = CurrentLookLocation - GetActorLocation();
+		TargetLookRotation = delta.Rotation();
+	}
+	else {
+		FRotator vr = GetViewRotation();
+		if (vr != GetActorRotation()) // Guards against "noise" where remote client only sees controller value when input is active
+		{
+			TargetLookRotation = vr;
+		}
+	}
+
+
+
+
 
 	//- Extend Input to Weapons -------------------------=
 	//
@@ -162,7 +192,7 @@ void ATPSCharacter::Tick(float deltaTime)
 	ATPSWeapon* weapon = GetEquippedWeapon();
 	if (IsValid(weapon) && CurrentCharacterState == Combat)
 	{
-		weapon->TargetDirection = TargetLookRotation;
+		weapon->TargetLocation = CurrentLookLocation;
 		weapon->TargetAccuracyTolerance = GetCurrentAccuracyTolerance();
 
 		if (IsFiring)
@@ -259,6 +289,11 @@ ATPSWeapon* ATPSCharacter::GetEquippedWeapon() const
 //  - Define behavior on death
 //~ ======================================================================== ~//
 
+
+void ATPSCharacter::SetTargetLocation(FVector targetLocation)
+{
+	TargetLookLocation = targetLocation;
+}
 
 
 

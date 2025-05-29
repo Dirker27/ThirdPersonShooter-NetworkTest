@@ -29,8 +29,11 @@ void ATPSProjectileLauncher::StopUse()
 
 void ATPSProjectileLauncher::PerformFire()
 {
+	// Find absolute target direction
+	FVector delta = TargetLocation - Muzzle->GetComponentLocation();
+
 	// Adjust the shooter's aim.
-	FRotator adjustedDirection = TargetDirection;
+	FRotator adjustedDirection = delta.Rotation();
 	FVector2D noise = CalculateAccuracyNoise();
 	adjustedDirection.Add(noise.X, noise.Y, 0);
 

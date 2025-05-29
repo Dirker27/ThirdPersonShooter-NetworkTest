@@ -5,6 +5,8 @@
 
 #include "Game/TPSGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
+#include "Pawn/TPSPawn.h"
 #include "Util/TPSFunctionLibrary.h"
 
 ATPSPlayerController::ATPSPlayerController()
@@ -14,8 +16,6 @@ ATPSPlayerController::ATPSPlayerController()
 	//bHiddenEd = false;
 #endif // WITH_EDITORONLY_DATA
 	//SetHidden(false);
-
-	ControllerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ControllerCamera"));
 }
 
 
@@ -37,10 +37,59 @@ void ATPSPlayerController::OnRep_PlayerState()
 	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::OnRep_PlayerState()"));
 }
 
+// PlayerControllers are NOT replicated to peer clients
+//   This sync will only ever be between Server<->OwningClient
+void ATPSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATPSPlayerController, PossessedCharacter);
+	DOREPLIFETIME(ATPSPlayerController, PossessedPawn);
+}
+
+void ATPSPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (PossessedCharacter)
+	{
+		PossessedCharacter->SetTargetLocation(GetCameraTargetLocation());
+	}
+	if (PossessedPawn)
+	{
+		PossessedPawn->SetTargetLocation(GetCameraTargetLocation());
+	}
+}
+
+
 
 //~ ====================================================================== ~//
 //- BEHAVIOR OPERATIONS
 //~ ====================================================================== ~//
+
+FVector ATPSPlayerController::GetCameraTargetLocation() const
+{
+	FVector playerLoc;
+	FRotator cameraRot;
+	GetPlayerViewPoint(playerLoc, cameraRot);
+
+	FVector cameraTargetLoc = playerLoc + (cameraRot.Vector() * 10000);
+
+	TArray<AActor*> actorsToIgnore;
+	actorsToIgnore.Add(GetPawn());
+
+	FHitResult hitResult;
+	UKismetSystemLibrary::LineTraceSingle(this, playerLoc, cameraTargetLoc,
+		TraceTypeQuery_MAX, false, actorsToIgnore, EDrawDebugTrace::Type::None,
+		hitResult,
+		true,
+		FLinearColor::Red, FLinearColor::Green, 5.f);
+
+	return hitResult.IsValidBlockingHit()
+		? hitResult.ImpactPoint
+		: cameraTargetLoc;
+}
+
 
 void ATPSPlayerController::RequestRespawn_Implementation()
 {
@@ -56,6 +105,10 @@ void ATPSPlayerController::NotifyPawnDeath()
 {
 	RequestRespawn();
 }
+
+
+
+
 
 
 //~ ====================================================================== ~//
@@ -172,6 +225,23 @@ void ATPSPlayerController::Respawn()
 
 //~ POSSESS ~//
 
+// AController::OnPossess()
+void ATPSPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	if (ATPSCharacter* c = Cast<ATPSCharacter>(InPawn))
+	{
+		PossessedCharacter = c;
+	}
+	else if (ATPSPawn* p = Cast<ATPSPawn>(InPawn))
+	{
+		PossessedPawn = p;
+	}
+}
+
+
+
 void ATPSPlayerController::PossessNearestPlayablePawn_Implementation()
 {
 	TArray<AActor*> exclusionList = TArray<AActor*>();
@@ -205,6 +275,14 @@ void ATPSPlayerController::PossessPawn()
 }
 
 //~ UN-POSSESS ~//
+
+// AController::OnUnPossess()
+void ATPSPlayerController::OnUnPossess()
+{
+	Super::OnUnPossess();
+	PossessedCharacter = nullptr;
+	PossessedPawn = nullptr;
+}
 
 void ATPSPlayerController::UnPossessCurrentPawn_Implementation()
 {

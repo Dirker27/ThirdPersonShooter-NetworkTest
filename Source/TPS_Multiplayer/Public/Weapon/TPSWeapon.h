@@ -109,7 +109,7 @@ public:
 
     // Targeting
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", Replicated);
-    FRotator TargetDirection;
+    FVector TargetLocation;
     // Accuracy (Degrees of freedom in Pitch/Yaw)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State");
     FVector2D TargetAccuracyTolerance;
