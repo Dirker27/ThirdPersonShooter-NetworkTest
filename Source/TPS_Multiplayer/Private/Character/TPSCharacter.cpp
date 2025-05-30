@@ -168,6 +168,8 @@ void ATPSCharacter::Tick(float deltaTime)
 	}
 
 	CurrentLookLocation = FMath::Lerp(CurrentLookLocation, TargetLookLocation, LookTargetInterpRate);
+	//CurrentLookLocation = FMath::FInterpTo(CurrentLookLocation, TargetLookLocation, deltaTime, LookTargetInterpRate);
+	
 
 	// Sync Character direction from Controller
 	if (IsTargetingLocation) {

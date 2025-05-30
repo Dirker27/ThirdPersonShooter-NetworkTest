@@ -117,25 +117,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Locomotion")
 	TEnumAsByte<ETPSLocomotionState> PreviousLocomotionState;
 	//
-	//
-	// Should Target Location drive Target Rotation?
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
-	bool IsTargetingLocation;
-	//
-	// Target Location - Provided by LOCAL Controller (Not Replicated)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
-	FVector TargetLookLocation;
-	// Current Look Location - Iterps to TargetLocation
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
-	FVector CurrentLookLocation;
-	// Interp rate for CurrentLookLocation;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
-	float LookTargetInterpRate = 0.7f;
-	//
-	// Target Rotation - Derived from Target Location (Replicated to peer clients)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
-	FRotator TargetLookRotation;
-	//
 	// IsAlive (Synthetic)
 	//   True if Character is not Incapacitated.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -156,6 +137,29 @@ public:
 	// Current Accuracy Tolerance
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector2D GetCurrentAccuracyTolerance() const;
+
+
+	//////////////////////////////////////////////////////
+	// Targeting
+
+	// Target Rotation - Derived from Target Location (Replicated to peer clients)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Targeting", Replicated)
+	FRotator TargetLookRotation;
+	//
+	// Should Target Location drive Target Rotation?
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Targeting")
+	bool IsTargetingLocation;
+	//
+	// Target Location - Provided by LOCAL Controller (Not Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Targeting")
+	FVector TargetLookLocation;
+	// Current Look Location - Iterps to TargetLocation
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Targeting")
+	FVector CurrentLookLocation;
+	// Interp rate for CurrentLookLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Targeting")
+	float LookTargetInterpRate = 0.8f;
+
 
 	////////////////////////////////////////////////////////
 	// Equipment State
