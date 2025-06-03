@@ -18,7 +18,7 @@ public:
     UTPSWorldManager();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<UTPSTeam*> ActiveTeams;
+    TArray<TObjectPtr<UTPSTeam>> ActiveTeams;
 
     
 };

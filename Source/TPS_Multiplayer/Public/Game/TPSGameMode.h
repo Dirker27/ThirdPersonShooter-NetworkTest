@@ -9,6 +9,8 @@
 #include "Player/TPSPlayerController.h"
 #include "Game/TPSGameConfiguration.h"
 #include "GameFramework/PlayerStart.h"
+#include "World/TPSCombatLog.h"
+#include "World/TPSWorldManager.h"
 
 #include "TPSGameMode.generated.h"
 
@@ -20,6 +22,17 @@ class TPS_MULTIPLAYER_API ATPSGameMode : public AGameMode
 public:
 	ATPSGameMode();
 	~ATPSGameMode();
+
+//~ ==================================================================== ~//
+//  COMPONENTS
+//~ ==================================================================== ~//
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UTPSWorldManager> WorldManager;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UTPSCombatLog> CombatLog;
 
 //~ ============================================================= ~//
 //  ATTRIBUTES
@@ -55,6 +68,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	APlayerStart* FindSpawnPoint();
+
+
+
+
+
 
 //~ ==================================================================== ~//
 //  CONSOLE COMMANDS (Developer-only API)
