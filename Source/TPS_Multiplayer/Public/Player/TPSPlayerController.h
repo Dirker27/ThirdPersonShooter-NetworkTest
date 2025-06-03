@@ -6,7 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerController.h"
 
-#include "Character/TPSCharacterState.h"
+#include "Character/TPSCharacterBehaviorState.h"
 #include "TPSControllerConfiguration.h"
 #include "Character/TPSCharacter.h"
 #include "GAS/GASAbilitySet.h"
@@ -151,7 +151,7 @@ public:
 	void OnDebugInput();
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnCharacterStateOverride(ETPSCharacterState state);
+	void OnCharacterStateOverride(ETPSCharacterBehaviorState state);
 
 	UFUNCTION(BlueprintCallable)
 	static FTPSControllerConfiguration GetControllerConfiguration() {

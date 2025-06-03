@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "UObject/ObjectMacros.h"
 
-#include "TPSCharacterState.generated.h"
+#include "TPSCharacterBehaviorState.generated.h"
 
 UENUM(BlueprintType)
-enum ETPSCharacterState : int
+enum ETPSCharacterBehaviorState : int
 {
     Casual = 0,
     Combat = 1,
@@ -17,7 +17,7 @@ enum ETPSCharacterState : int
     Mounted = 4
 };
 
-static std::unordered_map<char*, ETPSCharacterState> ETPSCharacterStateMap {
+static std::unordered_map<char*, ETPSCharacterBehaviorState> ETPSCharacterStateMap {
     { "Casual", Casual },
     { "Combat", Combat },
     { "Injured", Injured },
@@ -25,11 +25,11 @@ static std::unordered_map<char*, ETPSCharacterState> ETPSCharacterStateMap {
     { "Mounted", Mounted }
 };
 
-static const ETPSCharacterState ETPSCharacterStateFromString(char* state) {
+static const ETPSCharacterBehaviorState ETPSCharacterStateFromString(char* state) {
     return ETPSCharacterStateMap[state];
 }
 
-static const char* ETPSCharacterStateToString(const ETPSCharacterState state) {
+static const char* ETPSCharacterStateToString(const ETPSCharacterBehaviorState state) {
     switch (state) {
     case Casual:
         return "Casual";

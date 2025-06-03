@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "UObject/ObjectMacros.h"
 
-#include "TPSLocomotionState.generated.h"
+#include "TPSCharacterLocomotionState.generated.h"
 
 UENUM(BlueprintType)
-enum ETPSLocomotionState : int
+enum ETPSCharacterLocomotionState : int
 {
     Standing  = 0 UMETA(DisplayName = "Standing"),
     Crouching = 1 UMETA(DisplayName = "Crouching"),
@@ -18,7 +18,7 @@ enum ETPSLocomotionState : int
 };
 
 
-static std::unordered_map<char*, ETPSLocomotionState> ETPSLocomotionStateMap {
+static std::unordered_map<char*, ETPSCharacterLocomotionState> ETPSLocomotionStateMap {
     { "Standing", Standing },
     { "Crouching", Crouching },
     { "Prone", Prone },
@@ -26,11 +26,11 @@ static std::unordered_map<char*, ETPSLocomotionState> ETPSLocomotionStateMap {
     { "Ragdoll", Ragdoll }
 };
 
-static const ETPSLocomotionState ETPSLocomotionStateFromString(char* state) {
+static const ETPSCharacterLocomotionState ETPSLocomotionStateFromString(char* state) {
     return ETPSLocomotionStateMap[state];
 }
 
-static const char* ETPSLocomotionStateToString(const ETPSLocomotionState state) {
+static const char* ETPSLocomotionStateToString(const ETPSCharacterLocomotionState state) {
 	switch (state) {
 	case Standing:
 		return "Standing";

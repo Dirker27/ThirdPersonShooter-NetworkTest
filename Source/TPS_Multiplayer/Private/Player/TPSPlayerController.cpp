@@ -168,12 +168,12 @@ void ATPSPlayerController::UpdateControllerConfiguration(FTPSControllerConfigura
 //~ ====================================================================== ~//
 
 void ATPSPlayerController::TPS_OverrideCurrentCharacterStateFromString(FString input) {
-	ETPSCharacterState newState = ETPSCharacterStateFromString(TCHAR_TO_ANSI(*input));
+	ETPSCharacterBehaviorState newState = ETPSCharacterStateFromString(TCHAR_TO_ANSI(*input));
 	UE_LOG(LogTemp, Log, TEXT("DEBUG OVERRIDE: CharacterState -> [%s]-[%i]"), TCHAR_TO_ANSI(*input), newState);
 	OnCharacterStateOverride(newState);
 }
 void ATPSPlayerController::TPS_OverrideCurrentCharacterStateFromInt(int32 input) {
-	ETPSCharacterState newState = ETPSCharacterState(input);
+	ETPSCharacterBehaviorState newState = ETPSCharacterBehaviorState(input);
 	UE_LOG(LogTemp, Log, TEXT("DEBUG OVERRIDE: CharacterState -> [%i]-[%i]"), input, newState);
 	OnCharacterStateOverride(newState);
 }

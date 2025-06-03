@@ -10,8 +10,8 @@
 #include "TPSCharacterConfiguration.h"
 #include "TPSCharacterInventory.h"
 
-#include "Character/TPSLocomotionState.h"
-#include "Character/TPSCharacterState.h"
+#include "Character/TPSCharacterLocomotionState.h"
+#include "Character/TPSCharacterBehaviorState.h"
 #include "Equipment/TPSEquipmentManager.h"
 #include "GAS/TPSAbilitySystemComponent.h"
 #include "GAS/Attributes/CharacterHealthAttributeSet.h"
@@ -107,15 +107,15 @@ public:
 
 	// Character State
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Character", Replicated)
-	TEnumAsByte<ETPSCharacterState> CurrentCharacterState;
+	TEnumAsByte<ETPSCharacterBehaviorState> CurrentCharacterState;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Character")
-	TEnumAsByte<ETPSCharacterState> PreviousCharacterState;
+	TEnumAsByte<ETPSCharacterBehaviorState> PreviousCharacterState;
 	//
 	// Locomotion State
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Locomotion", Replicated)
-	TEnumAsByte<ETPSLocomotionState> CurrentLocomotionState;
+	TEnumAsByte<ETPSCharacterLocomotionState> CurrentLocomotionState;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Locomotion")
-	TEnumAsByte<ETPSLocomotionState> PreviousLocomotionState;
+	TEnumAsByte<ETPSCharacterLocomotionState> PreviousLocomotionState;
 	//
 	// IsAlive (Synthetic)
 	//   True if Character is not Incapacitated.
@@ -313,13 +313,13 @@ public:
 
 	// CharacterState
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static FString CharacterStateToFString(ETPSCharacterState state) {
+	static FString CharacterStateToFString(ETPSCharacterBehaviorState state) {
 		return FString(ETPSCharacterStateToString(state));
 	};
 	//
 	// LocomotionState
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static FString LocomotionStateToFString(ETPSLocomotionState state) {
+	static FString LocomotionStateToFString(ETPSCharacterLocomotionState state) {
 		return FString(ETPSLocomotionStateToString(state));
 	}
 
@@ -341,13 +341,13 @@ public:
 
 	// CharacterState
 	UFUNCTION(BlueprintCallable)
-	void ApplyCharacterState(const ETPSCharacterState CharacterState);
+	void ApplyCharacterState(const ETPSCharacterBehaviorState CharacterState);
 	UFUNCTION(BlueprintCallable)
 	void RevertCharacterState();
 	//
 	// LocomotionState
 	UFUNCTION(BlueprintCallable)
-	void ApplyLocomotionState(const ETPSLocomotionState LocomotionState);
+	void ApplyLocomotionState(const ETPSCharacterLocomotionState LocomotionState);
 	UFUNCTION(BlueprintCallable)
 	void RevertLocomotionState();
 
@@ -363,14 +363,14 @@ public:
 
 	// Determine what state we should be in.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ETPSLocomotionState EvaluateLocomotionStateForCurrentInput();
+	ETPSCharacterLocomotionState EvaluateLocomotionStateForCurrentInput();
 	//
 	// Calculate Speed
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	float GetBaseSpeedForCharacterState(const ETPSCharacterState CharacterState);
+	float GetBaseSpeedForCharacterState(const ETPSCharacterBehaviorState CharacterState);
 	//
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	float GetSpeedModifierForLocomotionState(const ETPSLocomotionState LocomotionState);
+	float GetSpeedModifierForLocomotionState(const ETPSCharacterLocomotionState LocomotionState);
 	//
 	// Apply calculated MovementSpeed
 	UFUNCTION(BlueprintCallable)

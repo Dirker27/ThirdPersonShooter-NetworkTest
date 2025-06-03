@@ -211,7 +211,7 @@ void ATPSCharacter::Tick(float deltaTime)
 
 	//- Derive State from Input -------------------------=
 	//
-	ETPSLocomotionState evaluatedState = EvaluateLocomotionStateForCurrentInput();
+	ETPSCharacterLocomotionState evaluatedState = EvaluateLocomotionStateForCurrentInput();
 	if (evaluatedState != CurrentLocomotionState)
 	{
 		ApplyLocomotionState(evaluatedState);
@@ -299,7 +299,7 @@ void ATPSCharacter::SetTargetLocation(FVector targetLocation)
 
 
 
-void ATPSCharacter::ApplyLocomotionState(const ETPSLocomotionState LocomotionState)
+void ATPSCharacter::ApplyLocomotionState(const ETPSCharacterLocomotionState LocomotionState)
 {
 	if (CurrentLocomotionState == LocomotionState) { return; } // swallow redundant state changes
 
@@ -321,7 +321,7 @@ void ATPSCharacter::RevertLocomotionState() {
 	ApplyLocomotionState(PreviousLocomotionState);
 }
 
-void ATPSCharacter::ApplyCharacterState(const ETPSCharacterState CharacterState)
+void ATPSCharacter::ApplyCharacterState(const ETPSCharacterBehaviorState CharacterState)
 {
 	if (CurrentCharacterState == CharacterState) { return; } // swallow redundant state changes
 
@@ -354,7 +354,7 @@ void ATPSCharacter::InterruptIdle()
 /**
  * https://www.notion.so/Game-Design-Document-GDD-670fda60cfeb41a089970b8fd240acaa?pvs=4#c31b4f8df636457b9783b951d60ecf03
  */
-float ATPSCharacter::GetBaseSpeedForCharacterState(const ETPSCharacterState CharacterState)
+float ATPSCharacter::GetBaseSpeedForCharacterState(const ETPSCharacterBehaviorState CharacterState)
 {
 	switch (CharacterState) {
 	case Casual:
@@ -375,7 +375,7 @@ float ATPSCharacter::GetBaseSpeedForCharacterState(const ETPSCharacterState Char
  * 
  * https://www.notion.so/Game-Design-Document-GDD-670fda60cfeb41a089970b8fd240acaa?pvs=4#c31b4f8df636457b9783b951d60ecf03 
  */
-float ATPSCharacter::GetSpeedModifierForLocomotionState(const ETPSLocomotionState LocomotionState)
+float ATPSCharacter::GetSpeedModifierForLocomotionState(const ETPSCharacterLocomotionState LocomotionState)
 {
 	switch (LocomotionState) {
 	case Standing:
@@ -413,7 +413,7 @@ float ATPSCharacter::UpdateCharacterSpeedForCurrentState()
 	return CurrentMaxWalkSpeed;
 }
 
-ETPSLocomotionState ATPSCharacter::EvaluateLocomotionStateForCurrentInput()
+ETPSCharacterLocomotionState ATPSCharacter::EvaluateLocomotionStateForCurrentInput()
 {
 	// TODO: Make this follow a strategy pattern based on current CharacterState
 	//   Transitions based on allowed LocomotionStates for CharacterState
