@@ -1,8 +1,10 @@
 // (C) ToasterCat Studios 2025
 
-#include "Team/TPSTeam.h"
+#include "Team/TPSPlatoon.h"
+
+#include "Model/TPSHierarchicalCollectionLevel.h"
 
 UTPSPlatoon::UTPSPlatoon()
 {
-
+	Level = PLATOON;
 }

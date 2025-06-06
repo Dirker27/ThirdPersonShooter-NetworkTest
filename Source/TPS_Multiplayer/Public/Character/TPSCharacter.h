@@ -9,6 +9,7 @@
 #include "AbilitySystemComponent.h"
 #include "TPSCharacterConfiguration.h"
 #include "TPSCharacterInventory.h"
+#include "TPSCharacterState.h"
 
 #include "Character/TPSCharacterLocomotionState.h"
 #include "Character/TPSCharacterBehaviorState.h"
@@ -104,6 +105,10 @@ public:
 
 	//////////////////////////////////////////////////////
 	// State
+
+	// TODO: Transfer existing and future state to this object(?)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health")
+	TObjectPtr<UTPSCharacterState> SerializableState;
 
 	// Character State
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Character", Replicated)

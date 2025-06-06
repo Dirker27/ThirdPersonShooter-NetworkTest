@@ -150,14 +150,14 @@ void ATPSCharacter::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
 
+
 	//- Sync State from Input ----------------------------=
 	//
 	SyncAttributesFromGAS();
 
 
-
-
-
+	//- Sync Character direction from Controller --------------------------=
+	//
 	if (IsLocallyControlled())
 	{
 		IsTargetingLocation = true;
@@ -166,12 +166,8 @@ void ATPSCharacter::Tick(float deltaTime)
 	{
 		IsTargetingLocation = false;
 	}
-
 	CurrentLookLocation = FMath::Lerp(CurrentLookLocation, TargetLookLocation, LookTargetInterpRate);
 	//CurrentLookLocation = FMath::FInterpTo(CurrentLookLocation, TargetLookLocation, deltaTime, LookTargetInterpRate);
-	
-
-	// Sync Character direction from Controller
 	if (IsTargetingLocation) {
 		FVector delta = CurrentLookLocation - GetActorLocation();
 		TargetLookRotation = delta.Rotation();
@@ -183,9 +179,6 @@ void ATPSCharacter::Tick(float deltaTime)
 			TargetLookRotation = vr;
 		}
 	}
-
-
-
 
 
 	//- Extend Input to Weapons -------------------------=

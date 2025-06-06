@@ -21,9 +21,4 @@ public:
     //   If unset, then all can use.
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<ETPSTeamID> TeamWhitelist;
-
-    // Teams that can use this Spawn Point.
-    //   If unset, then all can use.
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<ETPSSquadID> SquadWhitelist;
 };

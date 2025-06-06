@@ -37,7 +37,7 @@ struct FCombatLogEntry
     int ID;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TEnumAsByte<ECombatLogEntryType> Type;
+    ECombatLogEntryType Type;
 };
 
 

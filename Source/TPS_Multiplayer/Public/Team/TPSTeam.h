@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TPSPlatoon.h"
-#include "TPSSquad.h"
+#include "TPSCommandStructure.h"
 #include "TPSTeamConfiguration.h"
 #include "TPSTeamID.h"
 
@@ -22,19 +21,23 @@ public:
 //  ATTRIBUTES
 //~ ==================================================================== ~//
 public:
-
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    ETPSTeamID ID;
+    ETPSTeamID TeamID;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     FTPSTeamConfiguration Configuration;
 
-    ////////////////////////////////////////////////////////
-    // State
-
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<ETPSPlatoonID> ActivePlatoons;
+    TArray<TObjectPtr<UTPSHierarchicalCollection>> MemberCollections;
+};
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<ETPSSquadID> ActiveSquads;
+
+UCLASS()
+class UTeamRosterPreset : public UDataAsset
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditDefaultsOnly)
+    TObjectPtr<UTPSCommandStructure> CommandStructure;
 };

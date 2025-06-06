@@ -1,28 +1,15 @@
-#pragma once
+// (C) ToasterCat Studios 2025
 
-#include "Team/TPSSquadID.h"
+#pragma once
+#include "TPSCommandStructure.h"
 
 #include "TPSPlatoon.generated.h"
 
-UENUM(BlueprintType)
-enum class ETPSPlatoonID : uint8
-{
-    Able = 0,
-    Bravo = 1
-};
-
-
 UCLASS(BlueprintType)
-class TPS_MULTIPLAYER_API UTPSPlatoon : public UObject
+class TPS_MULTIPLAYER_API UTPSPlatoon : public UTPSCommandStructure
 {
     GENERATED_BODY()
 
 public:
     UTPSPlatoon();
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    ETPSPlatoonID ID;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<ETPSSquadID> ActiveSquads;
 };

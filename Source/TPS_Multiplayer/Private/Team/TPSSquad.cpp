@@ -4,6 +4,6 @@
 
 UTPSSquad::UTPSSquad()
 {
-
+	Level = SQUAD;
 }
 
