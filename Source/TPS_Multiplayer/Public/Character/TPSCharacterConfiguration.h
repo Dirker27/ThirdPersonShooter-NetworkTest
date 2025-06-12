@@ -16,7 +16,7 @@ class TPS_MULTIPLAYER_API UTPSCharacterConfiguration : public UDataAsset
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TEnumAsByte<ETPSCharacterBodyType> CharacterBodyType;
+    TEnumAsByte<ETPSCharacterBodyType> BodyType;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float BaseAccuracyTolerance = 1.f;

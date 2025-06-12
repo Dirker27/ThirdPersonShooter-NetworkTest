@@ -2,8 +2,6 @@
 
 #include "Character/TPSCharacter.h"
 
-#include "EnhancedInputComponent.h"
-#include "VectorTypes.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GAS/TPSAbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -22,6 +20,9 @@ ATPSCharacter::ATPSCharacter()
 
 	//- Sub-Components ------------------------------------=
 	//
+	// TODO: Initialize or load these from persistent store
+	Identity = CreateDefaultSubobject<UTPSCharacterIdentity>(TEXT("DefaultIdentity"));
+	Record = CreateDefaultSubobject<UTPSCharacterRecord>(TEXT("DefaultRecord"));
 	Configuration = CreateDefaultSubobject<UTPSCharacterConfiguration>(TEXT("DefaultConfiguration"));
 	//
 	Inventory = CreateDefaultSubobject<UTPSCharacterInventory>(TEXT("Inventory"));

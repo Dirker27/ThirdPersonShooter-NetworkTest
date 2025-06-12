@@ -8,8 +8,9 @@
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
 #include "TPSCharacterConfiguration.h"
+#include "TPSCharacterIdentity.h"
 #include "TPSCharacterInventory.h"
-#include "TPSCharacterState.h"
+#include "TPSCharacterRecord.h"
 
 #include "Character/TPSCharacterLocomotionState.h"
 #include "Character/TPSCharacterBehaviorState.h"
@@ -25,6 +26,13 @@
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUpdateCharacterAttributeDisplay);
 
+/**
+ * Defines an arbitrary Character in our game's universe.
+ *
+ *   - Identity: A character's persona (name, alignment, assignment)
+ *   - State: Life experience (XP, stats, and history)
+ *   - Configuration: Attributes and characteristics (Strength, accuracy)
+ */
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSCharacter : public ACharacter, public IAbilitySystemInterface
 {
@@ -34,7 +42,7 @@ public:
 	// Sets default values for this character's properties
 	ATPSCharacter();
 	~ATPSCharacter();
-
+	
 // UE Implementables
 protected:
 	virtual void BeginPlay() override;
@@ -64,6 +72,9 @@ public:
 
 	//////////////////////////////////////////////////////
 	// Identity
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State")
+	TObjectPtr<UTPSCharacterIdentity> Identity;
 	
 	// Name
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Identity")
@@ -81,10 +92,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration")
 	TObjectPtr<UTPSCharacterConfiguration> Configuration;
 
+
 	//////////////////////////////////////////////////////
 	// Attributes
 	//   (sync'd from GAS attributes where applicable)
-	
+
 	// Health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health", Replicated)
 	float CurrentHealth;
@@ -103,12 +115,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health")
 	float CurrentMaxWalkSpeed;
 
+	// Current Accuracy Tolerance (Synthetic)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FVector2D GetCurrentAccuracyTolerance() const;
+
 	//////////////////////////////////////////////////////
-	// State
+	// Persistent State
 
 	// TODO: Transfer existing and future state to this object(?)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health")
-	TObjectPtr<UTPSCharacterState> SerializableState;
+	TObjectPtr<UTPSCharacterRecord> Record;
+
+	//////////////////////////////////////////////////////
+	// Volatile State
 
 	// Character State
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Character", Replicated)
@@ -138,10 +157,6 @@ public:
 	//
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float IdleSeconds;
-	//
-	// Current Accuracy Tolerance
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FVector2D GetCurrentAccuracyTolerance() const;
 
 
 	//////////////////////////////////////////////////////
@@ -318,14 +333,14 @@ public:
 
 	// CharacterState
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static FString CharacterStateToFString(ETPSCharacterBehaviorState state) {
-		return FString(ETPSCharacterStateToString(state));
+	static FString CharacterStateToFString(ETPSCharacterBehaviorState s) {
+		return FString(ETPSCharacterStateToString(s));
 	};
 	//
 	// LocomotionState
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static FString LocomotionStateToFString(ETPSCharacterLocomotionState state) {
-		return FString(ETPSLocomotionStateToString(state));
+	static FString LocomotionStateToFString(ETPSCharacterLocomotionState s) {
+		return FString(ETPSLocomotionStateToString(s));
 	}
 
 
