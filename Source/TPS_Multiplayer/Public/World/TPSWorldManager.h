@@ -8,7 +8,10 @@
 #include "TPSWorldManager.generated.h"
 
 
-// To be owned by the GameMode
+/**
+ * Responsible for spawning and tracking loose objects in the world.
+ *   (equipment, dead characters, world objects, etc)
+ */
 UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSWorldManager : public UActorComponent
 {
@@ -18,7 +21,5 @@ public:
     UTPSWorldManager();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<TObjectPtr<UTPSTeam>> ActiveTeams;
-
-    
+    TArray<TObjectPtr<ATPSEquipableItem>> LooseItems;
 };

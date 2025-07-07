@@ -1,6 +1,7 @@
 // (C) ToasterCat Studios 2025
 
 #pragma once
+#include "TPSUnitID.h"
 #include "Model/TPSHierarchicalCollection.h"
 
 #include "TPSCommandGroup.generated.h"
@@ -19,11 +20,7 @@ public:
 
 	// Unique ID
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int ID;
-
-	// Callsign
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName Name;
+	FUnitID ID;
 
 	void Command();
 };

@@ -6,6 +6,7 @@
 
 #include "TPSTeamID.generated.h"
 
+// TODO: Replace w/ UnitID?
 UENUM(BlueprintType)
 enum class ETPSTeamID : uint8
 {
@@ -16,3 +17,21 @@ enum class ETPSTeamID : uint8
 	Green = 3,
 	Gold = 4
 };
+
+
+static FString TPSTeamIdToString(ETPSTeamID id)
+{
+	switch (id)
+	{
+	case ETPSTeamID::Red:
+		return "Red";
+	case ETPSTeamID::Blue:
+		return "Blue";
+	case ETPSTeamID::Green:
+		return "Green";
+	case ETPSTeamID::Gold:
+		return "Gold";
+	default:
+		return "TEAM";
+	}
+}

@@ -7,9 +7,9 @@
 static int _incrementingCommandID;
 UTPSCommandGroup::UTPSCommandGroup()
 {
-	Level = ANY;
+	Level = UNIT;
 
-	ID = _incrementingCommandID++;
+	ID.UnitNumber = _incrementingCommandID++;
 }
 
 

@@ -4,5 +4,4 @@
 
 UTPSTeam::UTPSTeam()
 {
-	
 }

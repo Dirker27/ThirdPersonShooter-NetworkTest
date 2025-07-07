@@ -5,7 +5,8 @@
 #include "TPSCharacterBodyType.h"
 #include "TPSCharacterRank.h"
 #include "Team/TPSFactionID.h"
-#include "Team/TPSTeamID.h"
+#include "Team/TPSSquadRole.h"
+#include "Team/TPSUnitID.h"
 
 #include "TPSCharacterIdentity.generated.h"
 
@@ -47,17 +48,15 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TEnumAsByte<ETPSCharacterRank> Rank;
 
-    // Team Alignment
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    TEnumAsByte<ETPSTeamID> TeamID;
-
     // Faction Alignment
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TEnumAsByte<ETPSFactionID> FactionID;
 
     // Assigned Squad/Unit
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    int CommandGroupID;
+    FUnitID AssignedUnit;
 
-
+    // Character's "Class" / Role in their Squad
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    ETPSSquadRole SquadRole;
 };

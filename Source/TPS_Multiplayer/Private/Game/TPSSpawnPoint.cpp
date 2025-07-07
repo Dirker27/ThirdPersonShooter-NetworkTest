@@ -4,6 +4,6 @@
 
 ATPSSPawnPoint::ATPSSPawnPoint()
 {
-	
+	Collider = CreateDefaultSubobject<UBoxComponent>(TEXT("Collider"));
 }
 

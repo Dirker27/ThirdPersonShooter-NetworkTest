@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TPSSpawnPoint.h"
 #include "GameFramework/GameMode.h"
 
 #include "Character/TPSCharacter.h"
 #include "Player/TPSPlayerController.h"
 #include "Game/TPSGameConfiguration.h"
 #include "GameFramework/PlayerStart.h"
+#include "Team/TPSTeamManager.h"
 #include "World/TPSCombatLog.h"
 #include "World/TPSWorldManager.h"
 
@@ -23,6 +25,9 @@ public:
 	ATPSGameMode();
 	~ATPSGameMode();
 
+protected:
+	virtual void BeginPlay() override;
+
 //~ ==================================================================== ~//
 //  COMPONENTS
 //~ ==================================================================== ~//
@@ -32,7 +37,13 @@ protected:
 	TObjectPtr<UTPSWorldManager> WorldManager;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UTPSTeamManager> TeamManager;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UTPSCombatLog> CombatLog;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TMap<int, TObjectPtr<ATPSSPawnPoint>> SpawnPointsById;
 
 //~ ============================================================= ~//
 //  ATTRIBUTES
@@ -50,8 +61,18 @@ public:
 
 
 //~ ============================================================= ~//
-//  BEHAVIOR
+//  OPERATIONS
 //~ ============================================================= ~//
+
+	////////////////////////////////////////////////////////
+	// Gameplay Functions
+
+	void InitializeTeams();
+	void IndexSpawnPointsForTeams();
+
+	void SpawnRedTeam();
+	void SpawnBlueTeam();
+
 
 	////////////////////////////////////////////////////////
 	// Gameplay Functions
@@ -68,6 +89,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	APlayerStart* FindSpawnPoint();
+
+
+
 
 
 

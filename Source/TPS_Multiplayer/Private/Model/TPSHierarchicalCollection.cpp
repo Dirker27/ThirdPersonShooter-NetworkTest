@@ -7,6 +7,7 @@ UTPSHierarchicalCollection::UTPSHierarchicalCollection()
 	
 }
 
+
 bool UTPSHierarchicalCollection::Add(ATPSCharacter* member)
 {
 	if (CanAddToCollection(member))
@@ -65,16 +66,9 @@ bool UTPSHierarchicalCollection::CanAddToCollection(UTPSHierarchicalCollection* 
 		return false;
 	}
 
-	switch (Level)
+	if (Level <= subCollection->Level)
 	{
-	case ANY:
-		break;
-	default:
-		if (Level <= subCollection->Level)
-		{
-			return false;
-		}
-		break;
+		return false;
 	}
 
 	return !ChildCollections.Contains(subCollection);

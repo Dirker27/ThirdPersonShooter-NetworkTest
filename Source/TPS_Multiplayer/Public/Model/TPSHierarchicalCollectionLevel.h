@@ -10,15 +10,14 @@
 UENUM(BlueprintType)
 enum ETPSHierarchicalLevel : int
 {
-	ANY = 0,
-
-	UNIT = 1,
-	TEAM = 2,
-	SQUAD = 3,
-	PLATOON = 4,
-	COMPANY = 5,
-	DIVISION = 6,
-	BATTALION = 7,
+	UNIT = 0,
+	FIRE_TEAM = 1,
+	SQUAD = 2,
+	PLATOON = 3,
+	COMPANY = 4,
+	DIVISION = 5,
+	BATTALION = 6,
+	ARMY = 7,
 
 	SUPREME = INT_MAX
 };

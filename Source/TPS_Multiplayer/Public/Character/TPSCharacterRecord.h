@@ -8,7 +8,9 @@
  * A Character's recorded stats, history, and experience.
  *
  * What will be persisted as this Character's progress between deployments.
- **/
+ *
+ * TODO: Consider "CharacterHistory" ('Record' for DB persistence)
+ */
 UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSCharacterRecord : public UObject
 {

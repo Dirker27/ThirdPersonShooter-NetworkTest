@@ -6,6 +6,7 @@
 #include "TPSCommandStructure.h"
 #include "TPSTeamConfiguration.h"
 #include "TPSTeamID.h"
+#include "Game/TPSSpawnPoint.h"
 
 #include "TPSTeam.generated.h"
 
@@ -28,7 +29,10 @@ public:
     FTPSTeamConfiguration Configuration;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<TObjectPtr<UTPSHierarchicalCollection>> MemberCollections;
+    TObjectPtr<UTPSHierarchicalCollection> RootCollection;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TArray<TObjectPtr<ATPSSPawnPoint>> SpawnPoints;
 };
 
 
@@ -40,4 +44,6 @@ class UTeamRosterPreset : public UDataAsset
 public:
     UPROPERTY(EditDefaultsOnly)
     TObjectPtr<UTPSCommandStructure> CommandStructure;
+
+
 };

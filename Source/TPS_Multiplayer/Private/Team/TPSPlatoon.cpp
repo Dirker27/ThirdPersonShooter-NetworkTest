@@ -6,5 +6,6 @@
 
 UTPSPlatoon::UTPSPlatoon()
 {
+	ID.UnitLevel = PLATOON;
 	Level = PLATOON;
 }
