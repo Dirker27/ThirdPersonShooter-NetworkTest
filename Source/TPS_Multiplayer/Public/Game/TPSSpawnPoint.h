@@ -13,7 +13,7 @@
 #include "TPSSpawnPoint.generated.h"
 
 UCLASS()
-class TPS_MULTIPLAYER_API ATPSSPawnPoint : public AActor// public APlayerStart
+class TPS_MULTIPLAYER_API ATPSSPawnPoint : public AActor //public APlayerStart
 {
     GENERATED_BODY()
 

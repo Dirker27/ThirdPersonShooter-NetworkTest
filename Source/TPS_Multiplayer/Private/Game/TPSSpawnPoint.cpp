@@ -8,15 +8,17 @@ static int _spawn_id = 0;
 ATPSSPawnPoint::ATPSSPawnPoint(const FObjectInitializer& ObjectInitializer)
 	: AActor(ObjectInitializer)
 {
-	Collider = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnCollider"));
+	Collider = CreateDefaultSubobject<UBoxComponent>(TEXT("Collider"));
+	SetRootComponent(Collider);
+	//Collider->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
 
-	ID = _spawn_id++;
+	//ID = _spawn_id++;
 	//Collider->ShapeColor = TPSTeamIdToColor(TeamID);
 }
 
 void ATPSSPawnPoint::SetColliderColor(FColor color)
 {
-	//Collider->ShapeColor = color;
+	Collider->ShapeColor = color;
 }
 
 int ATPSSPawnPoint::GenerateUniqueSpawnId()
@@ -29,6 +31,6 @@ bool ATPSSPawnPoint::IsSpawnAvailable()
 {
 	TArray<AActor*> actors;
 	Collider->GetOverlappingActors(actors, ATPSCharacter::StaticClass());
-
+	
 	return actors.IsEmpty();
 }
