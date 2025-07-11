@@ -3,13 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TPSSpawnPoint.h"
 #include "GameFramework/GameMode.h"
+#include "GameFramework/PlayerStart.h"
 
 #include "Character/TPSCharacter.h"
 #include "Player/TPSPlayerController.h"
 #include "Game/TPSGameConfiguration.h"
-#include "GameFramework/PlayerStart.h"
 #include "Team/TPSTeamManager.h"
 #include "World/TPSCombatLog.h"
 #include "World/TPSWorldManager.h"
@@ -67,11 +66,11 @@ public:
 	////////////////////////////////////////////////////////
 	// Gameplay Functions
 
+	UFUNCTION(BlueprintCallable)
 	void InitializeTeams();
-	void IndexSpawnPointsForTeams();
 
-	void SpawnRedTeam();
-	void SpawnBlueTeam();
+	UFUNCTION(BlueprintCallable)
+	void IndexSpawnPointsForTeams();
 
 
 	////////////////////////////////////////////////////////
@@ -85,10 +84,6 @@ public:
 	bool CanRespawn(ATPSPlayerController* playerController);
 	UFUNCTION(BlueprintCallable)
 	void PerformRespawn(ATPSPlayerController* playerController);
-
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	APlayerStart* FindSpawnPoint();
 
 
 

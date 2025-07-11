@@ -17,7 +17,7 @@ ATPSGameMode::~ATPSGameMode() { }
 
 void ATPSGameMode::BeginPlay()
 {
-	InitializeTeams();
+	Super::BeginPlay();
 }
 
 
@@ -34,9 +34,10 @@ void ATPSGameMode::IndexSpawnPointsForTeams()
 	{
 		if (ATPSSPawnPoint* spawn = Cast<ATPSSPawnPoint>(sp))
 		{
+			SpawnPointsById.Add(spawn->ID, spawn);
 			if (UTPSTeam* t = TeamManager->GetTeam(spawn->TeamID))
 			{
-				t->SpawnPoints.Add(spawn);
+				t->SpawnPool->AddSpawnPointToPool(spawn);
 			}
 		}
 	}
@@ -46,23 +47,11 @@ void ATPSGameMode::IndexSpawnPointsForTeams()
 void ATPSGameMode::InitializeTeams()
 {
 	TeamManager->CreateTeam(ETPSTeamID::Red);
-	TeamManager->ConfigureTeam(ETPSTeamID::Red, 1, 4);
+	TeamManager->ConfigureTeam(ETPSTeamID::Red, 1, 4, 5);
 
 	TeamManager->CreateTeam(ETPSTeamID::Blue);
-	TeamManager->ConfigureTeam(ETPSTeamID::Blue, 1, 3);
+	TeamManager->ConfigureTeam(ETPSTeamID::Blue, 1, 3, 6);
 }
-
-
-void ATPSGameMode::SpawnRedTeam()
-{
-	
-}
-
-void ATPSGameMode::SpawnBlueTeam()
-{
-	
-}
-
 
 
 
@@ -124,7 +113,7 @@ void ATPSGameMode::SpawnNewPlayerCharacter_Implementation(AController* controlle
 	ATPSCharacter* spawned = nullptr;
 	if (IsValid(PlayerCharacterTemplate))
 	{
-		APlayerStart* spawnPoint = FindSpawnPoint();
+		AActor* spawnPoint = FindPlayerStart(controller, TEXT(""));
 		if (IsValid(spawnPoint))
 		{
 			spawned = GetWorld()->SpawnActor<ATPSCharacter>(PlayerCharacterTemplate,
@@ -159,7 +148,7 @@ void ATPSGameMode::SpawnNewBot_Implementation(AController* controller)
 	ATPSCharacter* spawned = nullptr;
 	if (IsValid(BotTemplate))
 	{
-		APlayerStart* spawnPoint = FindSpawnPoint();
+		AActor* spawnPoint = FindPlayerStart(controller, TEXT(""));
 		if (IsValid(spawnPoint))
 		{
 			spawned = GetWorld()->SpawnActor<ATPSCharacter>(BotTemplate,
@@ -187,7 +176,7 @@ void ATPSGameMode::SpawnBots(int numBots)
 	}
 }
 
-APlayerStart* ATPSGameMode::FindSpawnPoint()
+/*AActor* ATPSGameMode::FindPlayerStart_Implementation(AController* Player, const FString& IncomingName)
 {
 	TArray<AActor*> OutActors;
 	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), OutActors);
@@ -196,12 +185,7 @@ APlayerStart* ATPSGameMode::FindSpawnPoint()
 
 	// Return the element at the random index
 	return Cast<APlayerStart>(OutActors[RandomIndex]);
-}
-
-
-
-
-
+}*/
 
 
 

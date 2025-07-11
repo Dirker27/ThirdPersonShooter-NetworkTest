@@ -8,7 +8,7 @@ UTPSHierarchicalCollection::UTPSHierarchicalCollection()
 }
 
 
-bool UTPSHierarchicalCollection::Add(ATPSCharacter* member)
+bool UTPSHierarchicalCollection::Add(UTPSCharacterInstance* member)
 {
 	if (CanAddToCollection(member))
 	{
@@ -29,7 +29,7 @@ bool UTPSHierarchicalCollection::Add(UTPSHierarchicalCollection* subCollection)
 	return false;
 }
 
-bool UTPSHierarchicalCollection::Remove(ATPSCharacter* member)
+bool UTPSHierarchicalCollection::Remove(UTPSCharacterInstance* member)
 {
 	if (!IsValid(member))
 	{
@@ -48,7 +48,7 @@ bool UTPSHierarchicalCollection::Remove(UTPSHierarchicalCollection* subCollectio
 }
 
 
-bool UTPSHierarchicalCollection::CanAddToCollection(ATPSCharacter* member) const
+bool UTPSHierarchicalCollection::CanAddToCollection(UTPSCharacterInstance* member) const
 {
 	if (!IsValid(member))
 	{

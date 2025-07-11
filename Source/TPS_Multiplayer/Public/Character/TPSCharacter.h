@@ -119,12 +119,13 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector2D GetCurrentAccuracyTolerance() const;
 
+
 	//////////////////////////////////////////////////////
 	// Persistent State
 
-	// TODO: Transfer existing and future state to this object(?)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State")
 	TObjectPtr<UTPSCharacterRecord> Record;
+
 
 	//////////////////////////////////////////////////////
 	// Volatile State

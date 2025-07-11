@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "TPSHierarchicalCollectionLevel.h"
 #include "Character/TPSCharacter.h"
+#include "Character/TPSCharacterInstance.h"
 #include "GameFramework/Actor.h"
 
 #include "TPSHierarchicalCollection.generated.h"
@@ -23,10 +24,10 @@ public:
 
 	// TODO: Make Generic/Template
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<TObjectPtr<ATPSCharacter>> Members;
+	TArray<TObjectPtr<UTPSCharacterInstance>> Members;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UTPSHierarchicalCollection> ParentCollection;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	//TObjectPtr<UTPSHierarchicalCollection> ParentCollection;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<TObjectPtr<UTPSHierarchicalCollection>> ChildCollections;
@@ -35,12 +36,12 @@ public:
 //  PUBLIC OPERATIONS
 //~ ======================================================================== ~//
 public:
-	bool Add(ATPSCharacter* member);
+	bool Add(UTPSCharacterInstance* member);
 	bool Add(UTPSHierarchicalCollection* subCollection);
-	bool Remove(ATPSCharacter* member);
+	bool Remove(UTPSCharacterInstance* member);
 	bool Remove(UTPSHierarchicalCollection* subCollection);
 
-	bool CanAddToCollection(ATPSCharacter* member) const;
+	bool CanAddToCollection(UTPSCharacterInstance* member) const;
 	bool CanAddToCollection(UTPSHierarchicalCollection* subCollection) const;
 };
 

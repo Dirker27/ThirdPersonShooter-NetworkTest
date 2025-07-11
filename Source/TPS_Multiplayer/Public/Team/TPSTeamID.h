@@ -18,6 +18,23 @@ enum class ETPSTeamID : uint8
 	Gold = 4
 };
 
+static FColor TPSTeamIdToColor(ETPSTeamID id)
+{
+	switch (id)
+	{
+	case ETPSTeamID::Red:
+		return FColor::Red;
+	case ETPSTeamID::Blue:
+		return FColor::Blue;
+	case ETPSTeamID::Green:
+		return FColor::Green;
+	case ETPSTeamID::Gold:
+		return FColor::Orange;
+	default:
+		return FColor::White;
+	}
+}
+
 
 static FString TPSTeamIdToString(ETPSTeamID id)
 {

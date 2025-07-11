@@ -2,10 +2,10 @@
 
 #pragma once
 
-//#include "TPSTeamID.h"
-#include "TPSTeamID.h"
 #include "Components/ActorComponent.h"
+
 #include "Model/TPSHierarchicalCollectionLevel.h"
+#include "Team/TPSTeamID.h"
 
 #include "TPSUnitID.generated.h"
 

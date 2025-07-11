@@ -4,4 +4,5 @@
 
 UTPSTeam::UTPSTeam()
 {
+    SpawnPool = CreateDefaultSubobject<UTPSSpawnPool>(TEXT("SpawnPool"));
 }

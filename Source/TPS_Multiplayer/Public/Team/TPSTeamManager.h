@@ -21,23 +21,24 @@ class TPS_MULTIPLAYER_API UTPSTeamManager : public UActorComponent
 public:
     UTPSTeamManager();
 
+protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TMap<ETPSTeamID, UTPSTeam*> ActiveTeams;
 
+public:
     UFUNCTION(BlueprintCallable)
     void CreateTeam(ETPSTeamID teamId);
 
     UFUNCTION(BlueprintCallable)
-    void ConfigureTeam(ETPSTeamID teamId, int numPlatoons, int numSquadsPerPlatoon);
+    void ConfigureTeam(ETPSTeamID teamId, int numPlatoons, int numSquadsPerPlatoon, int numUnitsPerFireteam);
 
     // Assign the Character to a Team, choosing an appropriate unit to fill.
     UFUNCTION(BlueprintCallable)
-    void AssignCharacterToTeam(ATPSCharacter* character, ETPSTeamID team);
+    void AssignCharacterToTeam(UTPSCharacterInstance* character, ETPSTeamID team);
 
     // Assign the Character to a specific Unit within a Team.
     UFUNCTION(BlueprintCallable)
-    void AssignCharacterToTeamUnit(ATPSCharacter* character, FUnitID unit);
-
+    void AssignCharacterToTeamUnit(UTPSCharacterInstance* character, FUnitID unit);
 
     UFUNCTION(BlueprintCallable)
     UTPSTeam* GetTeam(ETPSTeamID teamId);

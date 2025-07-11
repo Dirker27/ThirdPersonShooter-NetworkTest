@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/PlayerStart.h"
+#include "Team/TPSSquadRole.h"
 
 #include "Team/TPSTeamID.h"
 #include "Team/TPSUnitID.h"
@@ -11,27 +13,41 @@
 #include "TPSSpawnPoint.generated.h"
 
 UCLASS()
-class TPS_MULTIPLAYER_API ATPSSPawnPoint : public AActor //: public APlayerStart
+class TPS_MULTIPLAYER_API ATPSSPawnPoint : public AActor// public APlayerStart
 {
     GENERATED_BODY()
 
 public:
-    ATPSSPawnPoint();
+    ATPSSPawnPoint(const FObjectInitializer& ObjectInitializer);
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+protected:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TObjectPtr<UBoxComponent> Collider;
+
+public:
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
     int ID;
 
     // Teams that can use this Spawn Point.
     //   If unset, then all can use.
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    ETPSTeamID TeamID;
+    TEnumAsByte<ETPSTeamID> TeamID;
 
     // Squads in a Team that can use this Spawn Point
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FUnitID AssignedUnit;
 
-
-
+    // Preferred Squad Role to spawn at this 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<UBoxComponent> Collider;
+    TEnumAsByte<ETPSSquadRole> PreferredSquadRoleToSpawn;
+
+public:
+    UFUNCTION(BlueprintCallable)
+    void SetColliderColor(FColor color);
+
+    UFUNCTION(BlueprintCallable)
+    int GenerateUniqueSpawnId();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool IsSpawnAvailable();
 };

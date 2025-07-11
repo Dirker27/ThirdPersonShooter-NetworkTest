@@ -7,6 +7,7 @@
 #include "TPSTeamConfiguration.h"
 #include "TPSTeamID.h"
 #include "Game/TPSSpawnPoint.h"
+#include "Game/TPSSpawnPool.h"
 
 #include "TPSTeam.generated.h"
 
@@ -32,7 +33,7 @@ public:
     TObjectPtr<UTPSHierarchicalCollection> RootCollection;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<TObjectPtr<ATPSSPawnPoint>> SpawnPoints;
+    TObjectPtr<UTPSSpawnPool> SpawnPool;
 };
 
 
