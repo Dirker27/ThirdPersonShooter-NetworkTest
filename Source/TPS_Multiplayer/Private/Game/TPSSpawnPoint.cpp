@@ -5,7 +5,7 @@
 #include "Character/TPSCharacter.h"
 
 static int _spawn_id = 0;
-ATPSSPawnPoint::ATPSSPawnPoint(const FObjectInitializer& ObjectInitializer)
+ATPSSpawnPoint::ATPSSpawnPoint(const FObjectInitializer& ObjectInitializer)
 	: AActor(ObjectInitializer)
 {
 	Collider = CreateDefaultSubobject<UBoxComponent>(TEXT("Collider"));
@@ -16,18 +16,18 @@ ATPSSPawnPoint::ATPSSPawnPoint(const FObjectInitializer& ObjectInitializer)
 	//Collider->ShapeColor = TPSTeamIdToColor(TeamID);
 }
 
-void ATPSSPawnPoint::SetColliderColor(FColor color)
+void ATPSSpawnPoint::SetColliderColor(FColor color)
 {
 	Collider->ShapeColor = color;
 }
 
-int ATPSSPawnPoint::GenerateUniqueSpawnId()
+int ATPSSpawnPoint::GenerateUniqueSpawnId()
 {
 	return _spawn_id++;
 }
 
 
-bool ATPSSPawnPoint::IsSpawnAvailable()
+bool ATPSSpawnPoint::IsSpawnAvailable()
 {
 	TArray<AActor*> actors;
 	Collider->GetOverlappingActors(actors, ATPSCharacter::StaticClass());

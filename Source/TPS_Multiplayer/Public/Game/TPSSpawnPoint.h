@@ -13,21 +13,18 @@
 #include "TPSSpawnPoint.generated.h"
 
 UCLASS()
-class TPS_MULTIPLAYER_API ATPSSPawnPoint : public AActor //public APlayerStart
+class TPS_MULTIPLAYER_API ATPSSpawnPoint : public AActor //public APlayerStart
 {
     GENERATED_BODY()
 
 public:
-    ATPSSPawnPoint(const FObjectInitializer& ObjectInitializer);
+    ATPSSpawnPoint(const FObjectInitializer& ObjectInitializer);
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UBoxComponent> Collider;
 
 public:
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-    int ID;
-
     // Teams that can use this Spawn Point.
     //   If unset, then all can use.
     UPROPERTY(EditAnywhere, BlueprintReadWrite)

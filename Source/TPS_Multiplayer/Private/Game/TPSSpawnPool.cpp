@@ -8,12 +8,12 @@ UTPSSpawnPool::UTPSSpawnPool()
 }
 
 
-void UTPSSpawnPool::AddSpawnPointToPool(ATPSSPawnPoint* spawn)
+void UTPSSpawnPool::AddSpawnPointToPool(ATPSSpawnPoint* spawn)
 {
 	SpawnPoints.Add(spawn);
 }
 
-ATPSSPawnPoint* UTPSSpawnPool::FindFirstAvailableSpawnPoint()
+ATPSSpawnPoint* UTPSSpawnPool::FindFirstAvailableSpawnPoint()
 {
 	for (auto sp : SpawnPoints)
 	{
@@ -25,7 +25,7 @@ ATPSSPawnPoint* UTPSSpawnPool::FindFirstAvailableSpawnPoint()
 	return nullptr;
 }
 
-ATPSSPawnPoint* UTPSSpawnPool::FindBestSpawnPointForSquadRole(const ETPSSquadRole role)
+ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForSquadRole(const ETPSSquadRole role)
 {
 	for (auto sp : SpawnPoints)
 	{

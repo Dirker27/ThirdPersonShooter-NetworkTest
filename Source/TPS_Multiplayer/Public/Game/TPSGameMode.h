@@ -41,9 +41,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UTPSCombatLog> CombatLog;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TMap<int, TObjectPtr<ATPSSPawnPoint>> SpawnPointsById;
-
 //~ ============================================================= ~//
 //  ATTRIBUTES
 //~ ============================================================= ~//

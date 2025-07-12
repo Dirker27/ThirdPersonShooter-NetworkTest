@@ -19,18 +19,18 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TArray<TObjectPtr<ATPSSPawnPoint>> SpawnPoints;
+	TArray<TObjectPtr<ATPSSpawnPoint>> SpawnPoints;
 
 public:
 	UFUNCTION(BlueprintCallable)
-	TArray<ATPSSPawnPoint*> GetSpawnPoints() const { return SpawnPoints; }
+	TArray<ATPSSpawnPoint*> GetSpawnPoints() const { return SpawnPoints; }
 
 	UFUNCTION(BlueprintCallable)
-	void AddSpawnPointToPool(ATPSSPawnPoint* spawn);
+	void AddSpawnPointToPool(ATPSSpawnPoint* spawn);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ATPSSPawnPoint* FindFirstAvailableSpawnPoint();
+	ATPSSpawnPoint* FindFirstAvailableSpawnPoint();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ATPSSPawnPoint* FindBestSpawnPointForSquadRole(const ETPSSquadRole role);
+	ATPSSpawnPoint* FindBestSpawnPointForSquadRole(const ETPSSquadRole role);
 };

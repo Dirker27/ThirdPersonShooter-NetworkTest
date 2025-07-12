@@ -28,14 +28,13 @@ void ATPSGameMode::BeginPlay()
 void ATPSGameMode::IndexSpawnPointsForTeams()
 {
 	TArray<AActor*> spawnPoints;
-	UGameplayStatics::GetAllActorsOfClass(this, ATPSSPawnPoint::StaticClass(), spawnPoints);
+	UGameplayStatics::GetAllActorsOfClass(this, ATPSSpawnPoint::StaticClass(), spawnPoints);
 
 	for (auto sp : spawnPoints)
 	{
-		if (ATPSSPawnPoint* spawn = Cast<ATPSSPawnPoint>(sp))
+		if (ATPSSpawnPoint* spawn = Cast<ATPSSpawnPoint>(sp))
 		{
-			SpawnPointsById.Add(spawn->ID, spawn);
-			if (UTPSTeam* t = TeamManager->GetTeam(spawn->TeamID))
+			if (UTPSTeam* t = TeamManager->GetTeam(spawn->AssignedUnit.TeamID))
 			{
 				t->SpawnPool->AddSpawnPointToPool(spawn);
 			}
@@ -47,10 +46,10 @@ void ATPSGameMode::IndexSpawnPointsForTeams()
 void ATPSGameMode::InitializeTeams()
 {
 	TeamManager->CreateTeam(ETPSTeamID::Red);
-	TeamManager->ConfigureTeam(ETPSTeamID::Red, 1, 4, 5);
+	TeamManager->ConfigureTeam(ETPSTeamID::Red, 1, 4, 3);
 
 	TeamManager->CreateTeam(ETPSTeamID::Blue);
-	TeamManager->ConfigureTeam(ETPSTeamID::Blue, 1, 3, 6);
+	TeamManager->ConfigureTeam(ETPSTeamID::Blue, 1, 3, 4);
 }
 
 
