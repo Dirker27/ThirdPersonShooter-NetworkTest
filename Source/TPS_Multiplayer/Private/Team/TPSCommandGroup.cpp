@@ -7,7 +7,7 @@
 static int _incrementingCommandID;
 UTPSCommandGroup::UTPSCommandGroup()
 {
-	Level = UNIT;
+	Level = ETPSHierarchicalLevel::UNIT;
 
 	ID.UnitNumber = _incrementingCommandID++;
 }

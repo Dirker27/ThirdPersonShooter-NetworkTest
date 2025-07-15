@@ -4,5 +4,4 @@
 
 UTPSCommandStructure::UTPSCommandStructure()
 {
-
 }

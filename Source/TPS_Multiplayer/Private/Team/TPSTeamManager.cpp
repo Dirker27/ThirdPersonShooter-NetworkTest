@@ -28,6 +28,27 @@ static FString GetAliasForUnitNumber(int num)
 	}
 }
 
+/*static FString GetNameForUnitID(FTPSUnitID unitId)
+{
+	FString name = TPSTeamIdToString(unitId.TeamID);
+
+	ETPSHierarchicalLevel currentLevel = unitId.UnitLevel;
+	for (int i = unitId.UnitLevel; i >=0; i--)
+	{
+		currentLevel = static_cast<ETPSHierarchicalLevel>(i);
+
+		name.Append()
+	}
+
+	FString n = name.Append("");
+
+	
+
+	hierarchy
+
+	return name;
+}*/
+
 
 void UTPSTeamManager::CreateTeam(ETPSTeamID teamId)
 {
@@ -35,71 +56,122 @@ void UTPSTeamManager::CreateTeam(ETPSTeamID teamId)
 		FName(TPSTeamIdToString(teamId).Append(FString("TEAM-"))));
 	team->TeamID = teamId;
 
-	UTPSPlatoon* rootPlatoon = NewObject<UTPSPlatoon>(this, UTPSPlatoon::StaticClass(),
+	UTPSCommandStructure* root = NewObject<UTPSCommandStructure>(this, UTPSCommandStructure::StaticClass(),
 		FName(TPSTeamIdToString(teamId).Append(FString("root"))));
-	rootPlatoon->ID.UnitAlias = "ROOT";
-	rootPlatoon->ID.UnitNumber = 0;
-	rootPlatoon->ID.TeamID = teamId;
-	team->RootCollection = rootPlatoon;
+	root->ID.UnitLevel = ETPSHierarchicalLevel::ROOT;
+	root->ID.UnitNumber = 1;
+	root->ID.TeamID = teamId;
+	root->Level = ETPSHierarchicalLevel::ROOT;
+	team->RootCollection = root;
 
 	ActiveTeams.Add(teamId, team);
 }
 
-void UTPSTeamManager::ConfigureTeam(ETPSTeamID teamId,
-	int numSquadsPerPlatoon,
-	int numFireteamsPerSquad,
-	int numUnitsPerFireteam)
+void UTPSTeamManager::ConfigureTeam(ETPSTeamID teamId, FTPSTeamConfiguration configuration)
 {
 	if (UTPSTeam* team = GetTeam(teamId))
 	{
-		team->Configuration.MaxNumSquadsPerPlatoon = numSquadsPerPlatoon;
-		team->Configuration.MaxNumFireteamsPerSquad = numFireteamsPerSquad;
-		team->Configuration.MaxNumMembersPerFireteam = numUnitsPerFireteam;
+		team->Configuration = configuration;
 
-		for (int i = 0; i < numSquadsPerPlatoon; i++)
-		{
-			FName squadName = FName(TPSTeamIdToString(teamId).Append(FString("-") + FString::FromInt(i)));
+		// Platoon
+		int platoonCount = (configuration.LevelCapacityMap.Find(ETPSHierarchicalLevel::SQUAD))
+			? *configuration.LevelCapacityMap.Find(ETPSHierarchicalLevel::SQUAD)
+			: 0;
+		for (int a = 0; a < platoonCount; a++) {
+			FName platoonName = FName(TPSTeamIdToString(teamId).Append(FString("_") + FString::FromInt(a)));
 
-			UTPSSquad* squad = NewObject<UTPSSquad>(this, UTPSSquad::StaticClass(), squadName);
+			UTPSPlatoon* platoon = NewObject<UTPSPlatoon>(this, UTPSPlatoon::StaticClass(), platoonName);
 
-			squad->ID.UnitNumber = i;
-			squad->ID.UnitAlias = GetAliasForUnitNumber(squad->ID.UnitNumber);
-			squad->ID.ParentHierarchyMap.Add(PLATOON, 0);
-			team->RootCollection->ChildCollections.Add(squad);
+			platoon->ID.UnitLevel = ETPSHierarchicalLevel::PLATOON;
+			platoon->ID.UnitNumber = a+1;
+			platoon->ID.TeamID = teamId;
+			platoon->ID.Hierarchy.Add(team->RootCollection->ID.UnitLevel, team->RootCollection->ID.UnitNumber);
 
-			for (int j = 0; j < numFireteamsPerSquad; j++)
+			team->RootCollection->AddSubCollection(platoon);
+
+			// Squad
+			int squadCount = (configuration.LevelCapacityMap.Find(ETPSHierarchicalLevel::SQUAD))
+				? *configuration.LevelCapacityMap.Find(ETPSHierarchicalLevel::SQUAD)
+				: 0;
+			for (int i = 0; i < squadCount; i++)
 			{
-				FName fireteamName = FName(TPSTeamIdToString(teamId).Append(
-					FString("-") + FString::FromInt(i)
-					+ FString("_") + FString::FromInt(j + 1)));
+				FName squadName = FName(TPSTeamIdToString(teamId).Append(
+					FString("_") + FString::FromInt(a)
+					+ FString("-") + FString::FromInt(i)));
 
-				UTPSFireTeam* fireteam = NewObject<UTPSFireTeam>(this, UTPSFireTeam::StaticClass(), fireteamName);
-				fireteam->ID.UnitNumber = j+1;
-				fireteam->ID.UnitAlias = GetAliasForUnitNumber(fireteam->ID.UnitNumber);
-				fireteam->ID.ParentHierarchyMap.Add(PLATOON, 0);
-				fireteam->ID.ParentHierarchyMap.Add(SQUAD, squad->ID.UnitNumber);
-				squad->ChildCollections.Add(fireteam);
+				UTPSSquad* squad = NewObject<UTPSSquad>(this, UTPSSquad::StaticClass(), squadName);
 
-				for (int k = 0; k < numUnitsPerFireteam; k++)
+				squad->Alias = GetAliasForUnitNumber(squad->ID.UnitNumber);
+				squad->ID.UnitLevel = ETPSHierarchicalLevel::SQUAD;
+				squad->ID.UnitNumber = i+1;
+				squad->ID.TeamID = teamId;
+				squad->ID.Hierarchy = platoon->ID.Hierarchy;
+				squad->ID.Hierarchy.Add(platoon->ID.UnitLevel, platoon->ID.UnitNumber);
+
+				platoon->AddSubCollection(squad);
+
+				// FireTeam
+				int fireteamCount = (configuration.LevelCapacityMap.Find(ETPSHierarchicalLevel::FIRE_TEAM))
+					? *configuration.LevelCapacityMap.Find(ETPSHierarchicalLevel::FIRE_TEAM)
+					: 0;
+				for (int j = 0; j < fireteamCount; j++)
 				{
-					FName unitName = FName(TPSTeamIdToString(teamId).Append(
-						FString("-") + FString::FromInt(i)
-						+ FString("_") + FString::FromInt(j + 1) 
-						+ FString("_") + FString::FromInt(k + 1)));
+					FName fireteamName = FName(TPSTeamIdToString(teamId).Append(
+						FString("_") + FString::FromInt(a)
+						+ FString("-") + FString::FromInt(i)
+						+ FString("_") + FString::FromInt(j + 1)));
 
-					UTPSCharacterInstance* unit = NewObject<UTPSCharacterInstance>(this, UTPSCharacterInstance::StaticClass(), unitName);
+					UTPSFireTeam* fireteam = NewObject<UTPSFireTeam>(this, UTPSFireTeam::StaticClass(), fireteamName);
 
-					unit->Identity->Name = unitName;
-					unit->Identity->AssignedUnit = fireteam->ID;
-					unit->Identity->SquadRole = (k < 1) ? ETPSSquadRole::Leader : ETPSSquadRole::Rifleman;
-					unit->Configuration->BodyType = (k % 2 == 0) ? ETPSCharacterBodyType::Male : ETPSCharacterBodyType::Female;
+					fireteam->Alias = GetAliasForUnitNumber(fireteam->ID.UnitNumber);
+					fireteam->ID.UnitLevel = ETPSHierarchicalLevel::FIRE_TEAM;
+					fireteam->ID.UnitNumber = j+1;
+					fireteam->ID.TeamID = teamId;
+					fireteam->ID.Hierarchy = squad->ID.Hierarchy;
+					fireteam->ID.Hierarchy.Add(squad->ID.UnitLevel, squad->ID.UnitNumber);
 
-					fireteam->Members.Add(unit);
+					squad->AddSubCollection(fireteam);
+
+					// Unit
+					int unitCount = (configuration.LevelCapacityMap.Find(ETPSHierarchicalLevel::UNIT))
+						? *configuration.LevelCapacityMap.Find(ETPSHierarchicalLevel::UNIT)
+						: 0;
+					for (int k = 0; k < unitCount; k++)
+					{
+						FName unitName = FName(TPSTeamIdToString(teamId).Append(
+							FString("_") + FString::FromInt(a)
+							+ FString("-") + FString::FromInt(i)
+							+ FString("_") + FString::FromInt(j + 1) 
+							+ FString("_") + FString::FromInt(k + 1)));
+
+						UTPSCharacterInstance* unit = NewObject<UTPSCharacterInstance>(this, UTPSCharacterInstance::StaticClass(), unitName);
+
+						unit->Identity->UnitID.UnitLevel = ETPSHierarchicalLevel::UNIT;
+						unit->Identity->UnitID.UnitNumber = j + 1;
+						unit->Identity->UnitID.TeamID = teamId;
+						unit->Identity->UnitID.Hierarchy = fireteam->ID.Hierarchy;
+						unit->Identity->UnitID.Hierarchy.Add(fireteam->ID.UnitLevel, fireteam->ID.UnitNumber);
+
+						unit->Identity->Name = unitName;
+						unit->Identity->SquadRole = (k < 1) ? ETPSSquadRole::Leader : ETPSSquadRole::Rifleman;
+						unit->Configuration->BodyType = (k % 2 == 0) ? ETPSCharacterBodyType::Male : ETPSCharacterBodyType::Female;
+
+						fireteam->AddMember(unit);
+					}
 				}
 			}
 		}
 	}
 }
+
+/*UTPSHierarchicalCollection* UTPSTeamManager::ConfigureHierarchicalUnit(ETPSHierarchicalLevel level, int unitNum, UTPSHierarchicalCollection* parent)
+{
+	FTPSUnitID id = parent.
+
+	UTPSSquad* squad = NewObject<UTPSSquad>(this, UTPSSquad::StaticClass(), squadName);
+
+	return squad;
+}*/
 
 
 void UTPSTeamManager::AssignCharacterToTeam(UTPSCharacterInstance* character, ETPSTeamID team)
@@ -108,13 +180,13 @@ void UTPSTeamManager::AssignCharacterToTeam(UTPSCharacterInstance* character, ET
 }
 
 
-void UTPSTeamManager::AssignCharacterToTeamUnit(UTPSCharacterInstance* character, FUnitID unitId)
+void UTPSTeamManager::AssignCharacterToTeamUnit(UTPSCharacterInstance* character, FTPSUnitID unitId)
 {
 	if (UTPSCommandStructure* unit = GetUnit(unitId))
 	{
-		unit->Add(character);
+		unit->AddMember(character);
 		//character->Identity->TeamID = teamId;
-		character->Identity->AssignedUnit = unitId;
+		character->Identity->UnitID = unitId;
 	}
 }
 
@@ -129,7 +201,7 @@ UTPSTeam* UTPSTeamManager::GetTeam(ETPSTeamID teamId)
 	return nullptr;
 }
 
-static UTPSCommandStructure* _FindUnit(UTPSCommandStructure* root, FUnitID unitId)
+/*static UTPSCommandStructure* _FindUnit(UTPSCommandStructure* root, FTPSUnitID unitId)
 {
 	if (root->Level == unitId.UnitLevel)
 	{
@@ -142,15 +214,15 @@ static UTPSCommandStructure* _FindUnit(UTPSCommandStructure* root, FUnitID unitI
 
 	ETPSHierarchicalLevel childLvl = ETPSHierarchicalLevel(root->Level - 1);
 	return _FindUnit(
-		Cast<UTPSCommandStructure>(root->ChildCollections[*unitId.ParentHierarchyMap.Find(childLvl)]),
+		Cast<UTPSCommandStructure>(root->ChildCollections[*unitId.Hierarchy.Find(childLvl)]),
 		unitId);
-}
-UTPSCommandStructure* UTPSTeamManager::GetUnit(FUnitID unitId)
+}*/
+UTPSCommandStructure* UTPSTeamManager::GetUnit(FTPSUnitID unitId)
 {
-	if (UTPSTeam* team = GetTeam(unitId.TeamID))
+	/*if (UTPSTeam* team = GetTeam(unitId.TeamID))
 	{
 		UTPSPlatoon* p = Cast<UTPSPlatoon>(team->RootCollection);
 		return _FindUnit(p, unitId);
-	}
+	}*/
 	return nullptr;
 }

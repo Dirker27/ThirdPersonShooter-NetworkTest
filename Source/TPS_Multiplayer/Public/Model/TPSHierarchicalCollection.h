@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "TPSHierarchicalCollectionLevel.h"
+
 #include "Character/TPSCharacter.h"
 #include "Character/TPSCharacterInstance.h"
 #include "GameFramework/Actor.h"
@@ -22,8 +24,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TEnumAsByte<ETPSHierarchicalLevel> Level;
 
+protected:
 	// TODO: Make Generic/Template
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<TObjectPtr<UTPSCharacterInstance>> Members;
 
 	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -36,12 +39,19 @@ public:
 //  PUBLIC OPERATIONS
 //~ ======================================================================== ~//
 public:
-	bool Add(UTPSCharacterInstance* member);
-	bool Add(UTPSHierarchicalCollection* subCollection);
-	bool Remove(UTPSCharacterInstance* member);
-	bool Remove(UTPSHierarchicalCollection* subCollection);
+	UFUNCTION(BlueprintCallable)
+	bool AddMember(UTPSCharacterInstance* member);
+	UFUNCTION(BlueprintCallable)
+	bool AddSubCollection(UTPSHierarchicalCollection* subCollection);
 
-	bool CanAddToCollection(UTPSCharacterInstance* member) const;
-	bool CanAddToCollection(UTPSHierarchicalCollection* subCollection) const;
+	UFUNCTION(BlueprintCallable)
+	bool RemoveMember(UTPSCharacterInstance* member);
+	UFUNCTION(BlueprintCallable)
+	bool RemoveSubCollection(UTPSHierarchicalCollection* subCollection);
+
+	UFUNCTION(BlueprintCallable)
+	bool CanAddMember(UTPSCharacterInstance* member) const;
+	UFUNCTION(BlueprintCallable)
+	bool CanAddSubCollection(UTPSHierarchicalCollection* subCollection) const;
 };
 

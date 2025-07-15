@@ -6,6 +6,6 @@
 
 UTPSPlatoon::UTPSPlatoon()
 {
-	ID.UnitLevel = PLATOON;
-	Level = PLATOON;
+	ID.UnitLevel = ETPSHierarchicalLevel::PLATOON;
+	Level = ETPSHierarchicalLevel::PLATOON;
 }

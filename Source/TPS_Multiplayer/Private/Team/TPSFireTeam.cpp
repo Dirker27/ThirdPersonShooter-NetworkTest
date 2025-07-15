@@ -4,7 +4,7 @@
 
 UTPSFireTeam::UTPSFireTeam()
 {
-	ID.UnitLevel = FIRE_TEAM;
-	Level = FIRE_TEAM;
+	ID.UnitLevel = ETPSHierarchicalLevel::FIRE_TEAM;
+	Level = ETPSHierarchicalLevel::FIRE_TEAM;
 }
 

@@ -3,11 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "TPSCommandStructure.h"
 #include "TPSTeamConfiguration.h"
 #include "TPSTeamID.h"
-#include "Game/TPSSpawnPoint.h"
-#include "Game/TPSSpawnPool.h"
 
 #include "TPSTeam.generated.h"
 
@@ -30,7 +29,7 @@ public:
     FTPSTeamConfiguration Configuration;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<UTPSHierarchicalCollection> RootCollection;
+    TObjectPtr<UTPSCommandStructure> RootCollection;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UTPSSpawnPool> SpawnPool;

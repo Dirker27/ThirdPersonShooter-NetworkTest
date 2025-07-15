@@ -8,7 +8,7 @@
 #include "TPSHierarchicalCollectionLevel.generated.h"
 
 UENUM(BlueprintType)
-enum ETPSHierarchicalLevel : int
+enum class ETPSHierarchicalLevel : uint8
 {
 	UNIT = 0,
 	FIRE_TEAM = 1,
@@ -19,5 +19,5 @@ enum ETPSHierarchicalLevel : int
 	BATTALION = 6,
 	ARMY = 7,
 
-	SUPREME = INT_MAX
+	ROOT = 255
 };

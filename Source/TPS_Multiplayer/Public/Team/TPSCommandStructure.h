@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "Team/TPSCommandConfiguration.h"
+#include "Game/TPSSpawnPool.h"
+#include "Team/TPSCommandStructureConfiguration.h"
 #include "Team/TPSCommandGroup.h"
 
 #include "TPSCommandStructure.generated.h"
@@ -14,12 +15,15 @@ class TPS_MULTIPLAYER_API UTPSCommandStructure : public UTPSCommandGroup
 {
 	GENERATED_BODY()
 
-public:
+protected:
 	UTPSCommandStructure();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<ATPSCharacter> Leader;
+	TObjectPtr<UTPSCharacterInstance> Leader;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UTPSCommandConfiguration> Configuration;
+	TObjectPtr<UTPSCommandStructureConfiguration> Configuration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UTPSSpawnPool> SpawnPool;
 };

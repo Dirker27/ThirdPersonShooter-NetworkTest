@@ -25,18 +25,13 @@ protected:
     TObjectPtr<UBoxComponent> Collider;
 
 public:
-    // Teams that can use this Spawn Point.
-    //   If unset, then all can use.
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TEnumAsByte<ETPSTeamID> TeamID;
-
     // Squads in a Team that can use this Spawn Point
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FUnitID AssignedUnit;
+    FTPSUnitID AssignedUnit;
 
     // Preferred Squad Role to spawn at this 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TEnumAsByte<ETPSSquadRole> PreferredSquadRoleToSpawn;
+    ETPSSquadRole PreferredSquadRoleToSpawn;
 
 public:
     UFUNCTION(BlueprintCallable)

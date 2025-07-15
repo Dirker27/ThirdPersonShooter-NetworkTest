@@ -16,25 +16,20 @@
  *   ie: there can be an 'Abel Squad' on the other Team as well as your own.
  */
 USTRUCT(BlueprintType)
-struct TPS_MULTIPLAYER_API FUnitID
+struct TPS_MULTIPLAYER_API FTPSUnitID
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TEnumAsByte<ETPSTeamID> TeamID;
+	ETPSTeamID TeamID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int UnitNumber;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TEnumAsByte<ETPSHierarchicalLevel> UnitLevel;
-
-	// Display Name for the Unit
-	//   ('Easy' Company, 'Abel' Squad, etc)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString UnitAlias;
+	ETPSHierarchicalLevel UnitLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<TEnumAsByte<ETPSHierarchicalLevel>, int> ParentHierarchyMap;
+	TMap<ETPSHierarchicalLevel, int> Hierarchy;
 };
 

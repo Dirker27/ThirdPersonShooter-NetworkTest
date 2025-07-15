@@ -20,7 +20,13 @@ public:
 
 	// Unique ID
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FUnitID ID;
+	FTPSUnitID ID;
+
+	// Display Name for the Unit
+	//   ('Easy' Company, 'Abel' Squad, etc)
+	// TODO: Move to Unit details, not ID.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Alias;
 
 	void Command();
 };

@@ -46,10 +46,10 @@ void ATPSGameMode::IndexSpawnPointsForTeams()
 void ATPSGameMode::InitializeTeams()
 {
 	TeamManager->CreateTeam(ETPSTeamID::Red);
-	TeamManager->ConfigureTeam(ETPSTeamID::Red, 1, 4, 3);
+	TeamManager->ConfigureTeam(ETPSTeamID::Red, FTPSTeamConfiguration());
 
 	TeamManager->CreateTeam(ETPSTeamID::Blue);
-	TeamManager->ConfigureTeam(ETPSTeamID::Blue, 1, 3, 4);
+	TeamManager->ConfigureTeam(ETPSTeamID::Blue, FTPSTeamConfiguration());
 }
 
 

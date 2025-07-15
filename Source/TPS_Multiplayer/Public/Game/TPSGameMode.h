@@ -55,6 +55,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game|Configuration")
 	TSubclassOf<ATPSCharacter> BotTemplate;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Game|Configuration")
+	TMap<ETPSTeamID, UTPSTeamConfigurationData*> TeamConfigurationMap;
 
 //~ ============================================================= ~//
 //  OPERATIONS

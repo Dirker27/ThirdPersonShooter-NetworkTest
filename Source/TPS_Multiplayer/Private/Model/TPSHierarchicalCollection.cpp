@@ -8,9 +8,9 @@ UTPSHierarchicalCollection::UTPSHierarchicalCollection()
 }
 
 
-bool UTPSHierarchicalCollection::Add(UTPSCharacterInstance* member)
+bool UTPSHierarchicalCollection::AddMember(UTPSCharacterInstance* member)
 {
-	if (CanAddToCollection(member))
+	if (CanAddMember(member))
 	{
 		Members.Add(member);
 		return true;
@@ -19,7 +19,7 @@ bool UTPSHierarchicalCollection::Add(UTPSCharacterInstance* member)
 }
 
 // TODO: Guard against cyclical hierarchies
-bool UTPSHierarchicalCollection::Add(UTPSHierarchicalCollection* subCollection)
+bool UTPSHierarchicalCollection::AddSubCollection(UTPSHierarchicalCollection* subCollection)
 {
 	if (!ChildCollections.Contains(subCollection))
 	{
@@ -29,7 +29,7 @@ bool UTPSHierarchicalCollection::Add(UTPSHierarchicalCollection* subCollection)
 	return false;
 }
 
-bool UTPSHierarchicalCollection::Remove(UTPSCharacterInstance* member)
+bool UTPSHierarchicalCollection::RemoveMember(UTPSCharacterInstance* member)
 {
 	if (!IsValid(member))
 	{
@@ -38,7 +38,7 @@ bool UTPSHierarchicalCollection::Remove(UTPSCharacterInstance* member)
 	return (Members.Remove(member) > 0);
 }
 
-bool UTPSHierarchicalCollection::Remove(UTPSHierarchicalCollection* subCollection)
+bool UTPSHierarchicalCollection::RemoveSubCollection(UTPSHierarchicalCollection* subCollection)
 {
 	if (!IsValid(subCollection))
 	{
@@ -48,7 +48,7 @@ bool UTPSHierarchicalCollection::Remove(UTPSHierarchicalCollection* subCollectio
 }
 
 
-bool UTPSHierarchicalCollection::CanAddToCollection(UTPSCharacterInstance* member) const
+bool UTPSHierarchicalCollection::CanAddMember(UTPSCharacterInstance* member) const
 {
 	if (!IsValid(member))
 	{
@@ -59,7 +59,7 @@ bool UTPSHierarchicalCollection::CanAddToCollection(UTPSCharacterInstance* membe
 }
 
 // TODO: Guard against cyclical hierarchies
-bool UTPSHierarchicalCollection::CanAddToCollection(UTPSHierarchicalCollection* subCollection) const
+bool UTPSHierarchicalCollection::CanAddSubCollection(UTPSHierarchicalCollection* subCollection) const
 {
 	if (!IsValid(subCollection))
 	{

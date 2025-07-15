@@ -46,15 +46,15 @@ public:
 
     // Current Rank - granted and recognized independently of XP
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    TEnumAsByte<ETPSCharacterRank> Rank;
+    ETPSCharacterRank Rank;
 
     // Faction Alignment
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    TEnumAsByte<ETPSFactionID> FactionID;
+    ETPSFactionID FactionID;
 
-    // Assigned Squad/Unit
+    // Unit ID -> Squad/Team Hierarchy
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FUnitID AssignedUnit;
+    FTPSUnitID UnitID;
 
     // Character's "Class" / Role in their Squad
     UPROPERTY(EditAnywhere, BlueprintReadWrite)

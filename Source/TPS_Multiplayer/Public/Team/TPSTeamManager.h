@@ -30,19 +30,25 @@ public:
     void CreateTeam(ETPSTeamID teamId);
 
     UFUNCTION(BlueprintCallable)
-    void ConfigureTeam(ETPSTeamID teamId, int numPlatoons, int numSquadsPerPlatoon, int numUnitsPerFireteam);
+    void ConfigureTeam(ETPSTeamID teamId, FTPSTeamConfiguration configuration);
 
+/*private:
+    UFUNCTION(BlueprintCallable)
+    UTPSHierarchicalCollection* ConfigureHierarchicalUnit(ETPSHierarchicalLevel level, int unitNum, UTPSHierarchicalCollection* parent);
+*/
+
+public:
     // Assign the Character to a Team, choosing an appropriate unit to fill.
     UFUNCTION(BlueprintCallable)
     void AssignCharacterToTeam(UTPSCharacterInstance* character, ETPSTeamID team);
 
     // Assign the Character to a specific Unit within a Team.
     UFUNCTION(BlueprintCallable)
-    void AssignCharacterToTeamUnit(UTPSCharacterInstance* character, FUnitID unit);
+    void AssignCharacterToTeamUnit(UTPSCharacterInstance* character, FTPSUnitID unit);
 
     UFUNCTION(BlueprintCallable)
     UTPSTeam* GetTeam(ETPSTeamID teamId);
 
     UFUNCTION(BlueprintCallable)
-    UTPSCommandStructure* GetUnit(FUnitID unitId);
+    UTPSCommandStructure* GetUnit(FTPSUnitID unitId);
 };

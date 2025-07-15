@@ -9,10 +9,13 @@ struct FTPSTeamConfiguration
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TEnumAsByte<ETPSHierarchicalLevel> HighestSupportedCommandLevel = PLATOON;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<ETPSHierarchicalLevel> HighestSupportedCommandLevel = ETPSHierarchicalLevel::PLATOON;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<TEnumAsByte<ETPSHierarchicalLevel>, int> LevelCapacityMap;
+
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int MaxNumPlatoonsPerCompany = 4;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -22,5 +25,18 @@ struct FTPSTeamConfiguration
 	int MaxNumFireteamsPerSquad = 4;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	int MaxNumMembersPerFireteam = 4;
+	int MaxNumUnitsPerFireteam = 4;*/
+};
+
+
+
+
+UCLASS()
+class UTPSTeamConfigurationData : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FTPSTeamConfiguration Configuration;
 };

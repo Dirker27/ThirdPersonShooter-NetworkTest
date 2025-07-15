@@ -4,7 +4,7 @@
 
 UTPSSquad::UTPSSquad()
 {
-	ID.UnitLevel = SQUAD;
-	Level = SQUAD;
+	ID.UnitLevel = ETPSHierarchicalLevel::SQUAD;
+	Level = ETPSHierarchicalLevel::SQUAD;
 }
 
