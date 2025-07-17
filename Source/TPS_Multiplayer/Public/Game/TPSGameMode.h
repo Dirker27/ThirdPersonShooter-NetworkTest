@@ -4,14 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
-#include "GameFramework/PlayerStart.h"
 
 #include "Character/TPSCharacter.h"
 #include "Player/TPSPlayerController.h"
 #include "Game/TPSGameConfiguration.h"
 #include "Team/TPSTeamManager.h"
 #include "World/TPSCombatLog.h"
-#include "World/TPSWorldManager.h"
 
 #include "TPSGameMode.generated.h"
 
@@ -32,9 +30,6 @@ protected:
 //~ ==================================================================== ~//
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UTPSWorldManager> WorldManager;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UTPSTeamManager> TeamManager;
 
@@ -61,6 +56,7 @@ public:
 //~ ============================================================= ~//
 //  OPERATIONS
 //~ ============================================================= ~//
+public:
 
 	////////////////////////////////////////////////////////
 	// Gameplay Functions
@@ -75,6 +71,9 @@ public:
 	////////////////////////////////////////////////////////
 	// Gameplay Functions
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FColor GetColorForTeam(ETPSTeamID teamId);
+
 	// Respawn
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void RequestRespawn(ATPSPlayerController* playerController);
@@ -85,12 +84,15 @@ public:
 	void PerformRespawn(ATPSPlayerController* playerController);
 
 
+	//UFUNCTION(Server, Reliable, BlueprintCallable)
+	//void RequestSpawnCharacter(ATPSPlayerController* playerController);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	AActor* FindSpawnPointForCharacter(UTPSCharacterInstance* instance);
 
 
-
-
-
-
+	virtual AActor* FindPlayerStart_Implementation(AController* Player, const FString& IncomingName = L"") override;
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 //~ ==================================================================== ~//
 //  CONSOLE COMMANDS (Developer-only API)

@@ -9,6 +9,17 @@
 
 #include "TPSUnitID.generated.h"
 
+
+/*USTRUCT(BlueprintType)
+struct TPS_MULTIPLAYER_API FTPSUnitNumber
+{
+	GENERATED_BODY()
+
+	uint8 Number;
+};
+typedef uint8 FTPSUnitNumber;
+*/
+
 /**
  * Identifier to specify an exact unit in a given Team.
  *
@@ -24,12 +35,23 @@ struct TPS_MULTIPLAYER_API FTPSUnitID
 	ETPSTeamID TeamID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int UnitNumber;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ETPSHierarchicalLevel UnitLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<ETPSHierarchicalLevel, int> Hierarchy;
+	uint8 UnitNumber;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<ETPSHierarchicalLevel, uint8> Hierarchy;
 };
 
+
+
+UCLASS(BlueprintType)
+class UTPSUnitIdentifier : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FTPSUnitID ID;
+};

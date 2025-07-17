@@ -21,3 +21,25 @@ enum class ETPSHierarchicalLevel : uint8
 
 	ROOT = 255
 };
+
+static ETPSHierarchicalLevel LevelUp(ETPSHierarchicalLevel level)
+{
+	int lvl = static_cast<int>(level);
+	if (lvl >= 7)
+	{
+		return ETPSHierarchicalLevel::ROOT;
+	}
+
+	return static_cast<ETPSHierarchicalLevel>(lvl + 1);
+}
+
+static ETPSHierarchicalLevel LevelDown(ETPSHierarchicalLevel level)
+{
+	int lvl = static_cast<int>(level);
+	if (lvl <= 0)
+	{
+		return ETPSHierarchicalLevel::ROOT;
+	}
+
+	return static_cast<ETPSHierarchicalLevel>(lvl - 1);
+}

@@ -12,7 +12,7 @@
 
 
 /**
- * A Character's "ID Card"
+ * A Character's "UnitID Card"
  *
  * If we were to serialize this Character as a PERSON, what would we see?
  */
@@ -36,13 +36,13 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     FName Name;
 
-    // Unique ID
+    // Unique UnitID
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     FString UUID;
 
     // Masculine / Feminine ?
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TEnumAsByte<ETPSCharacterBodyType> CharacterBodyType;
+    ETPSCharacterBodyType CharacterBodyType;
 
     // Current Rank - granted and recognized independently of XP
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -52,7 +52,7 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     ETPSFactionID FactionID;
 
-    // Unit ID -> Squad/Team Hierarchy
+    // Unit UnitID -> Squad/Team Hierarchy
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     FTPSUnitID UnitID;
 

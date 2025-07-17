@@ -2,6 +2,7 @@
 
 #include "Game/TPSGameMode.h"
 
+#include "Game/TPSGameState.h"
 #include "Kismet/GameplayStatics.h"
 
 //~ ====================================================================== ~//
@@ -11,7 +12,6 @@
 ATPSGameMode::ATPSGameMode()
 {
 	TeamManager = CreateDefaultSubobject<UTPSTeamManager>(TEXT("TeamManager"));
-	WorldManager = CreateDefaultSubobject<UTPSWorldManager>(TEXT("WorldManager"));
 }
 ATPSGameMode::~ATPSGameMode() { }
 
@@ -22,7 +22,7 @@ void ATPSGameMode::BeginPlay()
 
 
 //~ ====================================================================== ~//
-//  Operations
+//  OPERATIONS
 //~ ====================================================================== ~//
 
 void ATPSGameMode::IndexSpawnPointsForTeams()
@@ -53,6 +53,12 @@ void ATPSGameMode::InitializeTeams()
 }
 
 
+FColor ATPSGameMode::GetColorForTeam(ETPSTeamID teamId)
+{
+	return TPSTeamIdToColor(teamId);
+}
+
+
 
 void ATPSGameMode::RequestRespawn_Implementation(ATPSPlayerController* playerController)
 {
@@ -75,6 +81,50 @@ void ATPSGameMode::PerformRespawn(ATPSPlayerController* playerController)
 	//playerController->Possess(p);
 
 	//return p;
+}
+
+
+/*void ATPSGameMode::RequestSpawnCharacter_Implementation(UTPSCharacterInstance* instance)
+{
+	if (ATPSSpawnPoint* spawn = FindSpawnPointForCharacter(instance))
+	{
+		
+	}
+}*/
+
+AActor* ATPSGameMode::FindSpawnPointForCharacter(UTPSCharacterInstance* instance)
+{
+	if (!IsValid(instance))
+	{
+		return nullptr;
+	}
+
+	ATPSGameState* state = GetGameState<ATPSGameState>();
+
+	if (UTPSTeam* team = state->GetTeam(instance->Identity->UnitID.TeamID))
+	{
+		return team->SpawnPool->FindBestSpawnPointForSquadRole(instance->Identity->SquadRole);
+	}
+
+	return FindPlayerStart(nullptr);
+}
+
+AActor* ATPSGameMode::FindPlayerStart_Implementation(AController* Player, const FString& IncomingName)
+{
+	/*TArray<AActor*> OutActors;
+	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), OutActors);
+
+	int32 RandomIndex = FMath::RandRange(0, OutActors.Num() - 1);
+
+	// Return the element at the random index
+	return Cast<APlayerStart>(OutActors[RandomIndex]);*/
+
+	return Super::FindPlayerStart_Implementation(Player, IncomingName);
+}
+
+AActor* ATPSGameMode::ChoosePlayerStart_Implementation(AController* Player)
+{
+	return Super::ChoosePlayerStart_Implementation(Player);
 }
 
 
@@ -174,20 +224,6 @@ void ATPSGameMode::SpawnBots(int numBots)
 		SpawnBot();
 	}
 }
-
-/*AActor* ATPSGameMode::FindPlayerStart_Implementation(AController* Player, const FString& IncomingName)
-{
-	TArray<AActor*> OutActors;
-	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), OutActors);
-
-	int32 RandomIndex = FMath::RandRange(0, OutActors.Num() - 1);
-
-	// Return the element at the random index
-	return Cast<APlayerStart>(OutActors[RandomIndex]);
-}*/
-
-
-
 
 
 

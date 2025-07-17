@@ -4,5 +4,4 @@
 
 UTPSCharacterIdentity::UTPSCharacterIdentity()
 {
-	
 }

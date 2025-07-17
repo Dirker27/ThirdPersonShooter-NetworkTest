@@ -5,6 +5,7 @@
 #include "TPSCharacterConfiguration.h"
 #include "TPSCharacterIdentity.h"
 #include "TPSCharacterRecord.h"
+#include "Equipment/TPSEquipmentLoadout.h"
 
 #include "TPSCharacterInstance.generated.h"
 
@@ -28,6 +29,12 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UTPSCharacterRecord> Record;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TObjectPtr<UTPSEquipmentLoadout> Loadout = nullptr;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    bool IsAlive = false;
+
 
 //~ ======================================================================== ~//
 //  SPAWNED ACTOR(s) TRACKING
@@ -35,6 +42,7 @@ public:
 private:
     UPROPERTY(Replicated)
     TArray<TObjectPtr<AActor>> SpawnedActors;
+
 public:
     UFUNCTION(BlueprintPure, Category = Equipment)
     TArray<AActor*> GetSpawnedActors() const { return SpawnedActors; }

@@ -6,7 +6,7 @@
 #include "TPSCharacterBodyType.generated.h"
 
 UENUM(BlueprintType)
-enum ETPSCharacterBodyType : int
+enum class ETPSCharacterBodyType : uint8
 {
     Male = 0,
     Female = 1

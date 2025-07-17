@@ -36,12 +36,3 @@ ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForSquadRole(const ETPSSquadRol
 	}
 	return FindFirstAvailableSpawnPoint();
 }
-
-
-ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForUnitAndRole(const FTPSUnitID uid, const ETPSSquadRole role)
-{
-	Do this from the GM instead - we only should provide FIRST and TYPED from here.
-
-	return FindBestSpawnPointForSquadRole(role);
-}
-

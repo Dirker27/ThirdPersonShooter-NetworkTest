@@ -23,7 +23,7 @@ public:
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TMap<ETPSTeamID, UTPSTeam*> ActiveTeams;
+    TMap<ETPSTeamID, TObjectPtr<UTPSTeam>> ActiveTeams;
 
 public:
     UFUNCTION(BlueprintCallable)
@@ -31,11 +31,6 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void ConfigureTeam(ETPSTeamID teamId, FTPSTeamConfiguration configuration);
-
-/*private:
-    UFUNCTION(BlueprintCallable)
-    UTPSHierarchicalCollection* ConfigureHierarchicalUnit(ETPSHierarchicalLevel level, int unitNum, UTPSHierarchicalCollection* parent);
-*/
 
 public:
     // Assign the Character to a Team, choosing an appropriate unit to fill.
@@ -51,4 +46,10 @@ public:
 
     UFUNCTION(BlueprintCallable)
     UTPSCommandStructure* GetUnit(FTPSUnitID unitId);
+
+private:
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    UTPSCommandStructure* _GetUnit(FTPSUnitID id, UTPSCommandStructure* node);
+
+    UTPSCharacterInstance* NewCharacter(FName name);
 };

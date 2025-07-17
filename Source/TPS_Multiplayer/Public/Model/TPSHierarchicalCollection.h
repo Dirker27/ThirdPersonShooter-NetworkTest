@@ -6,13 +6,16 @@
 
 #include "TPSHierarchicalCollectionLevel.h"
 
-#include "Character/TPSCharacter.h"
 #include "Character/TPSCharacterInstance.h"
 #include "GameFramework/Actor.h"
 
 #include "TPSHierarchicalCollection.generated.h"
 
-// A Hiererchical Trie-structure
+/**
+ * A Hierarchical Trie-structure that represents a group of entities (team characters)
+ *
+ * Can have nested sub-collections that have lower rank than the given node. 
+ */
 UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSHierarchicalCollection : public UObject
 {
@@ -21,19 +24,23 @@ class TPS_MULTIPLAYER_API UTPSHierarchicalCollection : public UObject
 public:
 	UTPSHierarchicalCollection();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TEnumAsByte<ETPSHierarchicalLevel> Level;
+
+	// Composite UnitID - unique to the active trie (but not globally)
+	//
+	// Level + UnitID == "Squad 2"
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTPSUnitID UnitID;
 
 protected:
 	// TODO: Make Generic/Template
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<TObjectPtr<UTPSCharacterInstance>> Members;
-
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	//TObjectPtr<UTPSHierarchicalCollection> ParentCollection;
+	TMap<uint8, TObjectPtr<UTPSCharacterInstance>> Members;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<TObjectPtr<UTPSHierarchicalCollection>> ChildCollections;
+	TObjectPtr<UTPSHierarchicalCollection> ParentCollection;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TMap<uint8, TObjectPtr<UTPSHierarchicalCollection>> ChildCollections;
 
 //~ ======================================================================== ~//
 //  PUBLIC OPERATIONS
@@ -53,5 +60,21 @@ public:
 	bool CanAddMember(UTPSCharacterInstance* member) const;
 	UFUNCTION(BlueprintCallable)
 	bool CanAddSubCollection(UTPSHierarchicalCollection* subCollection) const;
+
+
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSHierarchicalCollection* GetChildUnit(ETPSHierarchicalLevel targetLevel, int targetIdNumber);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSCharacterInstance* GetMember(uint8 targetIdNumber);
+
+protected:
+	void UpdateUnitIDForMember(UTPSCharacterInstance* member, uint8 id);
+	void UpdateUnitIDForSubCollection(UTPSHierarchicalCollection* subCollection, uint8 id);
+
+private:
+	uint8 GetNextAvailableIDNumberForMember() const;
+	uint8 GetNextAvailableIDNumberForSubCollection() const;
 };
 

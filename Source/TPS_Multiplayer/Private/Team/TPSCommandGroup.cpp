@@ -4,12 +4,8 @@
 
 #include "Model/TPSHierarchicalCollectionLevel.h"
 
-static int _incrementingCommandID;
 UTPSCommandGroup::UTPSCommandGroup()
 {
-	Level = ETPSHierarchicalLevel::UNIT;
-
-	ID.UnitNumber = _incrementingCommandID++;
 }
 
 

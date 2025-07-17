@@ -8,16 +8,20 @@
 
 #include "TPSCommandStructure.generated.h"
 
-// A Hierarchical group that can be issued commands that will chain down to
-//   child units.
+/**
+ * A generic unit of command-able units with a designated leader.
+ *
+ * 
+ */
 UCLASS()
 class TPS_MULTIPLAYER_API UTPSCommandStructure : public UTPSCommandGroup
 {
 	GENERATED_BODY()
 
-protected:
+public:
 	UTPSCommandStructure();
 
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UTPSCharacterInstance> Leader;
 
@@ -26,4 +30,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UTPSSpawnPool> SpawnPool;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void GrantLeader(UTPSCharacterInstance* member);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSCharacterInstance* GetLeader() const;
 };
