@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "TPSCommandStructureConfiguration.generated.h"
+#include "TPSCommandUnitConfiguration.generated.h"
 
 // Schema and rules for the current level of a command unit
-UCLASS()
-class TPS_MULTIPLAYER_API UTPSCommandStructureConfiguration : public UObject
+USTRUCT(BlueprintType)
+struct TPS_MULTIPLAYER_API FTPSCommandUnitConfiguration
 {
 	GENERATED_BODY()
 

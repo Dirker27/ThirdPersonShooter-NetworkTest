@@ -33,4 +33,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ATPSSpawnPoint* FindBestSpawnPointForSquadRole(const ETPSSquadRole role);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ATPSSpawnPoint* FindBestSpawnPointForUnitAndSquadRole(const FTPSUnitID unitId, const ETPSSquadRole role);
+
 };

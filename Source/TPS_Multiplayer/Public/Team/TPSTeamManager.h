@@ -9,6 +9,9 @@
 #include "TPSTeamManager.generated.h"
 
 
+
+
+
 /**
  * Responsible for spawning and tracking loose objects in the world.
  *   (equipment, dead characters, world objects, etc)
@@ -32,14 +35,19 @@ public:
     UFUNCTION(BlueprintCallable)
     void ConfigureTeam(ETPSTeamID teamId, FTPSTeamConfiguration configuration);
 
+    UFUNCTION(BlueprintCallable)
+    void PopulateTeam(ETPSTeamID teamId, TArray<UTPSCharacterInstance*> roster);
+
+
+
 public:
     // Assign the Character to a Team, choosing an appropriate unit to fill.
     UFUNCTION(BlueprintCallable)
-    void AssignCharacterToTeam(UTPSCharacterInstance* character, ETPSTeamID team);
+    void AssignCharacterToTeam(ETPSTeamID team, UTPSCharacterInstance* character);
 
     // Assign the Character to a specific Unit within a Team.
     UFUNCTION(BlueprintCallable)
-    void AssignCharacterToTeamUnit(UTPSCharacterInstance* character, FTPSUnitID unit);
+    void AssignCharacterToTeamUnit(FTPSUnitID unit, UTPSCharacterInstance* character);
 
     UFUNCTION(BlueprintCallable)
     UTPSTeam* GetTeam(ETPSTeamID teamId);
@@ -47,9 +55,14 @@ public:
     UFUNCTION(BlueprintCallable)
     UTPSCommandStructure* GetUnit(FTPSUnitID unitId);
 
-private:
-    UFUNCTION(BlueprintCallable, BlueprintPure)
-    UTPSCommandStructure* _GetUnit(FTPSUnitID id, UTPSCommandStructure* node);
+    UFUNCTION(BlueprintCallable)
+    int CountUnitMembers(FTPSUnitID unitId);
 
-    UTPSCharacterInstance* NewCharacter(FName name);
+
+private:
+    void _ConfigureUnit(UTPSCommandStructure* node, FTPSTeamConfiguration configuration,
+        ETPSHierarchicalLevel level);
+    void _PopulateUnit(UTPSCommandStructure* node);
+    int _CountUnitMembers(UTPSHierarchicalCollection* node);
+    UTPSCharacterInstance* _NewCharacter();
 };

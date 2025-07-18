@@ -13,7 +13,10 @@ struct FTPSTeamConfiguration
 	ETPSHierarchicalLevel HighestSupportedCommandLevel = ETPSHierarchicalLevel::PLATOON;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<ETPSHierarchicalLevel, int> LevelCapacityMap;
+	TMap<ETPSHierarchicalLevel, int> MemberCapacityMap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<ETPSHierarchicalLevel, int> SubUnitCapacityMap;
 };
 
 

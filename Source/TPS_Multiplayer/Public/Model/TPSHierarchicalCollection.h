@@ -64,10 +64,17 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UTPSHierarchicalCollection* GetChildUnit(ETPSHierarchicalLevel targetLevel, int targetIdNumber);
+	UTPSHierarchicalCollection* GetChildCollection(FTPSUnitID id);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	TArray<UTPSHierarchicalCollection*> GetAllChildCollections();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSCharacterInstance* GetMember(uint8 targetIdNumber);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	TArray<UTPSCharacterInstance*> GetAllMembers();
+
 
 protected:
 	void UpdateUnitIDForMember(UTPSCharacterInstance* member, uint8 id);
@@ -76,5 +83,15 @@ protected:
 private:
 	uint8 GetNextAvailableIDNumberForMember() const;
 	uint8 GetNextAvailableIDNumberForSubCollection() const;
+
+
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static ETPSHierarchicalLevel LevelDown(ETPSHierarchicalLevel level);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static ETPSHierarchicalLevel LevelUp(ETPSHierarchicalLevel level);
+
 };
 

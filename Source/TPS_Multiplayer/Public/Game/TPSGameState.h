@@ -6,6 +6,7 @@
 #include "GameFramework/GameState.h"
 
 #include "Team/TPSTeamManager.h"
+#include "World/TPSCombatLog.h"
 #include "World/TPSWorldManager.h"
 
 #include "TPSGameState.generated.h"
@@ -35,11 +36,38 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UTPSTeamManager> TeamState;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UTPSCombatLog> CombatLog;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<ETPSTeamID, int> TeamScores;
+
 
 //~ ==================================================================== ~//
 //  OPERATIONS
 //~ ==================================================================== ~//
 public:
+
+	//- LIVE STATE -//
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetTeamScore(ETPSTeamID teamId);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetTeamUnitCount(ETPSTeamID teamId);
+
+	//- TEAM CRUD -//
+
+	UFUNCTION(BlueprintCallable)
+	void CreateTeam(ETPSTeamID teamId);
+
+	UFUNCTION(BlueprintCallable)
+	void ConfigureTeam(ETPSTeamID teamId, FTPSTeamConfiguration configuration);
+
+	UFUNCTION(BlueprintCallable)
+	void PopulateTeam(ETPSTeamID teamId, TArray<UTPSCharacterInstance*> roster);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSTeam* GetTeam(ETPSTeamID teamId);
 

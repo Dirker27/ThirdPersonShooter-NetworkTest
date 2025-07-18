@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "TPSCharacter.h"
 #include "TPSCharacterConfiguration.h"
 #include "TPSCharacterIdentity.h"
 #include "TPSCharacterRecord.h"
@@ -35,23 +36,19 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     bool IsAlive = false;
 
-
 //~ ======================================================================== ~//
 //  SPAWNED ACTOR(s) TRACKING
 //~ ======================================================================== ~//
-private:
-    UPROPERTY(Replicated)
-    TArray<TObjectPtr<AActor>> SpawnedActors;
+protected:
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
+    TObjectPtr<ATPSCharacter> SpawnedActor;
 
 public:
-    UFUNCTION(BlueprintPure, Category = Equipment)
-    TArray<AActor*> GetSpawnedActors() const { return SpawnedActors; }
+    UFUNCTION(BlueprintCallable)
+    virtual void SpawnActor(TSubclassOf<ATPSCharacter> actorTemplate, AActor* spawnPoint);
 
     UFUNCTION(BlueprintCallable)
-    virtual void SpawnCharacterActors() { /* TODO */ }
-
-    UFUNCTION(BlueprintCallable)
-    virtual void DestroyCharacterActors() { /* TODO */ }
+    virtual void DestroyActor();
 
 
 

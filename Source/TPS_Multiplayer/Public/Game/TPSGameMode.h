@@ -30,11 +30,7 @@ protected:
 //~ ==================================================================== ~//
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UTPSTeamManager> TeamManager;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UTPSCombatLog> CombatLog;
+	/* STUB */
 
 //~ ============================================================= ~//
 //  ATTRIBUTES
@@ -61,19 +57,29 @@ public:
 	////////////////////////////////////////////////////////
 	// Gameplay Functions
 
+	// Instantiates Teams in GameState with configurations defined in TeamConfigurationMap
 	UFUNCTION(BlueprintCallable)
 	void InitializeTeams();
 
+	// Scans ALL PlayerStart and SpawnPoint Actors and indexes them accordingly in GameState
+	//   Should be invoked *after* Teams have been instantiated in order to index them.
 	UFUNCTION(BlueprintCallable)
-	void IndexSpawnPointsForTeams();
+	void IndexSpawnPoints();
+
+	// Spawn an entire team.
+	UFUNCTION(BlueprintCallable)
+	void SpawnTeam(ETPSTeamID teamId);
+
+	// Spawn a specific unit (including sub-units)
+	UFUNCTION(BlueprintCallable)
+	void SpawnUnit(FTPSUnitID unitId);
+private:
+	void _SpawnUnit(UTPSCommandStructure* unit, UTPSSpawnPool* spawnPool);
 
 
 	////////////////////////////////////////////////////////
 	// Gameplay Functions
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static FColor GetColorForTeam(ETPSTeamID teamId);
-
+public:
 	// Respawn
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void RequestRespawn(ATPSPlayerController* playerController);
@@ -82,10 +88,6 @@ public:
 	bool CanRespawn(ATPSPlayerController* playerController);
 	UFUNCTION(BlueprintCallable)
 	void PerformRespawn(ATPSPlayerController* playerController);
-
-
-	//UFUNCTION(Server, Reliable, BlueprintCallable)
-	//void RequestSpawnCharacter(ATPSPlayerController* playerController);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AActor* FindSpawnPointForCharacter(UTPSCharacterInstance* instance);

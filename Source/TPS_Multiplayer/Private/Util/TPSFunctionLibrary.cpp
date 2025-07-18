@@ -142,3 +142,30 @@ void UTPSFunctionLibrary::DrawDebugTrace(const UObject* worldContextObject,
         true,
         traceColor, hitColor, duration);
 }
+
+
+FColor UTPSFunctionLibrary::GetColorForTeam(ETPSTeamID teamId)
+{
+    return TPSTeamIdToColor(teamId);
+}
+
+
+FString UTPSFunctionLibrary::GetNameForUnitID(FTPSUnitID unitID)
+{
+    FString str = _TPSHierarchicalLevelToString(unitID.UnitLevel) + "-";
+
+    for (auto lvl : unitID.Hierarchy)
+    {
+        str += _TPSHierarchicalLevelAbbreviationToString(lvl.Key);
+        str.AppendInt(lvl.Value);
+    }
+    str += _TPSHierarchicalLevelAbbreviationToString(unitID.UnitLevel);
+    str.AppendInt(unitID.UnitNumber);
+
+    return str;
+}
+
+int64 UTPSFunctionLibrary::GetHashForUnitID(FTPSUnitID unitId)
+{
+    return FTPSUnitID::hash(unitId);
+}

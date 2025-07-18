@@ -18,6 +18,7 @@ class TPS_MULTIPLAYER_API UTPSFunctionLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Actor", meta = (WorldContext = "worldContextObject", DeterminesOutputType = "actorClass"))
 	static AActor* GetNearestActorOfClass(const UObject* worldContextObject, TSubclassOf<AActor> actorClass, FVector location, float radius = 512.f);
 
@@ -43,4 +44,16 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Physics")
 	static FVector2D CalculateNoise2D(const float pitchDegrees, const float yawDegrees);
+
+
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FColor GetColorForTeam(ETPSTeamID teamId);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FString GetNameForUnitID(FTPSUnitID unitID);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static int64 GetHashForUnitID(FTPSUnitID unitId);
+
 };

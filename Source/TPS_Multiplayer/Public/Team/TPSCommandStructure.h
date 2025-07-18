@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Game/TPSSpawnPool.h"
-#include "Team/TPSCommandStructureConfiguration.h"
+#include "Team/TPSCommandUnitConfiguration.h"
 #include "Team/TPSCommandGroup.h"
 
 #include "TPSCommandStructure.generated.h"
@@ -21,19 +21,20 @@ class TPS_MULTIPLAYER_API UTPSCommandStructure : public UTPSCommandGroup
 public:
 	UTPSCommandStructure();
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTPSCommandUnitConfiguration Configuration;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UTPSCharacterInstance> Leader;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UTPSCommandStructureConfiguration> Configuration;
+	TWeakObjectPtr<UTPSCharacterInstance> Leader;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UTPSSpawnPool> SpawnPool;
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void GrantLeader(UTPSCharacterInstance* member);
+	void SetLeader(UTPSCharacterInstance* member);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSCharacterInstance* GetLeader() const;

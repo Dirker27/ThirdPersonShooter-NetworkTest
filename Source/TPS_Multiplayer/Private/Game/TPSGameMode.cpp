@@ -11,7 +11,6 @@
 
 ATPSGameMode::ATPSGameMode()
 {
-	TeamManager = CreateDefaultSubobject<UTPSTeamManager>(TEXT("TeamManager"));
 }
 ATPSGameMode::~ATPSGameMode() { }
 
@@ -25,16 +24,17 @@ void ATPSGameMode::BeginPlay()
 //  OPERATIONS
 //~ ====================================================================== ~//
 
-void ATPSGameMode::IndexSpawnPointsForTeams()
+void ATPSGameMode::IndexSpawnPoints()
 {
 	TArray<AActor*> spawnPoints;
 	UGameplayStatics::GetAllActorsOfClass(this, ATPSSpawnPoint::StaticClass(), spawnPoints);
 
+	ATPSGameState* state = GetGameState<ATPSGameState>();
 	for (auto sp : spawnPoints)
 	{
 		if (ATPSSpawnPoint* spawn = Cast<ATPSSpawnPoint>(sp))
 		{
-			if (UTPSTeam* t = TeamManager->GetTeam(spawn->AssignedUnit.TeamID))
+			if (UTPSTeam* t = state->GetTeam(spawn->AssignedUnit.TeamID))
 			{
 				t->SpawnPool->AddSpawnPointToPool(spawn);
 			}
@@ -43,20 +43,57 @@ void ATPSGameMode::IndexSpawnPointsForTeams()
 }
 
 
+void ATPSGameMode::SpawnTeam(ETPSTeamID teamId)
+{
+	ATPSGameState* state = GetGameState<ATPSGameState>();
+	if (UTPSTeam* t = state->GetTeam(teamId))
+	{
+		_SpawnUnit(t->RootCollection, t->SpawnPool);
+	}
+}
+
+void ATPSGameMode::SpawnUnit(FTPSUnitID unitId)
+{
+	ATPSGameState* state = GetGameState<ATPSGameState>();
+	UTPSTeam* team = state->GetTeam(unitId.TeamID);
+	if (UTPSCommandStructure* unit = state->GetUnit(unitId))
+	{
+		_SpawnUnit(unit, team->SpawnPool);
+	}
+}
+
+void ATPSGameMode::_SpawnUnit(UTPSCommandStructure* unit, UTPSSpawnPool* spawnPool)
+{
+	for (auto instance : unit->GetAllMembers())
+	{
+		AActor* spawn = spawnPool->FindBestSpawnPointForUnitAndSquadRole(
+			instance->Identity->UnitID,
+			instance->Identity->SquadRole);
+
+		instance->SpawnActor(PlayerCharacterTemplate, spawn);
+	}
+
+	for (auto subUnit : unit->GetAllChildCollections())
+	{
+		_SpawnUnit(Cast<UTPSCommandStructure>(subUnit), spawnPool);
+	}
+}
+
+
+
 void ATPSGameMode::InitializeTeams()
 {
-	TeamManager->CreateTeam(ETPSTeamID::Red);
-	TeamManager->ConfigureTeam(ETPSTeamID::Red, FTPSTeamConfiguration());
+	ATPSGameState* state = GetGameState<ATPSGameState>();
 
-	TeamManager->CreateTeam(ETPSTeamID::Blue);
-	TeamManager->ConfigureTeam(ETPSTeamID::Blue, FTPSTeamConfiguration());
+	for (auto teamConfig : TeamConfigurationMap)
+	{
+		state->CreateTeam(teamConfig.Key);
+		state->ConfigureTeam(teamConfig.Key, teamConfig.Value->Configuration);
+	}
 }
 
 
-FColor ATPSGameMode::GetColorForTeam(ETPSTeamID teamId)
-{
-	return TPSTeamIdToColor(teamId);
-}
+
 
 
 
@@ -76,21 +113,8 @@ bool ATPSGameMode::CanRespawn(ATPSPlayerController* playerController)
 void ATPSGameMode::PerformRespawn(ATPSPlayerController* playerController)
 {
 	SpawnNewPlayerCharacter(playerController);
-
-	// Should perform from PlayerController?
-	//playerController->Possess(p);
-
-	//return p;
 }
 
-
-/*void ATPSGameMode::RequestSpawnCharacter_Implementation(UTPSCharacterInstance* instance)
-{
-	if (ATPSSpawnPoint* spawn = FindSpawnPointForCharacter(instance))
-	{
-		
-	}
-}*/
 
 AActor* ATPSGameMode::FindSpawnPointForCharacter(UTPSCharacterInstance* instance)
 {

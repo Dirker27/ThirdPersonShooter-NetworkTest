@@ -2,6 +2,7 @@
 
 #include "Character/TPSCharacterInstance.h"
 
+#include "Character/TPSCharacter.h"
 #include "Character/TPSCharacterRecord.h"
 #include "Net/UnrealNetwork.h"
 
@@ -17,4 +18,29 @@ void UTPSCharacterInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, Instigator);
+}
+
+
+void UTPSCharacterInstance::SpawnActor(TSubclassOf<ATPSCharacter> actorTemplate, AActor* spawnPoint)
+{
+	if (IsValid(SpawnedActor)) { return; }
+
+	ATPSCharacter* NewActor = GetWorld()->SpawnActor<ATPSCharacter>(actorTemplate,
+		spawnPoint->GetTransform().GetLocation(), spawnPoint->GetTransform().Rotator());
+
+	NewActor->Identity = Identity;
+	NewActor->Configuration = Configuration;
+
+	// TODO: Deferred Spawn to allow for setting defaults (Loadout, Identity, etc)
+
+	SpawnedActor = NewActor;
+}
+
+void UTPSCharacterInstance::DestroyActor()
+{
+	for (auto actor : SpawnedActor)
+	{
+		actor->Destroy();
+	}
+	SpawnedActor = nullptr;
 }

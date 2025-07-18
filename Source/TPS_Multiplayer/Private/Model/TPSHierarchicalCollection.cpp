@@ -26,7 +26,9 @@ bool UTPSHierarchicalCollection::AddSubCollection(UTPSHierarchicalCollection* su
 	{
 		uint8 id = GetNextAvailableIDNumberForSubCollection();
 		ChildCollections.Add(id, subCollection);
+
 		UpdateUnitIDForSubCollection(subCollection, id);
+
 		return true;
 	}
 	return false;
@@ -103,19 +105,48 @@ bool UTPSHierarchicalCollection::CanAddSubCollection(UTPSHierarchicalCollection*
 }
 
 
-
-UTPSHierarchicalCollection* UTPSHierarchicalCollection::GetChildUnit(ETPSHierarchicalLevel targetLevel, int targetIdNumber)
+UTPSHierarchicalCollection* UTPSHierarchicalCollection::GetChildCollection(FTPSUnitID id)
 {
-	if (auto collection = ChildCollections.Find(targetIdNumber))
+	if (id.UnitLevel > UnitID.UnitLevel)
 	{
-		if (collection->Get()->UnitID.UnitLevel == targetLevel)
+		return nullptr;
+	}
+
+	if (id.UnitLevel == UnitID.UnitLevel)
+	{
+		return id.UnitNumber == UnitID.UnitNumber
+			? this
+			: nullptr;
+	}
+
+
+	if (UnitID.UnitLevel == ETPSHierarchicalLevel::UNIT)
+	{
+		return nullptr;
+	}
+
+	ETPSHierarchicalLevel targetChildLvl = LevelDown(UnitID.UnitLevel);
+	if (auto targetChildUnitNumber = id.Hierarchy.Find(targetChildLvl))
+	{
+		if (auto childUnit = ChildCollections.Find(*targetChildUnitNumber))
 		{
-			return *collection;
+			return childUnit->Get()->GetChildCollection(id);
 		}
 	}
 
 	return nullptr;
 }
+
+TArray<UTPSHierarchicalCollection*> UTPSHierarchicalCollection::GetAllChildCollections()
+{
+	TArray<UTPSHierarchicalCollection*> children;
+	for (auto child : ChildCollections)
+	{
+		children.Add(child.Value);
+	}
+	return children;
+}
+
 
 
 UTPSCharacterInstance* UTPSHierarchicalCollection::GetMember(uint8 targetIdNumber)
@@ -124,8 +155,17 @@ UTPSCharacterInstance* UTPSHierarchicalCollection::GetMember(uint8 targetIdNumbe
 	{
 		return *member;
 	}
-
 	return nullptr;
+}
+
+TArray<UTPSCharacterInstance*> UTPSHierarchicalCollection::GetAllMembers()
+{
+	TArray<UTPSCharacterInstance*> children;
+	for (auto child : Members)
+	{
+		children.Add(child.Value);
+	}
+	return children;
 }
 
 
@@ -133,23 +173,35 @@ void UTPSHierarchicalCollection::UpdateUnitIDForMember(UTPSCharacterInstance* me
 {
 	member->Identity->UnitID.UnitNumber = id;
 	member->Identity->UnitID.TeamID = UnitID.TeamID;
+
 	member->Identity->UnitID.Hierarchy = UnitID.Hierarchy;
-	member->Identity->UnitID.Hierarchy.Add(member->Identity->UnitID.UnitLevel, id);
+	member->Identity->UnitID.Hierarchy.Add(UnitID.UnitLevel, UnitID.UnitNumber);
 }
 
 void UTPSHierarchicalCollection::UpdateUnitIDForSubCollection(UTPSHierarchicalCollection* subCollection, uint8 id)
 {
 	subCollection->UnitID.UnitNumber = id;
-	subCollection->UnitID.TeamID = UnitID.TeamID;
-	subCollection->UnitID.Hierarchy = UnitID.Hierarchy;
-	subCollection->UnitID.Hierarchy.Add(subCollection->UnitID.UnitLevel, id);
+	subCollection->UnitID.TeamID     = UnitID.TeamID;
+
+	subCollection->UnitID.Hierarchy  = UnitID.Hierarchy;
+	subCollection->UnitID.Hierarchy.Add(UnitID.UnitLevel, UnitID.UnitNumber);
+
+	for (auto subSubMember : subCollection->GetAllMembers())
+	{
+		subCollection->UpdateUnitIDForMember(subSubMember, subSubMember->Identity->UnitID.UnitNumber);
+	}
+
+	for (auto subSubUnit : subCollection->GetAllChildCollections())
+	{
+		subCollection->UpdateUnitIDForSubCollection(subSubUnit, subSubUnit->UnitID.UnitNumber);
+	}
 
 	subCollection->ParentCollection = this;
 }
 
 
 
-
+// TODO: Avoid linear probe
 uint8 UTPSHierarchicalCollection::GetNextAvailableIDNumberForMember() const
 {
 	int i = 1;
@@ -161,6 +213,7 @@ uint8 UTPSHierarchicalCollection::GetNextAvailableIDNumberForMember() const
 	return i;
 }
 
+// TODO: Avoid linear probe
 uint8 UTPSHierarchicalCollection::GetNextAvailableIDNumberForSubCollection() const
 {
 	int i = 1;
@@ -171,3 +224,18 @@ uint8 UTPSHierarchicalCollection::GetNextAvailableIDNumberForSubCollection() con
 
 	return i;
 }
+
+
+
+
+
+ETPSHierarchicalLevel UTPSHierarchicalCollection::LevelDown(ETPSHierarchicalLevel level)
+{
+	return _TPSLevel_Down(level);
+}
+
+ETPSHierarchicalLevel UTPSHierarchicalCollection::LevelUp(ETPSHierarchicalLevel level)
+{
+	return _TPSLevel_Up(level);
+}
+

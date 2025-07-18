@@ -7,14 +7,12 @@ UTPSCommandStructure::UTPSCommandStructure()
 }
 
 
-void UTPSCommandStructure::GrantLeader(UTPSCharacterInstance* member)
+void UTPSCommandStructure::SetLeader(UTPSCharacterInstance* member)
 {
-	UpdateUnitIDForMember(member, 0);
-
 	Leader = member;
 }
 
 UTPSCharacterInstance* UTPSCommandStructure::GetLeader() const
 {
-	return Leader;
+	return Leader.Get();
 }
