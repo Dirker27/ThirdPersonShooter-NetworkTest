@@ -3,6 +3,7 @@
 #include "Game/TPSGameMode.h"
 
 #include "Game/TPSGameState.h"
+#include "Game/TPSSpawnFormation.h"
 #include "Kismet/GameplayStatics.h"
 
 //~ ====================================================================== ~//
@@ -26,10 +27,11 @@ void ATPSGameMode::BeginPlay()
 
 void ATPSGameMode::IndexSpawnPoints()
 {
+	ATPSGameState* state = GetGameState<ATPSGameState>();
+
+	// ALL SpawnPoints -> TEAM
 	TArray<AActor*> spawnPoints;
 	UGameplayStatics::GetAllActorsOfClass(this, ATPSSpawnPoint::StaticClass(), spawnPoints);
-
-	ATPSGameState* state = GetGameState<ATPSGameState>();
 	for (auto sp : spawnPoints)
 	{
 		if (ATPSSpawnPoint* spawn = Cast<ATPSSpawnPoint>(sp))

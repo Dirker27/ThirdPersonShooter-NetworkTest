@@ -204,7 +204,7 @@ void UTPSHierarchicalCollection::UpdateUnitIDForSubCollection(UTPSHierarchicalCo
 // TODO: Avoid linear probe
 uint8 UTPSHierarchicalCollection::GetNextAvailableIDNumberForMember() const
 {
-	int i = 1;
+	int i = 0;
 	while (Members.Contains(i))
 	{
 		i++;

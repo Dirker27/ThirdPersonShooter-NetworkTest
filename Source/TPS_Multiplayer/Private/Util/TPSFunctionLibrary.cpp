@@ -167,5 +167,10 @@ FString UTPSFunctionLibrary::GetNameForUnitID(FTPSUnitID unitID)
 
 int64 UTPSFunctionLibrary::GetHashForUnitID(FTPSUnitID unitId)
 {
-    return FTPSUnitID::hash(unitId);
+    return FTPSUnitID::HashUnitIdentifier(unitId);
+}
+
+int64 UTPSFunctionLibrary::GetHashForUnitHierarchy(FTPSUnitID unitId)
+{
+    return FTPSUnitID::HashHierarchy(unitId);
 }

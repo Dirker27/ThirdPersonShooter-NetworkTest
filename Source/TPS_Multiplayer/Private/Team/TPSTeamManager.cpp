@@ -86,6 +86,12 @@ void UTPSTeamManager::_ConfigureUnit(UTPSCommandStructure* node, FTPSTeamConfigu
 	{
 		node->Alias = GetAliasForUnitNumber(node->UnitID.UnitNumber);
 	}
+
+
+	if (auto team = GetTeam(node->UnitID.TeamID))
+	{
+		team->UnitsById.Add(FTPSUnitID::HashUnitIdentifier(node->UnitID), node);
+	}
 }
 
 
@@ -104,6 +110,21 @@ void UTPSTeamManager::_PopulateUnit(UTPSCommandStructure* node)
 		if (i == 0)
 		{
 			instance->Identity->SquadRole = ETPSSquadRole::Leader;
+
+			switch (node->UnitID.UnitLevel) {
+			case ETPSHierarchicalLevel::FIRE_TEAM:
+				instance->Identity->Rank = ETPSCharacterRank::Corporal;
+				break;
+			case ETPSHierarchicalLevel::SQUAD:
+				instance->Identity->Rank = ETPSCharacterRank::Sergeant;
+				break;
+			case ETPSHierarchicalLevel::PLATOON:
+				instance->Identity->Rank = ETPSCharacterRank::Lieutenant;
+				break;
+			case ETPSHierarchicalLevel::COMPANY:
+				instance->Identity->Rank = ETPSCharacterRank::Captain;
+				break;
+			}
 			node->SetLeader(instance);
 		}
 	}
@@ -162,35 +183,15 @@ UTPSCommandStructure* UTPSTeamManager::GetUnit(FTPSUnitID unitId)
 {
 	if (auto t = GetTeam(unitId.TeamID))
 	{
+		if (auto unit = t->UnitsById.Find(FTPSUnitID::HashUnitIdentifier(unitId)))
+		{
+			return *unit;
+		}
+
 		return Cast<UTPSCommandStructure>(t->RootCollection->GetChildCollection(unitId));
 	}
 	return nullptr;
 }
-
-/*UTPSCommandStructure* UTPSTeamManager::_GetUnit(FTPSUnitID unitId, UTPSCommandStructure* node)
-{
-	if (!IsValid(node)) { return nullptr; }
-	ETPSHierarchicalLevel currentLevel = node->UnitID.UnitLevel;
-
-	if (unitId.UnitLevel > currentLevel)
-	{
-		return nullptr;
-	}
-
-	if (unitId.UnitLevel < currentLevel) {
-		ETPSHierarchicalLevel targetLevel = LevelDown(currentLevel);
-
-		if (uint8* targetUnitNumber = unitId.Hierarchy.Find(targetLevel))
-		{
-			return _GetUnit(unitId, Cast<UTPSCommandStructure>(node->GetChildUnit(targetLevel, *targetUnitNumber)));
-		}
-		return nullptr;
-	}
-
-	return (unitId.UnitNumber == node->UnitID.UnitNumber)
-		? node
-		: nullptr;
-}*/
 
 int UTPSTeamManager::CountUnitMembers(FTPSUnitID unitId)
 {

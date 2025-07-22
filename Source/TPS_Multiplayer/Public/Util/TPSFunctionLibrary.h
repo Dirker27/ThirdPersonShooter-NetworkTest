@@ -56,4 +56,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static int64 GetHashForUnitID(FTPSUnitID unitId);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static int64 GetHashForUnitHierarchy(FTPSUnitID unitId);
+
 };

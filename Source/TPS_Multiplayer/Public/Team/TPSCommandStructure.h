@@ -29,9 +29,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TWeakObjectPtr<UTPSCharacterInstance> Leader;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UTPSSpawnPool> SpawnPool;
-
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetLeader(UTPSCharacterInstance* member);

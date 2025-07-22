@@ -4,13 +4,17 @@
 
 UTPSSpawnPool::UTPSSpawnPool()
 {
-	
+	SpawnPoints.Empty();
+	SpawnPointsById.Empty();
 }
 
 
 void UTPSSpawnPool::AddSpawnPointToPool(ATPSSpawnPoint* spawn)
 {
-	SpawnPoints.Add(spawn);
+	if (IsValid(spawn)) {
+		SpawnPoints.Add(spawn);
+		SpawnPointsById.Add(FTPSUnitID::HashUnitIdentifier(spawn->AssignedUnit), spawn);
+	}
 }
 
 ATPSSpawnPoint* UTPSSpawnPool::FindFirstAvailableSpawnPoint()
@@ -37,9 +41,18 @@ ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForSquadRole(const ETPSSquadRol
 	return FindFirstAvailableSpawnPoint();
 }
 
-// TODO: Something WAY better than this...
+
 ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForUnitAndSquadRole(const FTPSUnitID unitId, const ETPSSquadRole role)
 {
+	int unitHash = FTPSUnitID::HashUnitIdentifier(unitId);
+	if (SpawnPointsById.Contains(unitHash))
+	{
+		auto spawn = *SpawnPointsById.Find(unitHash);
+		if (spawn->IsSpawnAvailable()) {
+			return spawn;
+		}
+	}
+
 	ATPSSpawnPoint* bestSpawn = FindFirstAvailableSpawnPoint();
 	ETPSHierarchicalLevel bestLevel = ETPSHierarchicalLevel::ROOT;
 
@@ -47,8 +60,8 @@ ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForUnitAndSquadRole(const FTPSU
 	{
 		if (bestLevel < sp->AssignedUnit.UnitLevel) { continue;	}
 
-		// Exact Fit - return immediately
-		if (sp->AssignedUnit == unitId)
+		// Correct Squad/Unit found - return immediately
+		if (FTPSUnitID::HashHierarchy(sp->AssignedUnit) == FTPSUnitID::HashHierarchy(unitId))
 		{
 			if (sp->PreferredSquadRoleToSpawn == role && sp->IsSpawnAvailable())
 			{

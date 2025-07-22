@@ -21,6 +21,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<TObjectPtr<ATPSSpawnPoint>> SpawnPoints;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TMap<int, TObjectPtr<ATPSSpawnPoint>> SpawnPointsById;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	TArray<ATPSSpawnPoint*> GetSpawnPoints() const { return SpawnPoints; }

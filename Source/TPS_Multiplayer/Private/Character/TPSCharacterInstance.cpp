@@ -24,6 +24,7 @@ void UTPSCharacterInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 void UTPSCharacterInstance::SpawnActor(TSubclassOf<ATPSCharacter> actorTemplate, AActor* spawnPoint)
 {
 	if (IsValid(SpawnedActor)) { return; }
+	if (!IsValid(spawnPoint)) { return; }
 
 	ATPSCharacter* NewActor = GetWorld()->SpawnActor<ATPSCharacter>(actorTemplate,
 		spawnPoint->GetTransform().GetLocation(), spawnPoint->GetTransform().Rotator());
@@ -38,9 +39,9 @@ void UTPSCharacterInstance::SpawnActor(TSubclassOf<ATPSCharacter> actorTemplate,
 
 void UTPSCharacterInstance::DestroyActor()
 {
-	for (auto actor : SpawnedActor)
+	if (IsValid(SpawnedActor))
 	{
-		actor->Destroy();
+		SpawnedActor->Destroy();
 	}
 	SpawnedActor = nullptr;
 }

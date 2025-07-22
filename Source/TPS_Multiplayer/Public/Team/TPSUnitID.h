@@ -38,10 +38,10 @@ struct TPS_MULTIPLAYER_API FTPSUnitID
 	ETPSHierarchicalLevel UnitLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 UnitNumber;
+	int UnitNumber;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<ETPSHierarchicalLevel, uint8> Hierarchy;
+	TMap<ETPSHierarchicalLevel, int> Hierarchy;
 
 public:
 	bool operator == (const FTPSUnitID other) const
@@ -52,13 +52,18 @@ public:
 			//&& Hierarchy == other.Hierarchy;
 	}
 
-	static uint64 hash(FTPSUnitID id)
+	static uint64 HashHierarchy(FTPSUnitID id)
+	{
+		return _hash(id.Hierarchy);
+	}
+
+	static uint64 HashUnitIdentifier(FTPSUnitID id)
 	{
 		return _hash(id.Hierarchy) + (id.UnitNumber << (static_cast<int>(id.UnitLevel) * 4));
 	}
 
 private:
-	static uint64 _hash(TMap<ETPSHierarchicalLevel, uint8> hierarchyMap)
+	static uint64 _hash(TMap<ETPSHierarchicalLevel, int> hierarchyMap)
 	{
 		uint64 hash = 0;
 		for (auto lvl : hierarchyMap.Array())

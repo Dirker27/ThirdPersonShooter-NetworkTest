@@ -33,6 +33,9 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UTPSSpawnPool> SpawnPool;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    TMap<int, TObjectPtr<UTPSCommandStructure>> UnitsById;
 };
 
 
