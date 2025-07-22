@@ -17,6 +17,9 @@ struct FTPSTeamConfiguration
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<ETPSHierarchicalLevel, int> SubUnitCapacityMap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<ETPSSquadRole, UTPSEquipmentLoadout*> MemberLoadoutMap;
 };
 
 

@@ -69,6 +69,7 @@ void UTPSTeamManager::_ConfigureUnit(UTPSCommandStructure* node, FTPSTeamConfigu
 		: 0;
 	node->Configuration.MaxNumMembers = memberCount;
 	node->Configuration.MaxNumSubCollections = subUnitCount;
+	node->Configuration.MemberLoadoutMap = configuration.MemberLoadoutMap;
 
 
 	if (level > ETPSHierarchicalLevel::FIRE_TEAM) 
@@ -107,6 +108,9 @@ void UTPSTeamManager::_PopulateUnit(UTPSCommandStructure* node)
 		instance->Identity->Name = FName(UTPSFunctionLibrary::GetNameForUnitID(
 			instance->Identity->UnitID));
 
+		instance->Identity->SquadRole = ETPSSquadRole::Rifleman;
+		if (i == 2) { instance->Identity->SquadRole = ETPSSquadRole::AutomaticRifleman; }
+
 		if (i == 0)
 		{
 			instance->Identity->SquadRole = ETPSSquadRole::Leader;
@@ -126,6 +130,12 @@ void UTPSTeamManager::_PopulateUnit(UTPSCommandStructure* node)
 				break;
 			}
 			node->SetLeader(instance);
+		}
+
+		if (auto l = node->Configuration.MemberLoadoutMap
+				.Find(instance->Identity->SquadRole))
+		{
+			instance->Loadout = *l;
 		}
 	}
 

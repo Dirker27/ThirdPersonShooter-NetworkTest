@@ -1,6 +1,7 @@
 // (C) ToasterCat Studios 2025
 
 #pragma once
+#include "Equipment/TPSEquipmentLoadout.h"
 
 #include "TPSCommandUnitConfiguration.generated.h"
 
@@ -16,6 +17,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int MaxNumMembers;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<ETPSSquadRole, UTPSEquipmentLoadout*> MemberLoadoutMap;
 
 	// TODO: Leader Inheritance Policy, Structure expand/coalesce rules, additional commands, etc
 };

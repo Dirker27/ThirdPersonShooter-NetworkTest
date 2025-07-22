@@ -44,6 +44,7 @@ ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForSquadRole(const ETPSSquadRol
 
 ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForUnitAndSquadRole(const FTPSUnitID unitId, const ETPSSquadRole role)
 {
+	// Exact fit by Unit ID - return immediately
 	int unitHash = FTPSUnitID::HashUnitIdentifier(unitId);
 	if (SpawnPointsById.Contains(unitHash))
 	{

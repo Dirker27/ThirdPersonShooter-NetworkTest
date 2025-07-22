@@ -26,15 +26,21 @@ void UTPSCharacterInstance::SpawnActor(TSubclassOf<ATPSCharacter> actorTemplate,
 	if (IsValid(SpawnedActor)) { return; }
 	if (!IsValid(spawnPoint)) { return; }
 
-	ATPSCharacter* NewActor = GetWorld()->SpawnActor<ATPSCharacter>(actorTemplate,
-		spawnPoint->GetTransform().GetLocation(), spawnPoint->GetTransform().Rotator());
 
-	NewActor->Identity = Identity;
-	NewActor->Configuration = Configuration;
+	/*ATPSCharacter* characterActor = GetWorld()->SpawnActor<ATPSCharacter>(actorTemplate,
+		spawnPoint->GetTransform().GetLocation(), spawnPoint->GetTransform().Rotator());*/
 
-	// TODO: Deferred Spawn to allow for setting defaults (Loadout, Identity, etc)
+	ATPSCharacter* characterActor = GetWorld()->SpawnActorDeferred<ATPSCharacter>(
+		actorTemplate,
+		spawnPoint->GetTransform());
 
-	SpawnedActor = NewActor;
+	characterActor->Identity = Identity;
+	characterActor->Configuration = Configuration;
+	characterActor->EquipmentManager->Loadout = Loadout;
+
+	characterActor->FinishSpawning(spawnPoint->GetTransform(), /*bIsDefaultTransform=*/ true);
+
+	SpawnedActor = characterActor;
 }
 
 void UTPSCharacterInstance::DestroyActor()
