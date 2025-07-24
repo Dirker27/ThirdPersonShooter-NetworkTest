@@ -3,8 +3,6 @@
 #include "Team/TPSTeamManager.h"
 
 #include "Team/TPSFireTeam.h"
-#include "Team/TPSPlatoon.h"
-#include "Team/TPSSquad.h"
 #include "Util/TPSFunctionLibrary.h"
 
 UTPSTeamManager::UTPSTeamManager()
@@ -111,6 +109,7 @@ void UTPSTeamManager::_PopulateUnit(UTPSCommandStructure* node)
 		instance->Identity->SquadRole = ETPSSquadRole::Rifleman;
 		if (i == 2) { instance->Identity->SquadRole = ETPSSquadRole::AutomaticRifleman; }
 
+
 		if (i == 0)
 		{
 			instance->Identity->SquadRole = ETPSSquadRole::Leader;
@@ -131,6 +130,10 @@ void UTPSTeamManager::_PopulateUnit(UTPSCommandStructure* node)
 			}
 			node->SetLeader(instance);
 		}
+
+		instance->Identity->CharacterBodyType = (i % 2 == 0)
+			? ETPSCharacterBodyType::Male
+			: ETPSCharacterBodyType::Female;
 
 		if (auto l = node->Configuration.MemberLoadoutMap
 				.Find(instance->Identity->SquadRole))

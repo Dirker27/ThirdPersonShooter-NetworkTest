@@ -23,9 +23,6 @@ public:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TArray<UMaterialInstance*> MeshMaterialInstances;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    UClass* AnimationBlueprint;
 };
 
 
