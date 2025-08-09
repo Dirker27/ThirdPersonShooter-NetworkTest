@@ -93,7 +93,7 @@ void UTPSTeamManager::_ConfigureUnit(UTPSCommandStructure* node, FTPSTeamConfigu
 	}
 }
 
-
+// TODO: Derive unit role/rank from TeamConfig
 void UTPSTeamManager::_PopulateUnit(UTPSCommandStructure* node)
 {
 	//if (!IsValid(node)) { return; }
@@ -109,7 +109,7 @@ void UTPSTeamManager::_PopulateUnit(UTPSCommandStructure* node)
 		instance->Identity->SquadRole = ETPSSquadRole::Rifleman;
 		if (i == 2) { instance->Identity->SquadRole = ETPSSquadRole::AutomaticRifleman; }
 
-
+		instance->Identity->Rank = ETPSCharacterRank::Private;
 		if (i == 0)
 		{
 			instance->Identity->SquadRole = ETPSSquadRole::Leader;

@@ -144,13 +144,13 @@ void UTPSFunctionLibrary::DrawDebugTrace(const UObject* worldContextObject,
 }
 
 
-FColor UTPSFunctionLibrary::GetColorForTeam(ETPSTeamID teamId)
+FColor UTPSFunctionLibrary::GetColorForTeam(const ETPSTeamID teamId)
 {
     return TPSTeamIdToColor(teamId);
 }
 
 
-FString UTPSFunctionLibrary::GetNameForUnitID(FTPSUnitID unitID)
+FString UTPSFunctionLibrary::GetNameForUnitID(const FTPSUnitID unitID)
 {
     FString str = _TPSHierarchicalLevelToString(unitID.UnitLevel) + "-";
 
@@ -165,12 +165,18 @@ FString UTPSFunctionLibrary::GetNameForUnitID(FTPSUnitID unitID)
     return str;
 }
 
-int64 UTPSFunctionLibrary::GetHashForUnitID(FTPSUnitID unitId)
+int64 UTPSFunctionLibrary::GetHashForUnitID(const FTPSUnitID unitId)
 {
     return FTPSUnitID::HashUnitIdentifier(unitId);
 }
 
-int64 UTPSFunctionLibrary::GetHashForUnitHierarchy(FTPSUnitID unitId)
+int64 UTPSFunctionLibrary::GetHashForUnitHierarchy(const FTPSUnitID unitId)
 {
     return FTPSUnitID::HashHierarchy(unitId);
+}
+
+
+FString UTPSFunctionLibrary::GetAbbreviationForRank(const ETPSCharacterRank rank)
+{
+    return TPSCharacterRankAbbreviationString(rank);
 }

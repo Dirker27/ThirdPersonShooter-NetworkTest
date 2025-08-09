@@ -49,6 +49,6 @@ static FString TPSTeamIdToString(ETPSTeamID id)
 	case ETPSTeamID::Gold:
 		return "Gold";
 	default:
-		return "TEAM";
+		return "[TEAM]";
 	}
 }

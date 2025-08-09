@@ -46,17 +46,19 @@ public:
 	static FVector2D CalculateNoise2D(const float pitchDegrees, const float yawDegrees);
 
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FString GetAbbreviationForRank(const ETPSCharacterRank rank);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static FColor GetColorForTeam(ETPSTeamID teamId);
+	static FColor GetColorForTeam(const ETPSTeamID teamId);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static FString GetNameForUnitID(FTPSUnitID unitID);
+	static FString GetNameForUnitID(const FTPSUnitID unitID);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static int64 GetHashForUnitID(FTPSUnitID unitId);
+	static int64 GetHashForUnitID(const FTPSUnitID unitId);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static int64 GetHashForUnitHierarchy(FTPSUnitID unitId);
+	static int64 GetHashForUnitHierarchy(const FTPSUnitID unitId);
 
 };

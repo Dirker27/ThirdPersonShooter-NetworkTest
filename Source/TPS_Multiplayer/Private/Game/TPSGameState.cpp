@@ -21,6 +21,7 @@ int ATPSGameState::GetTeamScore(ETPSTeamID teamId)
 
 int ATPSGameState::GetTeamUnitCount(ETPSTeamID teamId)
 {
+    int count = 0;
     if (UTPSTeam* team = TeamState->GetTeam(teamId))
     {
         return TeamState->CountUnitMembers(team->RootCollection->UnitID);
