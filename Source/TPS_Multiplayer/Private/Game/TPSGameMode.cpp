@@ -36,7 +36,7 @@ void ATPSGameMode::IndexSpawnPoints()
 	{
 		if (ATPSSpawnPoint* spawn = Cast<ATPSSpawnPoint>(sp))
 		{
-			if (UTPSTeam* t = state->GetTeam(spawn->AssignedUnit.TeamID))
+			if (UTPSTeam* t = state->TeamState->GetTeam(spawn->AssignedUnit.TeamID))
 			{
 				t->SpawnPool->AddSpawnPointToPool(spawn);
 			}
@@ -48,7 +48,7 @@ void ATPSGameMode::IndexSpawnPoints()
 void ATPSGameMode::SpawnTeam(ETPSTeamID teamId)
 {
 	ATPSGameState* state = GetGameState<ATPSGameState>();
-	if (UTPSTeam* t = state->GetTeam(teamId))
+	if (UTPSTeam* t = state->TeamState->GetTeam(teamId))
 	{
 		_SpawnUnit(t->RootCollection, t->SpawnPool);
 	}
@@ -57,8 +57,8 @@ void ATPSGameMode::SpawnTeam(ETPSTeamID teamId)
 void ATPSGameMode::SpawnUnit(FTPSUnitID unitId)
 {
 	ATPSGameState* state = GetGameState<ATPSGameState>();
-	UTPSTeam* team = state->GetTeam(unitId.TeamID);
-	if (UTPSCommandStructure* unit = state->GetUnit(unitId))
+	UTPSTeam* team = state->TeamState->GetTeam(unitId.TeamID);
+	if (UTPSCommandStructure* unit = state->TeamState->GetUnit(unitId))
 	{
 		_SpawnUnit(unit, team->SpawnPool);
 	}
@@ -73,6 +73,8 @@ void ATPSGameMode::_SpawnUnit(UTPSCommandStructure* unit, UTPSSpawnPool* spawnPo
 			instance->Identity->SquadRole);
 
 		instance->SpawnActor(PlayerCharacterTemplate, spawn);
+
+		GetGameState<ATPSGameState>()->TeamState->ActivateCharacter(instance);
 	}
 
 	for (auto subUnit : unit->GetAllChildCollections())
@@ -89,8 +91,8 @@ void ATPSGameMode::InitializeTeams()
 
 	for (auto teamConfig : TeamConfigurationMap)
 	{
-		state->CreateTeam(teamConfig.Key);
-		state->ConfigureTeam(teamConfig.Key, teamConfig.Value->Configuration);
+		state->TeamState->CreateTeam(teamConfig.Key);
+		state->TeamState->ConfigureTeam(teamConfig.Key, teamConfig.Value->Configuration);
 	}
 }
 
@@ -127,7 +129,7 @@ AActor* ATPSGameMode::FindSpawnPointForCharacter(UTPSCharacterInstance* instance
 
 	ATPSGameState* state = GetGameState<ATPSGameState>();
 
-	if (UTPSTeam* team = state->GetTeam(instance->Identity->UnitID.TeamID))
+	if (UTPSTeam* team = state->TeamState->GetTeam(instance->Identity->UnitID.TeamID))
 	{
 		return team->SpawnPool->FindBestSpawnPointForSquadRole(instance->Identity->SquadRole);
 	}

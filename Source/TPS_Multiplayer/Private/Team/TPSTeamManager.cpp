@@ -2,6 +2,7 @@
 
 #include "Team/TPSTeamManager.h"
 
+#include "Kismet/KismetMathLibrary.h"
 #include "Team/TPSFireTeam.h"
 #include "Util/TPSFunctionLibrary.h"
 
@@ -89,26 +90,44 @@ void UTPSTeamManager::_ConfigureUnit(UTPSCommandStructure* node, FTPSTeamConfigu
 
 	if (auto team = GetTeam(node->UnitID.TeamID))
 	{
-		team->UnitsById.Add(FTPSUnitID::HashUnitIdentifier(node->UnitID), node);
+		team->CommandUnitsById.Add(
+			FTPSUnitID::HashUnitIdentifier(node->UnitID),
+			node);
 	}
 }
+
+
 
 // TODO: Derive unit role/rank from TeamConfig
 void UTPSTeamManager::_PopulateUnit(UTPSCommandStructure* node)
 {
-	//if (!IsValid(node)) { return; }
+	if (!IsValid(node)) { return; }
 
+	// Instantiate and map CharacterInstances -> Unit/Team
 	for (int i = 0; i < node->Configuration.MaxNumMembers; i++)
 	{
+		//- Instantiate CharacterInstances -----------------------=
+		//
+		// TODO: [PC-173] Construct CharacterInstances from CharacterInstanceFactory (supplied by GameMode/TeamConfiguration)
+		//
 		UTPSCharacterInstance* instance = _NewCharacter();
 		node->AddMember(instance);
-
+		//
 		instance->Identity->Name = FName(UTPSFunctionLibrary::GetNameForUnitID(
 			instance->Identity->UnitID));
+		instance->Identity->CharacterBodyType = 
+			(FMath::RandRange(0, 1) > 0)
+				? ETPSCharacterBodyType::Male
+				: ETPSCharacterBodyType::Female;
 
+
+		//- Assign Squad Role from Schema -----------------------=
+		//
+		// TODO: [PC-174] Derive this from UnitSchema in FTPSCommandUnitConfiguration
+		//
 		instance->Identity->SquadRole = ETPSSquadRole::Rifleman;
 		if (i == 2) { instance->Identity->SquadRole = ETPSSquadRole::AutomaticRifleman; }
-
+		//
 		instance->Identity->Rank = ETPSCharacterRank::Private;
 		if (i == 0)
 		{
@@ -131,14 +150,18 @@ void UTPSTeamManager::_PopulateUnit(UTPSCommandStructure* node)
 			node->SetLeader(instance);
 		}
 
-		instance->Identity->CharacterBodyType = (i % 2 == 0)
-			? ETPSCharacterBodyType::Male
-			: ETPSCharacterBodyType::Female;
-
+		// Assign Loadout based on SquadRole
 		if (auto l = node->Configuration.MemberLoadoutMap
 				.Find(instance->Identity->SquadRole))
 		{
 			instance->Loadout = *l;
+		}
+
+		if (auto team = GetTeam(node->UnitID.TeamID))
+		{
+			team->MembersById.Add(
+				FTPSUnitID::HashUnitIdentifier(instance->Identity->UnitID),
+				instance);
 		}
 	}
 
@@ -160,6 +183,15 @@ void UTPSTeamManager::PopulateTeam(ETPSTeamID teamId, TArray<UTPSCharacterInstan
 	}
 }
 
+void UTPSTeamManager::ActivateCharacter(UTPSCharacterInstance* instance)
+{
+	if (UTPSTeam* team = GetTeam(instance->Identity->UnitID.TeamID))
+	{
+		team->ActiveMembersById.Add(
+			FTPSUnitID::HashUnitIdentifier(instance->Identity->UnitID),
+			instance);
+	}
+}
 
 
 void UTPSTeamManager::AssignCharacterToTeam(ETPSTeamID team, UTPSCharacterInstance* character)
@@ -196,7 +228,7 @@ UTPSCommandStructure* UTPSTeamManager::GetUnit(FTPSUnitID unitId)
 {
 	if (auto t = GetTeam(unitId.TeamID))
 	{
-		if (auto unit = t->UnitsById.Find(FTPSUnitID::HashUnitIdentifier(unitId)))
+		if (auto unit = t->CommandUnitsById.Find(FTPSUnitID::HashUnitIdentifier(unitId)))
 		{
 			return *unit;
 		}
@@ -204,6 +236,33 @@ UTPSCommandStructure* UTPSTeamManager::GetUnit(FTPSUnitID unitId)
 		return Cast<UTPSCommandStructure>(t->RootCollection->GetChildCollection(unitId));
 	}
 	return nullptr;
+}
+
+UTPSCharacterInstance* UTPSTeamManager::GetUnitLeader(FTPSUnitID id)
+{
+	if (auto unit = GetUnit(id))
+	{
+		return unit->GetLeader();
+	}
+	return nullptr;
+}
+
+int UTPSTeamManager::GetActiveTeamMemberCount(ETPSTeamID teamId)
+{
+	if (UTPSTeam* team = GetTeam(teamId))
+	{
+		return team->ActiveMembersById.Num();
+	}
+	return 0;
+}
+
+int UTPSTeamManager::GetTotalTeamMemberCount(ETPSTeamID teamId)
+{
+	if (UTPSTeam* team = GetTeam(teamId))
+	{
+		return CountUnitMembers(team->RootCollection->UnitID);
+	}
+	return 0;
 }
 
 int UTPSTeamManager::CountUnitMembers(FTPSUnitID unitId)
@@ -223,10 +282,7 @@ int UTPSTeamManager::_CountUnitMembers(UTPSHierarchicalCollection* node)
 
 	for (auto member : node->GetAllMembers())
 	{
-		if (member->IsAlive)
-		{
-			count++;
-		}
+		count++;
 	}
 
 	for (auto subUnit : node->GetAllChildCollections())

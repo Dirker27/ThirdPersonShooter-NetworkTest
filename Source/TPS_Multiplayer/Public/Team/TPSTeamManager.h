@@ -41,6 +41,9 @@ public:
 
 
 public:
+    UFUNCTION(BlueprintCallable)
+    void ActivateCharacter(UTPSCharacterInstance* instance);
+
     // Assign the Character to a Team, choosing an appropriate unit to fill.
     UFUNCTION(BlueprintCallable)
     void AssignCharacterToTeam(ETPSTeamID team, UTPSCharacterInstance* character);
@@ -54,6 +57,15 @@ public:
 
     UFUNCTION(BlueprintCallable)
     UTPSCommandStructure* GetUnit(FTPSUnitID unitId);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    UTPSCharacterInstance* GetUnitLeader(FTPSUnitID id);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    int GetActiveTeamMemberCount(ETPSTeamID teamId);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    int GetTotalTeamMemberCount(ETPSTeamID teamId);
 
     UFUNCTION(BlueprintCallable)
     int CountUnitMembers(FTPSUnitID unitId);

@@ -29,7 +29,7 @@ public:
 //~ ==================================================================== ~//
 //  COMPONENTS
 //~ ==================================================================== ~//
-protected:
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UTPSWorldManager> WorldState;
 
@@ -39,7 +39,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UTPSCombatLog> CombatLog;
 
-
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<ETPSTeamID, int> TeamScores;
 
@@ -53,29 +53,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetTeamScore(ETPSTeamID teamId);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	int GetTeamUnitCount(ETPSTeamID teamId);
-
-	//- TEAM CRUD -//
-
-	UFUNCTION(BlueprintCallable)
-	void CreateTeam(ETPSTeamID teamId);
-
-	UFUNCTION(BlueprintCallable)
-	void ConfigureTeam(ETPSTeamID teamId, FTPSTeamConfiguration configuration);
-
-	UFUNCTION(BlueprintCallable)
-	void PopulateTeam(ETPSTeamID teamId, TArray<UTPSCharacterInstance*> roster);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UTPSTeam* GetTeam(ETPSTeamID teamId);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UTPSCommandStructure* GetUnit(FTPSUnitID id);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UTPSCharacterInstance* GetUnitLeader(FTPSUnitID id);
 
 
 };

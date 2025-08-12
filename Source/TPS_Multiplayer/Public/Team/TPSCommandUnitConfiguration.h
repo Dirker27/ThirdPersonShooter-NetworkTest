@@ -5,7 +5,11 @@
 
 #include "TPSCommandUnitConfiguration.generated.h"
 
-// Schema and rules for the current level of a command unit
+/**
+ * Schema and rules for the current level of a command unit
+ *
+ * TODO: [PC-174] Add Schema definitions for SquadRoles (how many Rifleman, AutoGunners, etc)
+ */
 USTRUCT(BlueprintType)
 struct TPS_MULTIPLAYER_API FTPSCommandUnitConfiguration
 {

@@ -35,7 +35,20 @@ public:
     TObjectPtr<UTPSSpawnPool> SpawnPool;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-    TMap<int, TObjectPtr<UTPSCommandStructure>> UnitsById;
+    TMap<int, TObjectPtr<UTPSCommandStructure>> CommandUnitsById;
+
+    // All characters that have *ever* been a part of this team
+    //   (incl. deceased and never-spawned)
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    TMap<int, TObjectPtr<UTPSCharacterInstance>> MembersById;
+
+    // All *active* (alive) characters that are a part of this team.
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    TMap<int, TObjectPtr<UTPSCharacterInstance>> ActiveMembersById;
+
+    // All *active* (connected) players that are a part of this team.
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    TMap<int, TObjectPtr<UTPSCharacterInstance>> ActivePlayersById;
 };
 
 
