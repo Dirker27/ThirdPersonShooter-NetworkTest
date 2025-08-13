@@ -34,7 +34,28 @@ public:
     TObjectPtr<UTPSEquipmentLoadout> Loadout = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    bool IsAlive = false;
+    bool IsAlive = true;
+
+
+
+//~ ======================================================================== ~//
+//  Instance -> Actor Operations
+//~ ======================================================================== ~//
+public:
+    //UFUNCTION(BlueprintCallable)
+    //void Die();
+
+    //UFUNCTION(BlueprintCallable)
+    //void Focus();
+
+    //UFUNCTION(BlueprintCallable)
+    //void UnFocus();
+
+    //UFUNCTION(BlueprintCallable)
+    //void ShowDebug();
+
+    //UFUNCTION(BlueprintCallable)
+    //void HideDebug();
 
 //~ ======================================================================== ~//
 //  SPAWNED ACTOR(s) TRACKING

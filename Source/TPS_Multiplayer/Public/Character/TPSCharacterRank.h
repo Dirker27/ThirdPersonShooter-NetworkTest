@@ -46,35 +46,35 @@ static FString TPSCharacterRankAbbreviationString(ETPSCharacterRank rank)
     switch (rank)
     {
     case ETPSCharacterRank::Recruit:
-        return "RCT";
+        return "Rct";
     case ETPSCharacterRank::Private:
     case ETPSCharacterRank::PrivateFirstClass:
     case ETPSCharacterRank::PrivateSecondClass:
-        return "PVT";
+        return "Pvt";
     case ETPSCharacterRank::Corporal:
-        return "CPL";
+        return "Cpl";
     case ETPSCharacterRank::Sergeant:
     case ETPSCharacterRank::StaffSergeant:
     case ETPSCharacterRank::MasterSergeant:
     case ETPSCharacterRank::FirstSergeant:
     case ETPSCharacterRank::SergeantMajor:
-        return "SGT";
+        return "Sgt";
     case ETPSCharacterRank::Lieutenant:
-        return "LT";
+        return "Lt";
     case ETPSCharacterRank::Captain:
-        return "CPT";
+        return "Cpt";
     case ETPSCharacterRank::Major:
-        return "MJR";
+        return "Mjr";
     case ETPSCharacterRank::Colonel:
     case ETPSCharacterRank::LieutenantColonel:
-        return "COL";
+        return "Col";
     case ETPSCharacterRank::General:
     case ETPSCharacterRank::BrigadierGeneral:
     case ETPSCharacterRank::LieutenantGeneral:
     case ETPSCharacterRank::MajorGeneral:
-        return "GNL";
+        return "Gen";
     case ETPSCharacterRank::CommanderInChief:
-        return "CMDR";
+        return "Cmdr";
     default:
         return "[RANK]";
     }

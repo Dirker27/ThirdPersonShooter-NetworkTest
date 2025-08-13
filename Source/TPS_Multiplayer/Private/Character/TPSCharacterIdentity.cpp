@@ -4,4 +4,5 @@
 
 UTPSCharacterIdentity::UTPSCharacterIdentity()
 {
+    Guid = FGuid::NewGuid();
 }

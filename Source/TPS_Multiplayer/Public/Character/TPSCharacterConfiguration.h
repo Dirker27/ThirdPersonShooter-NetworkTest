@@ -18,6 +18,8 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     ETPSCharacterBodyType BodyType;
 
+    // How accurate the Character's shooting arm is in DEGREES of freedom.
+    //    TODO: Move to "CharacterAttributes" object
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float BaseAccuracyTolerance = 1.f;
 

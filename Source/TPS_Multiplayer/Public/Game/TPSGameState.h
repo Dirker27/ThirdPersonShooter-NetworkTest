@@ -26,17 +26,20 @@ class TPS_MULTIPLAYER_API ATPSGameState : public AGameState
 public:
 	ATPSGameState();
 
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 //~ ==================================================================== ~//
 //  COMPONENTS
 //~ ==================================================================== ~//
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
 	TObjectPtr<UTPSWorldManager> WorldState;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
 	TObjectPtr<UTPSTeamManager> TeamState;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
 	TObjectPtr<UTPSCombatLog> CombatLog;
 
 protected:

@@ -73,12 +73,8 @@ public:
 	//////////////////////////////////////////////////////
 	// Identity
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter")
 	TObjectPtr<UTPSCharacterIdentity> Identity;
-	
-	// Name
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Identity")
-	FString Name;
 
 	//////////////////////////////////////////////////////
 	// Configuration
@@ -96,6 +92,7 @@ public:
 	//////////////////////////////////////////////////////
 	// Attributes
 	//   (sync'd from GAS attributes where applicable)
+	//   TODO: Migrate to "CharacterAttributes" Object
 
 	// Health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health", Replicated)
@@ -104,15 +101,15 @@ public:
 	float MaxHealth;
 
 	// Armor
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Armor", Replicated)
 	float CurrentArmor;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Armor")
 	float MaxArmor;
 
 	// Movement Speed
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Movement", Replicated)
 	float MovementSpeedModifier;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Movement")
 	float CurrentMaxWalkSpeed;
 
 	// Current Accuracy Tolerance (Synthetic)
@@ -131,15 +128,15 @@ public:
 	// Volatile State
 
 	// Character State
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Character", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State", Replicated)
 	TEnumAsByte<ETPSCharacterBehaviorState> CurrentCharacterState;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Character")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State")
 	TEnumAsByte<ETPSCharacterBehaviorState> PreviousCharacterState;
 	//
 	// Locomotion State
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Locomotion", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State", Replicated)
 	TEnumAsByte<ETPSCharacterLocomotionState> CurrentLocomotionState;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Locomotion")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State")
 	TEnumAsByte<ETPSCharacterLocomotionState> PreviousLocomotionState;
 	//
 	// IsAlive (Synthetic)

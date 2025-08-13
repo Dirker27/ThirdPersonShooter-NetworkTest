@@ -156,11 +156,11 @@ FString UTPSFunctionLibrary::GetNameForUnitID(const FTPSUnitID unitID)
 
     for (auto lvl : unitID.Hierarchy)
     {
-        str += _TPSHierarchicalLevelAbbreviationToString(lvl.Key);
         str.AppendInt(lvl.Value);
+        str += _TPSHierarchicalLevelAbbreviationToString(lvl.Key);
     }
-    str += _TPSHierarchicalLevelAbbreviationToString(unitID.UnitLevel);
     str.AppendInt(unitID.UnitNumber);
+    str += _TPSHierarchicalLevelAbbreviationToString(unitID.UnitLevel);
 
     return str;
 }

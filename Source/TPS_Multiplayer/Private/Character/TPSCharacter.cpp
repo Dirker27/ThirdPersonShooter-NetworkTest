@@ -2,8 +2,10 @@
 
 #include "Character/TPSCharacter.h"
 
+#include "Game/TPSGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GAS/TPSAbilitySystemComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 #include "Player/TPSPlayerController.h"
@@ -75,7 +77,8 @@ ATPSCharacter::~ATPSCharacter()
 	// cleanup?
 }
 
-void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
+void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	//DOREPLIFETIME(ATPSCharacter, CurrentHealth);
@@ -431,7 +434,8 @@ ETPSCharacterLocomotionState ATPSCharacter::EvaluateLocomotionStateForCurrentInp
 	return Standing;
 }
 
-bool ATPSCharacter::IsActionActive() const {
+bool ATPSCharacter::IsActionActive() const
+{
 	return IsAiming
 		|| IsFiring
 		|| IsEquipping
@@ -451,6 +455,13 @@ void ATPSCharacter::PerformDeath()
 		UE_LOG(LogTemp, Log, TEXT("[CLIENT] XXXXXXXXXXXX CHARACTER DEATH [%s] XXXXXXXXXXXX"), *GetName());
 	}
 
+	// Notify GameMode/State
+	if (auto gm = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this)))
+	{
+		//gm->NotifyCharacterDeath(Identity->Guid);
+	}
+
+	// Notify Player (iff controlled)
 	if (ATPSPlayerController* controller = GetController<ATPSPlayerController>())
 	{
 		controller->NotifyPawnDeath();
@@ -476,18 +487,21 @@ void ATPSCharacter::PerformDeath()
 
 // - BOOST -//
 
-void ATPSCharacter::StartBoost() {
+void ATPSCharacter::StartBoost()
+{
 	IsBoosting = true;
 	OnBoostAbilityStart();
 }
-void ATPSCharacter::EndBoost() {
+void ATPSCharacter::EndBoost()
+{
 	IsBoosting = false;
 	OnBoostAbilityEnd();
 }
 
 // - AIM -//
 
-void ATPSCharacter::StartAim() {
+void ATPSCharacter::StartAim()
+{
 	IsAiming = true;
 
 	ATPSWeapon* weapon = GetEquippedWeapon();
@@ -498,7 +512,8 @@ void ATPSCharacter::StartAim() {
 
 	OnAimAbilityStart();
 }
-void ATPSCharacter::EndAim() {
+void ATPSCharacter::EndAim()
+{
 	IsAiming = false;
 
 	ATPSWeapon* weapon = GetEquippedWeapon();
@@ -512,7 +527,8 @@ void ATPSCharacter::EndAim() {
 
 // - FIRE WEAPON / USE EQUIPMENT -//
 
-void ATPSCharacter::StartFireWeapon() {
+void ATPSCharacter::StartFireWeapon()
+{
 	IsFiring = true;
 
 	ATPSWeapon* weapon = GetEquippedWeapon();
@@ -523,7 +539,8 @@ void ATPSCharacter::StartFireWeapon() {
 
 	OnFireWeaponAbilityStart();
 }
-void ATPSCharacter::EndFireWeapon() {
+void ATPSCharacter::EndFireWeapon()
+{
 	IsFiring = false;
 
 	ATPSWeapon* weapon = GetEquippedWeapon();
@@ -537,7 +554,8 @@ void ATPSCharacter::EndFireWeapon() {
 
 // - EQUIP WEAPON -//
 
-void ATPSCharacter::StartEquipWeapon() {
+void ATPSCharacter::StartEquipWeapon()
+{
 	IsEquipping = true;
 	OnEquipWeaponAbilityStart();
 }
@@ -548,40 +566,47 @@ void ATPSCharacter::EndEquipWeapon() {
 
 // - UN-EQUIP WEAPON -//
 
-void ATPSCharacter::StartUnEquipWeapon() {
+void ATPSCharacter::StartUnEquipWeapon()
+{
 	IsEquipping = true;
 	OnUnEquipWeaponAbilityStart();
 }
-void ATPSCharacter::EndUnEquipWeapon() {
+void ATPSCharacter::EndUnEquipWeapon()
+{
 	IsEquipping = false;
 	OnUnEquipWeaponAbilityEnd();
 }
 
 // - RELOAD WEAPON -//
 
-void ATPSCharacter::StartReloadWeapon() {
+void ATPSCharacter::StartReloadWeapon()
+{
 	IsReloading = true;
 	OnReloadWeaponAbilityStart();
 }
-void ATPSCharacter::EndReloadWeapon() {
+void ATPSCharacter::EndReloadWeapon()
+{
 	IsReloading = false;
 	OnReloadWeaponAbilityEnd();
 }
 
 // - INTERACT -//
 
-void ATPSCharacter::StartInteract() {
+void ATPSCharacter::StartInteract()
+{
 	IsInteracting = true;
 	OnInteractAbilityStart();
 }
-void ATPSCharacter::EndInteract() {
+void ATPSCharacter::EndInteract()
+{
 	IsInteracting = false;
 	OnInteractAbilityEnd();
 }
 
 
 // Blueprint Hook for on-fallout death animation.
-void ATPSCharacter::FellOutOfWorld(const class UDamageType& dmgType) {
+void ATPSCharacter::FellOutOfWorld(const class UDamageType& dmgType)
+{
 	OnFellOutOfWorld();
 }
 
@@ -598,7 +623,8 @@ void ATPSCharacter::FellOutOfWorld(const class UDamageType& dmgType) {
 
 
 
-void ATPSCharacter::PossessedBy(AController* NewController) { // server
+void ATPSCharacter::PossessedBy(AController* NewController) // server
+{ 
 	Super::PossessedBy(NewController);
 
 	if (HasAuthority())
@@ -619,7 +645,8 @@ void ATPSCharacter::PossessedBy(AController* NewController) { // server
 	}
 }
 
-void ATPSCharacter::OnRep_PlayerState() { // client
+void ATPSCharacter::OnRep_PlayerState() // client
+{ 
 	Super::OnRep_PlayerState();
 
 	if (HasAuthority())
@@ -670,7 +697,7 @@ UAbilitySystemComponent* ATPSCharacter::GetAbilitySystemComponent() const {
 void ATPSCharacter::SetupAbilitySystem()
 {
 	if (!IsValid(AbilitySystem)) { return; }
-	UE_LOG(LogTemp, Log, TEXT("Initializing ASC for Character[%s]..."), *Name);
+	UE_LOG(LogTemp, Log, TEXT("Initializing ASC for Character[%s]..."), *Identity->Guid.ToString());
 
 	AbilitySystem->InitializeBaseAbilitiesAndEffects();
 
@@ -683,11 +710,11 @@ void ATPSCharacter::SetupAbilitySystem()
 		.AddUObject(this, &ThisClass::OnMovementAttributeChanged);
 
 	// Print
-	UE_LOG(LogTemp, Log, TEXT("ASC for Character[%s] initialized."), *Name);
-	for (auto ability : AbilitySystem->GetActivatableAbilities())
+	UE_LOG(LogTemp, Log, TEXT("ASC for Character[%s] initialized."), *Identity->Guid.ToString());
+	/*for (auto ability : AbilitySystem->GetActivatableAbilities())
 	{
 		UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
-	}
+	}*/
 }
 
 // OnChange listeners performed on SERVER
@@ -724,7 +751,7 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* playerInputCompon
 {
 	Super::SetupPlayerInputComponent(playerInputComponent);
 
-	UE_LOG(LogTemp, Log, TEXT("Character[%s]::SetupInputComponent()"), *GetName());
+	UE_LOG(LogTemp, Log, TEXT("Character[%s]::SetupInputComponent()"), *Identity->Guid.ToString());
 	AbilitySystem->BindToInputComponent(playerInputComponent);
 }
 

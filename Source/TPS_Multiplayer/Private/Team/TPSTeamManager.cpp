@@ -113,7 +113,9 @@ void UTPSTeamManager::_PopulateUnit(UTPSCommandStructure* node)
 		UTPSCharacterInstance* instance = _NewCharacter();
 		node->AddMember(instance);
 		//
-		instance->Identity->Name = FName(UTPSFunctionLibrary::GetNameForUnitID(
+		instance->Identity->FirstName = FName(TEXT("Karl"));
+		instance->Identity->Callsign = FName(TEXT("Callsign"));
+		instance->Identity->LastName = FName(UTPSFunctionLibrary::GetNameForUnitID(
 			instance->Identity->UnitID));
 		instance->Identity->CharacterBodyType = 
 			(FMath::RandRange(0, 1) > 0)

@@ -32,13 +32,21 @@ public:
     ////////////////////////////////////////////////////////
     // Identity
 
-    // Character's Name
+    // Character's First Name - "Steve", "Bob", "Jenny", etc.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FName Name;
+    FName FirstName;
 
-    // Unique UnitID
+    // Character's Last Name - "Williams", "Stevenson", "O'Rourke", etc.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FString UUID;
+    FName LastName;
+
+    // Character's Callsign - "Iceman", "Hard Tack", "Thrill", etc.
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    FName Callsign;
+
+    // Unique ID - independent of UnitID
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    FGuid Guid;
 
     // Masculine / Feminine ?
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -53,6 +61,7 @@ public:
     ETPSFactionID FactionID;
 
     // Unit UnitID -> Squad/Team Hierarchy
+    //   Can be zero-d out if no assignment is active.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     FTPSUnitID UnitID;
 
