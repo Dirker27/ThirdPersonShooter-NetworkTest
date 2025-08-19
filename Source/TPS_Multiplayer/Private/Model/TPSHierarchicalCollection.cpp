@@ -4,7 +4,6 @@
 
 UTPSHierarchicalCollection::UTPSHierarchicalCollection()
 {
-	
 }
 
 
@@ -12,9 +11,8 @@ bool UTPSHierarchicalCollection::AddMember(UTPSCharacterInstance* member)
 {
 	if (CanAddMember(member))
 	{
-		uint8 id = GetNextAvailableIDNumberForMember();
-		Members.Add(id, member);
-		UpdateUnitIDForMember(member, id);
+		int idNumber = Members.Add(member);
+		UpdateUnitIdForMember(member, idNumber);
 		return true;
 	}
 	return false;
@@ -24,24 +22,18 @@ bool UTPSHierarchicalCollection::AddSubCollection(UTPSHierarchicalCollection* su
 {
 	if (CanAddSubCollection(subCollection))
 	{
-		uint8 id = GetNextAvailableIDNumberForSubCollection();
-		ChildCollections.Add(id, subCollection);
-
-		UpdateUnitIDForSubCollection(subCollection, id);
-
+		int index = SubCollections.Add(subCollection);
+		UpdateUnitIdForSubCollection(subCollection, index);
 		return true;
 	}
 	return false;
 }
 
-bool UTPSHierarchicalCollection::RemoveMember(UTPSCharacterInstance* member)
+bool UTPSHierarchicalCollection::RemoveMember(const int idNumber)
 {
-	if (!IsValid(member))
-	{
-		return false;
-	}
+	if (idNumber >= Members.Num()) { return false; }
 
-	if (Members.Remove(member->Identity->UnitID.UnitNumber) > 0)
+	if (auto member = Members[idNumber])
 	{
 		member->Identity->UnitID.Hierarchy.Empty();
 		member->Identity->UnitID.UnitNumber = 0;
@@ -51,13 +43,11 @@ bool UTPSHierarchicalCollection::RemoveMember(UTPSCharacterInstance* member)
 	return false;
 }
 
-bool UTPSHierarchicalCollection::RemoveSubCollection(UTPSHierarchicalCollection* subCollection)
+bool UTPSHierarchicalCollection::RemoveSubCollection(const int idNumber)
 {
-	if (!IsValid(subCollection))
-	{
-		return false;
-	}
-	if (ChildCollections.Remove(subCollection->UnitID.UnitNumber) > 0)
+	if (idNumber >= SubCollections.Num()) { return false; }
+
+	if (auto subCollection = SubCollections[idNumber])
 	{
 		subCollection->UnitID.Hierarchy.Empty();
 		subCollection->UnitID.UnitNumber = 0;
@@ -66,14 +56,9 @@ bool UTPSHierarchicalCollection::RemoveSubCollection(UTPSHierarchicalCollection*
 	return false;
 }
 
-bool UTPSHierarchicalCollection::CanAddMember(UTPSCharacterInstance* member) const
+bool UTPSHierarchicalCollection::CanAddMember(const UTPSCharacterInstance* member) const
 {
 	if (!IsValid(member))
-	{
-		return false;
-	}
-
-	if (Members.Num() > 254)
 	{
 		return false;
 	}
@@ -83,7 +68,7 @@ bool UTPSHierarchicalCollection::CanAddMember(UTPSCharacterInstance* member) con
 }
 
 // TODO: Guard against cyclical hierarchies
-bool UTPSHierarchicalCollection::CanAddSubCollection(UTPSHierarchicalCollection* subCollection) const
+bool UTPSHierarchicalCollection::CanAddSubCollection(const UTPSHierarchicalCollection* subCollection) const
 {
 	if (!IsValid(subCollection))
 	{
@@ -95,17 +80,12 @@ bool UTPSHierarchicalCollection::CanAddSubCollection(UTPSHierarchicalCollection*
 		return false;
 	}
 
-	if (ChildCollections.Num() > 254)
-	{
-		return false;
-	}
-
 	return true;
-	//return !ChildCollections.Contains(subCollection);
+	//return !SubCollections.Contains(subCollection);
 }
 
 
-UTPSHierarchicalCollection* UTPSHierarchicalCollection::GetChildCollection(FTPSUnitID id)
+UTPSHierarchicalCollection* UTPSHierarchicalCollection::GetSubCollection(FTPSUnitID id)
 {
 	if (id.UnitLevel > UnitID.UnitLevel)
 	{
@@ -128,48 +108,49 @@ UTPSHierarchicalCollection* UTPSHierarchicalCollection::GetChildCollection(FTPSU
 	ETPSHierarchicalLevel targetChildLvl = LevelDown(UnitID.UnitLevel);
 	if (auto targetChildUnitNumber = id.Hierarchy.Find(targetChildLvl))
 	{
-		if (auto childUnit = ChildCollections.Find(*targetChildUnitNumber))
+		if (*targetChildUnitNumber >= SubCollections.Num()) { return nullptr; }
+		if (auto childUnit = SubCollections[*targetChildUnitNumber])
 		{
-			return childUnit->Get()->GetChildCollection(id);
+			return childUnit->GetSubCollection(id);
 		}
 	}
 
 	return nullptr;
 }
 
-TArray<UTPSHierarchicalCollection*> UTPSHierarchicalCollection::GetAllChildCollections()
+TArray<UTPSHierarchicalCollection*> UTPSHierarchicalCollection::GetAllSubCollections()
 {
-	TArray<UTPSHierarchicalCollection*> children;
-	for (auto child : ChildCollections)
+	/*TArray<UTPSHierarchicalCollection*> children;
+	for (auto child : SubCollections)
 	{
 		children.Add(child.Value);
 	}
-	return children;
+	return children;*/
+	return SubCollections;
 }
 
 
 
-UTPSCharacterInstance* UTPSHierarchicalCollection::GetMember(uint8 targetIdNumber)
+UTPSCharacterInstance* UTPSHierarchicalCollection::GetMember(int targetIdNumber)
 {
-	if (auto member = Members.Find(targetIdNumber))
-	{
-		return *member;
-	}
-	return nullptr;
+	if (targetIdNumber >= Members.Num()) { return nullptr; }
+
+	return Members[targetIdNumber];
 }
 
 TArray<UTPSCharacterInstance*> UTPSHierarchicalCollection::GetAllMembers()
 {
-	TArray<UTPSCharacterInstance*> children;
+	/*TArray<UTPSCharacterInstance*> children;
 	for (auto child : Members)
 	{
 		children.Add(child.Value);
 	}
-	return children;
+	return children;*/
+	return Members;
 }
 
 
-void UTPSHierarchicalCollection::UpdateUnitIDForMember(UTPSCharacterInstance* member, uint8 id)
+void UTPSHierarchicalCollection::UpdateUnitIdForMember(UTPSCharacterInstance* member, int id)
 {
 	member->Identity->UnitID.UnitNumber = id;
 	member->Identity->UnitID.TeamID = UnitID.TeamID;
@@ -178,7 +159,7 @@ void UTPSHierarchicalCollection::UpdateUnitIDForMember(UTPSCharacterInstance* me
 	member->Identity->UnitID.Hierarchy.Add(UnitID.UnitLevel, UnitID.UnitNumber);
 }
 
-void UTPSHierarchicalCollection::UpdateUnitIDForSubCollection(UTPSHierarchicalCollection* subCollection, uint8 id)
+void UTPSHierarchicalCollection::UpdateUnitIdForSubCollection(UTPSHierarchicalCollection* subCollection, int id)
 {
 	subCollection->UnitID.UnitNumber = id;
 	subCollection->UnitID.TeamID     = UnitID.TeamID;
@@ -188,45 +169,16 @@ void UTPSHierarchicalCollection::UpdateUnitIDForSubCollection(UTPSHierarchicalCo
 
 	for (auto subSubMember : subCollection->GetAllMembers())
 	{
-		subCollection->UpdateUnitIDForMember(subSubMember, subSubMember->Identity->UnitID.UnitNumber);
+		subCollection->UpdateUnitIdForMember(subSubMember, subSubMember->Identity->UnitID.UnitNumber);
 	}
 
-	for (auto subSubUnit : subCollection->GetAllChildCollections())
+	for (auto subSubUnit : subCollection->GetAllSubCollections())
 	{
-		subCollection->UpdateUnitIDForSubCollection(subSubUnit, subSubUnit->UnitID.UnitNumber);
+		subCollection->UpdateUnitIdForSubCollection(subSubUnit, subSubUnit->UnitID.UnitNumber);
 	}
 
 	subCollection->ParentCollection = this;
 }
-
-
-
-// TODO: Avoid linear probe
-uint8 UTPSHierarchicalCollection::GetNextAvailableIDNumberForMember() const
-{
-	int i = 0;
-	while (Members.Contains(i))
-	{
-		i++;
-	}
-
-	return i;
-}
-
-// TODO: Avoid linear probe
-uint8 UTPSHierarchicalCollection::GetNextAvailableIDNumberForSubCollection() const
-{
-	int i = 1;
-	while (ChildCollections.Contains(i))
-	{
-		i++;
-	}
-
-	return i;
-}
-
-
-
 
 
 ETPSHierarchicalLevel UTPSHierarchicalCollection::LevelDown(ETPSHierarchicalLevel level)

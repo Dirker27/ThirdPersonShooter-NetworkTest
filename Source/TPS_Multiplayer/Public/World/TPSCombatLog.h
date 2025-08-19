@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Team/TPSTeam.h"
+#include "Team/TPSTeamInstance.h"
 
 #include "TPSCombatLog.generated.h"
 

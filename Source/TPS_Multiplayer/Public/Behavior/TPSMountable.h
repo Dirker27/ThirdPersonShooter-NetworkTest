@@ -33,10 +33,10 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|Configuration")
     FTPSMountOffset GlobalMountOffset;
 
-    //- State ---------------------------------------------=
+    //- TPSGameState ---------------------------------------------=
     //
     // Active(?) Mount Point
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|State", Replicated)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|TPSGameState", Replicated)
     TWeakObjectPtr<UTPSMountPoint> MountPoint = nullptr;
     //
     // Is Currently Mounted to a MountPoint Target.

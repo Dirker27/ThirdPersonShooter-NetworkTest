@@ -6,10 +6,12 @@
 #include "GameFramework/GameMode.h"
 
 #include "Character/TPSCharacter.h"
+#include "Character/TPSCharacterInstanceFactory.h"
 #include "Player/TPSPlayerController.h"
 #include "Game/TPSGameConfiguration.h"
-#include "Team/TPSTeamManager.h"
+#include "Team/TPSTeamInstanceFactory.h"
 #include "World/TPSCombatLog.h"
+#include "World/TPSWorldManager.h"
 
 #include "TPSGameMode.generated.h"
 
@@ -30,6 +32,17 @@ protected:
 //~ ==================================================================== ~//
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS")
+	TObjectPtr<UTPSTeamInstanceFactory> TeamInstanceFactory;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS")
+	TObjectPtr<UTPSWorldManager> WorldManager;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS")
+	TObjectPtr<UTPSCharacterInstanceFactory> CharacterInstanceFactory;
+
+//~ ==================================================================== ~//
+//  STATE
+//~ ==================================================================== ~//
+private:
 	/* STUB */
 
 //~ ============================================================= ~//
@@ -37,17 +50,17 @@ protected:
 //~ ============================================================= ~//
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Game|Debug")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="TPS|Debug")
 	bool IsDebugEnabled = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Game|Configuration")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPS|Configuration")
 	TSubclassOf<ATPSCharacter> PlayerCharacterTemplate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game|Configuration")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|Configuration")
 	TSubclassOf<ATPSCharacter> BotTemplate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Game|Configuration")
-	TMap<ETPSTeamID, UTPSTeamConfigurationData*> TeamConfigurationMap;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPS|Configuration")
+	TMap<TEnumAsByte<ETPSTeamID>, TObjectPtr<UTPSTeamConfigurationData>> TeamConfigurationMap;
 
 //~ ============================================================= ~//
 //  OPERATIONS
@@ -60,6 +73,10 @@ public:
 	// Instantiates Teams in GameState with configurations defined in TeamConfigurationMap
 	UFUNCTION(BlueprintCallable)
 	void InitializeTeams();
+
+	// Populates a Team and its sub-units with generated Character instances.
+	UFUNCTION(BlueprintCallable)
+	void PopulateTeams();
 
 	// Scans ALL PlayerStart and SpawnPoint Actors and indexes them accordingly in GameState
 	//   Should be invoked *after* Teams have been instantiated in order to index them.
@@ -80,6 +97,10 @@ private:
 	////////////////////////////////////////////////////////
 	// Gameplay Functions
 public:
+	// Respawn
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void KillCharacter(const FGuid characterId);
+
 	// Respawn
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void RequestRespawn(ATPSPlayerController* playerController);

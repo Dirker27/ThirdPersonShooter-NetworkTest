@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Team/TPSTeam.h"
+#include "Game/TPSGameState.h"
+#include "Team/TPSTeamInstance.h"
 
 #include "TPSWorldManager.generated.h"
 
@@ -19,7 +20,4 @@ class TPS_MULTIPLAYER_API UTPSWorldManager : public UActorComponent
 
 public:
     UTPSWorldManager();
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<TObjectPtr<ATPSEquipableItem>> LooseItems;
 };

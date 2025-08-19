@@ -3,9 +3,10 @@
 
 #include "Player/TPSPlayerController.h"
 
-#include "Game/TPSGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+
+#include "Game/TPSGameMode.h"
 #include "Pawn/TPSPawn.h"
 #include "Util/TPSFunctionLibrary.h"
 
@@ -164,7 +165,7 @@ void ATPSPlayerController::UpdateControllerConfiguration(FTPSControllerConfigura
 
 
 //~ ====================================================================== ~//
-//- State Overrides
+//- TPSGameState Overrides
 //~ ====================================================================== ~//
 
 void ATPSPlayerController::TPS_OverrideCurrentCharacterStateFromString(FString input) {

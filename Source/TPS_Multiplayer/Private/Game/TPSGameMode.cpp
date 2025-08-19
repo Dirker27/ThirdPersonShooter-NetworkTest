@@ -1,10 +1,13 @@
-// (C) ToasterCat Studios 2024
+// (C) ToasterCat Studios 2025
 
 #include "Game/TPSGameMode.h"
 
+#include "Kismet/GameplayStatics.h"
+
 #include "Game/TPSGameState.h"
 #include "Game/TPSSpawnFormation.h"
-#include "Kismet/GameplayStatics.h"
+#include "Team/TPSTeamInstanceFactory.h"
+#include "World/TPSWorldManager.h"
 
 //~ ====================================================================== ~//
 //  CONSTRUCTORS
@@ -12,6 +15,10 @@
 
 ATPSGameMode::ATPSGameMode()
 {
+	WorldManager = CreateDefaultSubobject<UTPSWorldManager>(TEXT("WorldState"));
+	TeamInstanceFactory = CreateDefaultSubobject<UTPSTeamInstanceFactory>(TEXT("TeamInstanceFactory"));
+	CharacterInstanceFactory = CreateDefaultSubobject<UTPSCharacterInstanceFactory>(TEXT("CharacterInstanceFactory"));
+	//CombatLog = CreateDefaultSubobject<UTPSCombatLog>(TEXT("CombatLog"));
 }
 ATPSGameMode::~ATPSGameMode() { }
 
@@ -36,7 +43,7 @@ void ATPSGameMode::IndexSpawnPoints()
 	{
 		if (ATPSSpawnPoint* spawn = Cast<ATPSSpawnPoint>(sp))
 		{
-			if (UTPSTeam* t = state->TeamState->GetTeam(spawn->AssignedUnit.TeamID))
+			if (UTPSTeamInstance* t = state->GetTeam(spawn->AssignedUnit.TeamID))
 			{
 				t->SpawnPool->AddSpawnPointToPool(spawn);
 			}
@@ -48,17 +55,18 @@ void ATPSGameMode::IndexSpawnPoints()
 void ATPSGameMode::SpawnTeam(ETPSTeamID teamId)
 {
 	ATPSGameState* state = GetGameState<ATPSGameState>();
-	if (UTPSTeam* t = state->TeamState->GetTeam(teamId))
+	if (UTPSTeamInstance* t = state->GetTeam(teamId))
 	{
-		_SpawnUnit(t->RootCollection, t->SpawnPool);
+		_SpawnUnit(t->RootUnit, t->SpawnPool);
 	}
 }
 
 void ATPSGameMode::SpawnUnit(FTPSUnitID unitId)
 {
 	ATPSGameState* state = GetGameState<ATPSGameState>();
-	UTPSTeam* team = state->TeamState->GetTeam(unitId.TeamID);
-	if (UTPSCommandStructure* unit = state->TeamState->GetUnit(unitId))
+
+	UTPSTeamInstance* team = state->GetTeam(unitId.TeamID);
+	if (UTPSCommandStructure* unit = state->GetUnit(unitId))
 	{
 		_SpawnUnit(unit, team->SpawnPool);
 	}
@@ -74,10 +82,10 @@ void ATPSGameMode::_SpawnUnit(UTPSCommandStructure* unit, UTPSSpawnPool* spawnPo
 
 		instance->SpawnActor(PlayerCharacterTemplate, spawn);
 
-		GetGameState<ATPSGameState>()->TeamState->ActivateCharacter(instance);
+		TeamInstanceFactory->ActivateCharacter(instance);
 	}
 
-	for (auto subUnit : unit->GetAllChildCollections())
+	for (auto subUnit : unit->GetAllSubCollections())
 	{
 		_SpawnUnit(Cast<UTPSCommandStructure>(subUnit), spawnPool);
 	}
@@ -87,18 +95,41 @@ void ATPSGameMode::_SpawnUnit(UTPSCommandStructure* unit, UTPSSpawnPool* spawnPo
 
 void ATPSGameMode::InitializeTeams()
 {
-	ATPSGameState* state = GetGameState<ATPSGameState>();
-
 	for (auto teamConfig : TeamConfigurationMap)
 	{
-		state->TeamState->CreateTeam(teamConfig.Key);
-		state->TeamState->ConfigureTeam(teamConfig.Key, teamConfig.Value->Configuration);
+		TeamInstanceFactory->CreateTeam(teamConfig.Key);
+		//TPSGameState->IndexTeams();
+
+		TeamInstanceFactory->ConfigureTeam(teamConfig.Key, teamConfig.Value->Configuration);
+		//TPSGameState->IndexTeamUnits();
 	}
 }
 
 
+void ATPSGameMode::PopulateTeams()
+{
+	ATPSGameState* state = GetGameState<ATPSGameState>();
+
+	TArray<TObjectPtr<UTPSCharacterInstance>> roster;
+	for (auto team : state->Teams)
+	{
+		TeamInstanceFactory->PopulateTeam(team->TeamID, roster);
+	}
+	//TPSGameState->IndexCharacters();
+}
 
 
+
+void ATPSGameMode::KillCharacter_Implementation(const FGuid characterId)
+{
+	UE_LOG(LogTemp, Log, TEXT("RECEIVED REQUEST::KillCharacter([%s])..."), *characterId.ToString());
+	ATPSGameState* state = GetGameState<ATPSGameState>();
+
+	if (auto character = state->GetCharacter(characterId))
+	{
+		character->Die();
+	}
+}
 
 
 void ATPSGameMode::RequestRespawn_Implementation(ATPSPlayerController* playerController)
@@ -128,8 +159,7 @@ AActor* ATPSGameMode::FindSpawnPointForCharacter(UTPSCharacterInstance* instance
 	}
 
 	ATPSGameState* state = GetGameState<ATPSGameState>();
-
-	if (UTPSTeam* team = state->TeamState->GetTeam(instance->Identity->UnitID.TeamID))
+	if (UTPSTeamInstance* team = state->GetTeam(instance->Identity->UnitID.TeamID))
 	{
 		return team->SpawnPool->FindBestSpawnPointForSquadRole(instance->Identity->SquadRole);
 	}

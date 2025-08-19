@@ -21,6 +21,16 @@ class TPS_MULTIPLAYER_API UTPSCharacterInstance : public UObject
 public:
     UTPSCharacterInstance();
 
+protected:
+    virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+    virtual bool IsSupportedForNetworking() const override;
+
+
+//~ ==================================================================== ~//
+//  STATE
+//~ ==================================================================== ~//
+
+public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UTPSCharacterIdentity> Identity;
 
@@ -33,7 +43,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UTPSEquipmentLoadout> Loadout = nullptr;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
     bool IsAlive = true;
 
 
@@ -42,20 +52,20 @@ public:
 //  Instance -> Actor Operations
 //~ ======================================================================== ~//
 public:
-    //UFUNCTION(BlueprintCallable)
-    //void Die();
+    UFUNCTION(BlueprintCallable)
+    void Die();
 
-    //UFUNCTION(BlueprintCallable)
-    //void Focus();
+    UFUNCTION(BlueprintCallable)
+    void Focus();
 
-    //UFUNCTION(BlueprintCallable)
-    //void UnFocus();
+    UFUNCTION(BlueprintCallable)
+    void UnFocus();
 
-    //UFUNCTION(BlueprintCallable)
-    //void ShowDebug();
+    UFUNCTION(BlueprintCallable)
+    void ShowDebug();
 
-    //UFUNCTION(BlueprintCallable)
-    //void HideDebug();
+    UFUNCTION(BlueprintCallable)
+    void HideDebug();
 
 //~ ======================================================================== ~//
 //  SPAWNED ACTOR(s) TRACKING

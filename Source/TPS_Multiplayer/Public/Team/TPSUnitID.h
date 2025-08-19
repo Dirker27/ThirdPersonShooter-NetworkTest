@@ -10,16 +10,6 @@
 #include "TPSUnitID.generated.h"
 
 
-/*USTRUCT(BlueprintType)
-struct TPS_MULTIPLAYER_API FTPSUnitNumber
-{
-	GENERATED_BODY()
-
-	uint8 Number;
-};
-typedef uint8 FTPSUnitNumber;
-*/
-
 /**
  * Identifier to specify an exact unit in a given Team.
  *
@@ -32,7 +22,7 @@ struct TPS_MULTIPLAYER_API FTPSUnitID
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ETPSTeamID TeamID;
+	TEnumAsByte<ETPSTeamID> TeamID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ETPSHierarchicalLevel UnitLevel;
@@ -43,13 +33,18 @@ struct TPS_MULTIPLAYER_API FTPSUnitID
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<ETPSHierarchicalLevel, int> Hierarchy;
 
+	/*TPS_MULTIPLAYER_API static inline const FTPSUnitID UnSet = {
+		ETPSTeamID::Independent,
+		ETPSHierarchicalLevel::UNIT,
+		0
+	};*/
+
 public:
 	bool operator == (const FTPSUnitID other) const
 	{
 		return TeamID == other.TeamID
 			&& UnitLevel == other.UnitLevel
 			&& _hash(Hierarchy) == _hash(other.Hierarchy);
-			//&& Hierarchy == other.Hierarchy;
 	}
 
 	static uint64 HashHierarchy(FTPSUnitID id)
@@ -59,7 +54,9 @@ public:
 
 	static uint64 HashUnitIdentifier(FTPSUnitID id)
 	{
-		return _hash(id.Hierarchy) + (id.UnitNumber << (static_cast<int>(id.UnitLevel) * 4));
+		return _hash(id.Hierarchy)
+			+ (id.UnitNumber << (static_cast<int>(id.UnitLevel) * 4))
+			+ (id.TeamID << (7 * 4)); // TEAM -> First nibble of 32-bit int.
 	}
 
 private:
@@ -74,6 +71,22 @@ private:
 	}
 };
 
+
+static FString TPSUnitIdToString(const FTPSUnitID unitId)
+{
+	FString str = _TPSHierarchicalLevelToString(unitId.UnitLevel) + "-"
+		+ TPSTeamIdToString(unitId.TeamID) + "_";
+
+	for (auto lvl : unitId.Hierarchy)
+	{
+		str += _TPSHierarchicalLevelAbbreviationToString(lvl.Key);
+		str.AppendInt(lvl.Value);
+	}
+	str += _TPSHierarchicalLevelAbbreviationToString(unitId.UnitLevel);
+	str.AppendInt(unitId.UnitNumber);
+
+	return str;
+}
 
 
 UCLASS(BlueprintType)

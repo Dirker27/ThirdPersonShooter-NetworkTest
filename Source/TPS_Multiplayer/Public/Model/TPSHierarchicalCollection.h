@@ -34,13 +34,13 @@ public:
 protected:
 	// TODO: Make Generic/Template
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TMap<uint8, TObjectPtr<UTPSCharacterInstance>> Members;
+	TArray<TObjectPtr<UTPSCharacterInstance>> Members;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UTPSHierarchicalCollection> ParentCollection;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TMap<uint8, TObjectPtr<UTPSHierarchicalCollection>> ChildCollections;
+	TArray<TObjectPtr<UTPSHierarchicalCollection>> SubCollections;
 
 //~ ======================================================================== ~//
 //  PUBLIC OPERATIONS
@@ -52,39 +52,33 @@ public:
 	bool AddSubCollection(UTPSHierarchicalCollection* subCollection);
 
 	UFUNCTION(BlueprintCallable)
-	bool RemoveMember(UTPSCharacterInstance* member);
+	bool RemoveMember(const int idNumber);
 	UFUNCTION(BlueprintCallable)
-	bool RemoveSubCollection(UTPSHierarchicalCollection* subCollection);
+	bool RemoveSubCollection(const int idNumber);
 
 	UFUNCTION(BlueprintCallable)
-	bool CanAddMember(UTPSCharacterInstance* member) const;
+	bool CanAddMember(const UTPSCharacterInstance* member) const;
 	UFUNCTION(BlueprintCallable)
-	bool CanAddSubCollection(UTPSHierarchicalCollection* subCollection) const;
+	bool CanAddSubCollection(const UTPSHierarchicalCollection* subCollection) const;
 
 
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UTPSHierarchicalCollection* GetChildCollection(FTPSUnitID id);
+	UTPSHierarchicalCollection* GetSubCollection(FTPSUnitID id);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	TArray<UTPSHierarchicalCollection*> GetAllChildCollections();
+	TArray<UTPSHierarchicalCollection*> GetAllSubCollections();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UTPSCharacterInstance* GetMember(uint8 targetIdNumber);
+	UTPSCharacterInstance* GetMember(int targetIdNumber);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	TArray<UTPSCharacterInstance*> GetAllMembers();
 
 
 protected:
-	void UpdateUnitIDForMember(UTPSCharacterInstance* member, uint8 id);
-	void UpdateUnitIDForSubCollection(UTPSHierarchicalCollection* subCollection, uint8 id);
-
-private:
-	uint8 GetNextAvailableIDNumberForMember() const;
-	uint8 GetNextAvailableIDNumberForSubCollection() const;
-
-
+	void UpdateUnitIdForMember(UTPSCharacterInstance* member, int id);
+	void UpdateUnitIdForSubCollection(UTPSHierarchicalCollection* subCollection, int id);
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)

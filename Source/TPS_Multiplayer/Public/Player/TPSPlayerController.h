@@ -41,7 +41,7 @@ protected:
 public:
 
 	////////////////////////////////////////////////////////
-	// State
+	// TPSGameState
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
 	TObjectPtr<ATPSCharacter> PossessedCharacter;
@@ -82,7 +82,7 @@ public:
 public:
 
 	////////////////////////////////////////////////////////
-	// Override Character State
+	// Override Character TPSGameState
 
 	UFUNCTION(Exec, Category="Debug|Overrides")
 	void TPS_OverrideCurrentCharacterStateFromInt(int32 state);

@@ -149,20 +149,9 @@ FColor UTPSFunctionLibrary::GetColorForTeam(const ETPSTeamID teamId)
     return TPSTeamIdToColor(teamId);
 }
 
-
-FString UTPSFunctionLibrary::GetNameForUnitID(const FTPSUnitID unitID)
+FString UTPSFunctionLibrary::GetNameForUnitID(const FTPSUnitID unitId)
 {
-    FString str = _TPSHierarchicalLevelToString(unitID.UnitLevel) + "-";
-
-    for (auto lvl : unitID.Hierarchy)
-    {
-        str.AppendInt(lvl.Value);
-        str += _TPSHierarchicalLevelAbbreviationToString(lvl.Key);
-    }
-    str.AppendInt(unitID.UnitNumber);
-    str += _TPSHierarchicalLevelAbbreviationToString(unitID.UnitLevel);
-
-    return str;
+    return TPSUnitIdToString(unitId);
 }
 
 int64 UTPSFunctionLibrary::GetHashForUnitID(const FTPSUnitID unitId)

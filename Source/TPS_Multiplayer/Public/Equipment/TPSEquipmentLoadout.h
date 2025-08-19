@@ -12,7 +12,7 @@
 #include "TPSEquipmentLoadout.generated.h"
 
 /**
- * State object for a character's weapons, equipment, and gear.
+ * TPSGameState object for a character's weapons, equipment, and gear.
  */
 UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSEquipmentLoadout : public UDataAsset

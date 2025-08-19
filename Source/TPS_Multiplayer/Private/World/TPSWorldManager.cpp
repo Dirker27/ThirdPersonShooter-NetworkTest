@@ -4,5 +4,3 @@ UTPSWorldManager::UTPSWorldManager()
 {
 	
 }
-
-

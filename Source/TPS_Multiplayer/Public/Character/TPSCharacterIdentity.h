@@ -34,17 +34,18 @@ public:
 
     // Character's First Name - "Steve", "Bob", "Jenny", etc.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FName FirstName;
+    FString FirstName;
 
     // Character's Last Name - "Williams", "Stevenson", "O'Rourke", etc.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FName LastName;
+    FString LastName;
 
     // Character's Callsign - "Iceman", "Hard Tack", "Thrill", etc.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FName Callsign;
+    FString Callsign;
 
-    // Unique ID - independent of UnitID
+    // Unique ID - independent of UnitID.
+    //   Used for lookup and management operations from GameMode / GameState.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     FGuid Guid;
 

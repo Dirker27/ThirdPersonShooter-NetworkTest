@@ -2,9 +2,10 @@
 
 #include "Character/TPSCharacterInstance.h"
 
+#include "Net/UnrealNetwork.h"
+
 #include "Character/TPSCharacter.h"
 #include "Character/TPSCharacterRecord.h"
-#include "Net/UnrealNetwork.h"
 
 UTPSCharacterInstance::UTPSCharacterInstance()
 {
@@ -18,17 +19,22 @@ void UTPSCharacterInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, Instigator);
+
+	DOREPLIFETIME(ThisClass, IsAlive);
+	DOREPLIFETIME(ThisClass, SpawnedActor);
 }
+
+bool UTPSCharacterInstance::IsSupportedForNetworking() const
+{
+	return true;
+}
+
 
 
 void UTPSCharacterInstance::SpawnActor(TSubclassOf<ATPSCharacter> actorTemplate, AActor* spawnPoint)
 {
 	if (IsValid(SpawnedActor)) { return; }
 	if (!IsValid(spawnPoint)) { return; }
-
-
-	/*ATPSCharacter* characterActor = GetWorld()->SpawnActor<ATPSCharacter>(actorTemplate,
-		spawnPoint->GetTransform().GetLocation(), spawnPoint->GetTransform().Rotator());*/
 
 	ATPSCharacter* characterActor = GetWorld()->SpawnActorDeferred<ATPSCharacter>(
 		actorTemplate,
@@ -50,4 +56,46 @@ void UTPSCharacterInstance::DestroyActor()
 		SpawnedActor->Destroy();
 	}
 	SpawnedActor = nullptr;
+}
+
+
+
+void UTPSCharacterInstance::Die()
+{
+	IsAlive = false;
+
+	if (IsValid(SpawnedActor))
+	{
+		SpawnedActor->Die();
+	}
+}
+
+
+void UTPSCharacterInstance::Focus()
+{
+	if (!IsValid(SpawnedActor)) { return; }
+
+	SpawnedActor->IsFocused = true;
+}
+
+void UTPSCharacterInstance::UnFocus()
+{
+	if (!IsValid(SpawnedActor)) { return; }
+
+	SpawnedActor->IsFocused = false;
+}
+
+
+void UTPSCharacterInstance::ShowDebug()
+{
+	if (!IsValid(SpawnedActor)) { return; }
+
+	SpawnedActor->IsDebugEnabled = true;
+}
+
+void UTPSCharacterInstance::HideDebug()
+{
+	if (!IsValid(SpawnedActor)) { return; }
+
+	SpawnedActor->IsDebugEnabled = false;
 }

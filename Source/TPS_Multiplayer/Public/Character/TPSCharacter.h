@@ -95,21 +95,21 @@ public:
 	//   TODO: Migrate to "CharacterAttributes" Object
 
 	// Health
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Health", Replicated)
 	float CurrentHealth;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Health")
 	float MaxHealth;
 
 	// Armor
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Armor", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Armor", Replicated)
 	float CurrentArmor;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Armor")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Armor")
 	float MaxArmor;
 
 	// Movement Speed
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Movement", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Movement", Replicated)
 	float MovementSpeedModifier;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Movement")
 	float CurrentMaxWalkSpeed;
 
 	// Current Accuracy Tolerance (Synthetic)
@@ -118,25 +118,25 @@ public:
 
 
 	//////////////////////////////////////////////////////
-	// Persistent State
+	// Persistent TPSGameState
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState")
 	TObjectPtr<UTPSCharacterRecord> Record;
 
 
 	//////////////////////////////////////////////////////
-	// Volatile State
+	// Volatile TPSGameState
 
-	// Character State
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State", Replicated)
+	// Character TPSGameState
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState", Replicated)
 	TEnumAsByte<ETPSCharacterBehaviorState> CurrentCharacterState;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState")
 	TEnumAsByte<ETPSCharacterBehaviorState> PreviousCharacterState;
 	//
-	// Locomotion State
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State", Replicated)
+	// Locomotion TPSGameState
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState", Replicated)
 	TEnumAsByte<ETPSCharacterLocomotionState> CurrentLocomotionState;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState")
 	TEnumAsByte<ETPSCharacterLocomotionState> PreviousLocomotionState;
 	//
 	// IsAlive (Synthetic)
@@ -161,26 +161,26 @@ public:
 	// Targeting
 
 	// Target Rotation - Derived from Target Location (Replicated to peer clients)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Targeting", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Targeting", Replicated)
 	FRotator TargetLookRotation;
 	//
 	// Should Target Location drive Target Rotation?
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Targeting")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Targeting")
 	bool IsTargetingLocation;
 	//
 	// Target Location - Provided by LOCAL Controller (Not Replicated)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Targeting")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Targeting")
 	FVector TargetLookLocation;
 	// Current Look Location - Iterps to TargetLocation
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Targeting")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Targeting")
 	FVector CurrentLookLocation;
 	// Interp rate for CurrentLookLocation;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Targeting")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Targeting")
 	float LookTargetInterpRate = 0.8f;
 
 
 	////////////////////////////////////////////////////////
-	// Equipment State
+	// Equipment TPSGameState
 
 	// Current Equipped Weapon (Synthetic)
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -189,43 +189,47 @@ public:
 	////////////////////////////////////////////////////////
 	// Controller Input
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
 	bool IsBoosting;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
 	bool IsCrouchInputReceived;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
 	bool IsAiming;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
 	bool IsFiring;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
 	bool IsEquipping;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
 	bool IsReloading;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
 	bool IsInteracting;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
 	bool IsInMenu;
 
 	//////////////////////////////////////////////////////
 	// UI Visibility
 
 	// Shows full diagnostic data to peer client/server
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Render")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Render")
 	bool IsDebugEnabled = false;
 	//
+	// "Highlight" character to peer display (turn on shiny shader)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Render")
+	bool IsFocused = false;
+	//
 	// Shows name/health data to peer client/server
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Render")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Render")
 	bool ShouldRenderUnitFrame = true;
 	//
 	// Shows simple debug data to peer client
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Render")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Render")
 	bool ShouldRenderDebugFrame = true;
 
 
@@ -355,7 +359,7 @@ private:
 public:
 
 	////////////////////////////////////////////////////////
-	// State Modifiers
+	// TPSGameState Modifiers
 
 	// CharacterState
 	UFUNCTION(BlueprintCallable)
@@ -399,6 +403,8 @@ public:
 
 
 	// Character Death
+	UFUNCTION(BlueprintCallable)
+	void Die();
 	UFUNCTION(BlueprintCallable)
 	void PerformDeath();
 	UFUNCTION(BlueprintImplementableEvent)

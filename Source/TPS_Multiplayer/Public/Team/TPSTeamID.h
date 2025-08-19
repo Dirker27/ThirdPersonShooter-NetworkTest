@@ -6,9 +6,10 @@
 
 #include "TPSTeamID.generated.h"
 
-// TODO: Replace w/ UnitID?
+static const int TEAM_SLOT_SIZE = 5;
+
 UENUM(BlueprintType)
-enum class ETPSTeamID : uint8
+enum ETPSTeamID : int
 {
 	Independent = 0 UMETA(DisplayName = "NONE"), // Independent | Lone Wolves
 

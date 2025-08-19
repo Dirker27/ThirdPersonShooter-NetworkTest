@@ -85,7 +85,7 @@ public:
     FTPSMountOffset WeaponHolsterOffset = FTPSMountOffset();
 
     /////////////////////////////////////////////////////////////////
-    // State
+    // TPSGameState
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipable|Effects")
     TArray<FActiveGameplayEffectHandle> AppliedActiveEffectHandles;
@@ -94,11 +94,11 @@ public:
     TArray<FActiveGameplayEffectHandle> AppliedPassiveEffectHandles;
 
     // IsOwned by a Pawn
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipable|State", Replicated)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipable|TPSGameState", Replicated)
     bool IsOwned;
     
     // IsEquipped by a Pawn
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipable|State", Replicated)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipable|TPSGameState", Replicated)
     bool IsEquipped;
 
 //~ ========================================================================= ~//

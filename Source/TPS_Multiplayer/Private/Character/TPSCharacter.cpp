@@ -155,7 +155,7 @@ void ATPSCharacter::Tick(float deltaTime)
 	Super::Tick(deltaTime);
 
 
-	//- Sync State from Input ----------------------------=
+	//- Sync TPSGameState from Input ----------------------------=
 	//
 	SyncAttributesFromGAS();
 
@@ -206,7 +206,7 @@ void ATPSCharacter::Tick(float deltaTime)
 		}
 	}
 
-	//- Derive State from Input -------------------------=
+	//- Derive TPSGameState from Input -------------------------=
 	//
 	ETPSCharacterLocomotionState evaluatedState = EvaluateLocomotionStateForCurrentInput();
 	if (evaluatedState != CurrentLocomotionState)
@@ -325,7 +325,7 @@ void ATPSCharacter::ApplyCharacterState(const ETPSCharacterBehaviorState Charact
 	PreviousCharacterState = CurrentCharacterState;
 	CurrentCharacterState = CharacterState;
 
-	// TODO: State Transitions Engine
+	// TODO: TPSGameState Transitions Engine
 	if (CurrentCharacterState == Combat)
 	{
 		//EquipmentManager->Ready();
@@ -415,13 +415,13 @@ ETPSCharacterLocomotionState ATPSCharacter::EvaluateLocomotionStateForCurrentInp
 	// TODO: Make this follow a strategy pattern based on current CharacterState
 	//   Transitions based on allowed LocomotionStates for CharacterState
 
-	// Character State Overrides
+	// Character TPSGameState Overrides
 	if (CurrentCharacterState == Incapacitated)
 	{
 		return Ragdoll;
 	}
 
-	// Simplified State Tree (Casual & Combat)
+	// Simplified TPSGameState Tree (Casual & Combat)
 	if (IsCrouchInputReceived)
 	{
 		return Crouching;
@@ -444,6 +444,12 @@ bool ATPSCharacter::IsActionActive() const
 		|| IsInMenu;
 }
 
+void ATPSCharacter::Die()
+{
+	PerformDeath();
+}
+
+
 void ATPSCharacter::PerformDeath()
 {
 	if (HasAuthority())
@@ -455,7 +461,7 @@ void ATPSCharacter::PerformDeath()
 		UE_LOG(LogTemp, Log, TEXT("[CLIENT] XXXXXXXXXXXX CHARACTER DEATH [%s] XXXXXXXXXXXX"), *GetName());
 	}
 
-	// Notify GameMode/State
+	// Notify GameMode/TPSGameState
 	if (auto gm = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this)))
 	{
 		//gm->NotifyCharacterDeath(Identity->Guid);

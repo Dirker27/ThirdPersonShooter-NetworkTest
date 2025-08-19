@@ -50,7 +50,7 @@ private:
 public:
 
 	////////////////////////////////////////////////////////
-	// State
+	// TPSGameState
 
 	/* TODO: [PC-132] Configure Player Loadout + Faction/Team for initial Spawn.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

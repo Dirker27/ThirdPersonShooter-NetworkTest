@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "Game/TPSSpawnPool.h"
 #include "Team/TPSCommandUnitConfiguration.h"
 #include "Team/TPSCommandGroup.h"
 
@@ -10,8 +9,6 @@
 
 /**
  * A generic unit of command-able units with a designated leader.
- *
- * 
  */
 UCLASS()
 class TPS_MULTIPLAYER_API UTPSCommandStructure : public UTPSCommandGroup
@@ -21,12 +18,17 @@ class TPS_MULTIPLAYER_API UTPSCommandStructure : public UTPSCommandGroup
 public:
 	UTPSCommandStructure();
 
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual bool IsSupportedForNetworking() const override;
+
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTPSCommandUnitConfiguration Configuration;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	TWeakObjectPtr<UTPSCharacterInstance> Leader;
 
 public:
