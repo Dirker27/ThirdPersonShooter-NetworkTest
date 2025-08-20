@@ -3,13 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerController.h"
 
-#include "Character/TPSCharacterBehaviorState.h"
-#include "TPSControllerConfiguration.h"
+#include "Character/Types/TPSCharacterBehaviorState.h"
 #include "Character/TPSCharacter.h"
-#include "GAS/GASAbilitySet.h"
+#include "Player/TPSControllerConfiguration.h"
 
 #include "TPSPlayerController.generated.h"
 

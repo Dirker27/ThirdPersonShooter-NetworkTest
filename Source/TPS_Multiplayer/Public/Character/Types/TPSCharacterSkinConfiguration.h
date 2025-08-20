@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 
-#include "Character/TPSCharacterBodyType.h"
-
 #include "TPSCharacterSkinConfiguration.generated.h"
 
 

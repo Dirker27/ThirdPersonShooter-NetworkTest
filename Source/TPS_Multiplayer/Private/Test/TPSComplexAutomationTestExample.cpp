@@ -232,7 +232,7 @@ bool FTPSCharacterInitializationTest::RunTest(const FString& Parameters)
 	TestEqual("Initial Health should be 100", character->CurrentHealth, 100, KINDA_SMALL_NUMBER);
 	TestEqual("Initial Armor should be 100", character->CurrentArmor, 100, KINDA_SMALL_NUMBER);
 	TestEqual("Initial MovementSpeedModifier should be 1.0", character->MovementSpeedModifier, 1, KINDA_SMALL_NUMBER);
-	TestEqual("Initial CharacterState should be Casual", character->CurrentCharacterState, Casual);
+	TestEqual("Initial CharacterState should be Casual", character->CurrentBehaviorState, Casual);
 	TestEqual("Initial LocomotionState should be Standing", character->CurrentLocomotionState, Standing);
 	TestFalse("Initial IsBoosting should be false", character->IsBoosting);
 	TestFalse("Initial IsCrouchInputReceived should be false", character->IsCrouchInputReceived);
@@ -259,17 +259,17 @@ bool FTPSCharacterBehaviorTest::RunTest(const FString& Parameters)
 	ATPSCharacter* character = World->SpawnActor<ATPSCharacter>();
 
 	// Apply/revert CharacterState
-	character->ApplyCharacterState(Combat);
-	TestEqual("Applied CurrentCharacterState should be Combat",
-	character->CurrentCharacterState, Combat);
-	TestEqual("Applied PreviousCharacterState should be Casual",
-	character->PreviousCharacterState, Casual);
+	character->ApplyBehaviorState(Combat);
+	TestEqual("Applied CurrentBehaviorState should be Combat",
+	character->CurrentBehaviorState, Combat);
+	TestEqual("Applied PreviousBehaviorState should be Casual",
+	character->PreviousBehaviorState, Casual);
 	//
 	character->RevertCharacterState();
-	TestEqual("Reverted CurrentCharacterState should be Casual",
-	character->CurrentCharacterState, Casual);
-	TestEqual("Reverted PreviousCharacterState should be Combat",
-	character->PreviousCharacterState, Combat);
+	TestEqual("Reverted CurrentBehaviorState should be Casual",
+	character->CurrentBehaviorState, Casual);
+	TestEqual("Reverted PreviousBehaviorState should be Combat",
+	character->PreviousBehaviorState, Combat);
 
 	// Apply/revert LocomotionState
 	character->ApplyLocomotionState(Crouching);

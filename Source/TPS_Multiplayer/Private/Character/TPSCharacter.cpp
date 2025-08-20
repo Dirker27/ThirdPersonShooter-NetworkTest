@@ -58,8 +58,8 @@ ATPSCharacter::ATPSCharacter()
 	MovementSpeedModifier = 1.0;
 	CurrentMaxWalkSpeed = 200;
 	//
-	CurrentCharacterState = Casual;
-	PreviousCharacterState = Incapacitated;
+	CurrentBehaviorState = Casual;
+	PreviousBehaviorState = Incapacitated;
 	CurrentLocomotionState = Standing;
 	PreviousLocomotionState = Crouching;
 	//
@@ -70,6 +70,9 @@ ATPSCharacter::ATPSCharacter()
 	IsInteracting = false;
 	IsInMenu = false;
 	TargetLookRotation = FRotator::ZeroRotator;
+
+
+	HasDeathTriggered = false;
 }
 
 ATPSCharacter::~ATPSCharacter()
@@ -85,7 +88,7 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	//DOREPLIFETIME(ATPSCharacter, CurrentArmor);
 
 	DOREPLIFETIME(ATPSCharacter, CurrentLocomotionState);
-	DOREPLIFETIME(ATPSCharacter, CurrentCharacterState);
+	DOREPLIFETIME(ATPSCharacter, CurrentBehaviorState);
 
 	//DOREPLIFETIME(ATPSCharacter, MovementSpeedModifier);
 
@@ -155,9 +158,23 @@ void ATPSCharacter::Tick(float deltaTime)
 	Super::Tick(deltaTime);
 
 
-	//- Sync TPSGameState from Input ----------------------------=
+	//- Sync state from AbilitySystem ----------------------------=
 	//
 	SyncAttributesFromGAS();
+
+
+	// DEATH CHECK - Server-Only
+	if (HasAuthority())
+	{
+		if (IsDeathConditionMet() && !HasDeathTriggered)
+		{
+			ATPSGameMode* gameMode = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this));
+			gameMode->KillCharacter(Identity->Guid, LastHit.Instigator);
+
+
+			//Die();
+		}
+	}
 
 
 	//- Sync Character direction from Controller --------------------------=
@@ -189,7 +206,7 @@ void ATPSCharacter::Tick(float deltaTime)
 	//
 	// Extend targeting data to current weapon
 	ATPSWeapon* weapon = GetEquippedWeapon();
-	if (IsValid(weapon) && CurrentCharacterState == Combat)
+	if (IsValid(weapon) && CurrentBehaviorState == Combat)
 	{
 		weapon->TargetLocation = CurrentLookLocation;
 		weapon->TargetAccuracyTolerance = GetCurrentAccuracyTolerance();
@@ -206,7 +223,8 @@ void ATPSCharacter::Tick(float deltaTime)
 		}
 	}
 
-	//- Derive TPSGameState from Input -------------------------=
+
+	//- Derive State from Input -------------------------=
 	//
 	ETPSCharacterLocomotionState evaluatedState = EvaluateLocomotionStateForCurrentInput();
 	if (evaluatedState != CurrentLocomotionState)
@@ -214,7 +232,7 @@ void ATPSCharacter::Tick(float deltaTime)
 		ApplyLocomotionState(evaluatedState);
 	}
 	SyncComponentsFromState();
-
+	//
 	if (IsActionActive() || GetVelocity().Size() > 0.1)
 	{
 		IdleSeconds = 0;
@@ -223,6 +241,7 @@ void ATPSCharacter::Tick(float deltaTime)
 	{
 		IdleSeconds += deltaTime;
 	}
+
 
 	//- Broadcast to UI Listeners -----------------------=
 	//
@@ -248,7 +267,7 @@ void ATPSCharacter::SyncComponentsFromState()
 
 bool ATPSCharacter::IsAlive() const
 {
-	return (CurrentCharacterState != Incapacitated);
+	return (CurrentBehaviorState != Incapacitated);
 }
 bool ATPSCharacter::IsCrouching() const
 {
@@ -289,6 +308,17 @@ ATPSWeapon* ATPSCharacter::GetEquippedWeapon() const
 //~ ======================================================================== ~//
 
 
+bool ATPSCharacter::IsDeathConditionMet()
+{
+	if (CanDie && CurrentHealth <= 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+
+
 void ATPSCharacter::SetTargetLocation(FVector targetLocation)
 {
 	TargetLookLocation = targetLocation;
@@ -318,19 +348,19 @@ void ATPSCharacter::RevertLocomotionState() {
 	ApplyLocomotionState(PreviousLocomotionState);
 }
 
-void ATPSCharacter::ApplyCharacterState(const ETPSCharacterBehaviorState CharacterState)
+void ATPSCharacter::ApplyBehaviorState(const ETPSCharacterBehaviorState CharacterState)
 {
-	if (CurrentCharacterState == CharacterState) { return; } // swallow redundant state changes
+	if (CurrentBehaviorState == CharacterState) { return; } // swallow redundant state changes
 
-	PreviousCharacterState = CurrentCharacterState;
-	CurrentCharacterState = CharacterState;
+	PreviousBehaviorState = CurrentBehaviorState;
+	CurrentBehaviorState = CharacterState;
 
 	// TODO: TPSGameState Transitions Engine
-	if (CurrentCharacterState == Combat)
+	if (CurrentBehaviorState == Combat)
 	{
 		//EquipmentManager->Ready();
 	}
-	else if (PreviousCharacterState == Combat && CurrentCharacterState != Incapacitated)
+	else if (PreviousBehaviorState == Combat && CurrentBehaviorState != Incapacitated)
 	{
 		EquipmentManager->UnReady();
 	}
@@ -338,7 +368,7 @@ void ATPSCharacter::ApplyCharacterState(const ETPSCharacterBehaviorState Charact
 	ShouldNotify = true;
 }
 void ATPSCharacter::RevertCharacterState() {
-	ApplyCharacterState(PreviousCharacterState);
+	ApplyBehaviorState(PreviousBehaviorState);
 }
 
 void ATPSCharacter::InterruptIdle()
@@ -391,7 +421,7 @@ float ATPSCharacter::GetSpeedModifierForLocomotionState(const ETPSCharacterLocom
 
 float ATPSCharacter::UpdateCharacterSpeedForCurrentState()
 {
-	float baseSpeed = GetBaseSpeedForCharacterState(CurrentCharacterState);
+	float baseSpeed = GetBaseSpeedForCharacterState(CurrentBehaviorState);
 	float locomotionStateModifier = GetSpeedModifierForLocomotionState(CurrentLocomotionState);
 
 	// Set by GAS
@@ -416,7 +446,7 @@ ETPSCharacterLocomotionState ATPSCharacter::EvaluateLocomotionStateForCurrentInp
 	//   Transitions based on allowed LocomotionStates for CharacterState
 
 	// Character TPSGameState Overrides
-	if (CurrentCharacterState == Incapacitated)
+	if (CurrentBehaviorState == Incapacitated)
 	{
 		return Ragdoll;
 	}
@@ -444,13 +474,17 @@ bool ATPSCharacter::IsActionActive() const
 		|| IsInMenu;
 }
 
-void ATPSCharacter::Die()
+
+void ATPSCharacter::Die_Implementation()
 {
-	PerformDeath();
+	if (!HasDeathTriggered) {
+		HasDeathTriggered = true;
+		StartDeath();
+	}
 }
 
 
-void ATPSCharacter::PerformDeath()
+void ATPSCharacter::StartDeath_Implementation()
 {
 	if (HasAuthority())
 	{
@@ -461,11 +495,15 @@ void ATPSCharacter::PerformDeath()
 		UE_LOG(LogTemp, Log, TEXT("[CLIENT] XXXXXXXXXXXX CHARACTER DEATH [%s] XXXXXXXXXXXX"), *GetName());
 	}
 
-	// Notify GameMode/TPSGameState
-	if (auto gm = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this)))
-	{
-		//gm->NotifyCharacterDeath(Identity->Guid);
-	}
+	ApplyBehaviorState(Incapacitated);
+
+	OnDeathStart();
+}
+
+
+void ATPSCharacter::CompleteDeath_Implementation()
+{
+	//ApplyBehaviorState(Incapacitated);
 
 	// Notify Player (iff controlled)
 	if (ATPSPlayerController* controller = GetController<ATPSPlayerController>())
@@ -473,11 +511,8 @@ void ATPSCharacter::PerformDeath()
 		controller->NotifyPawnDeath();
 	}
 
-	OnDeath();
+	OnDeathComplete();
 }
-
-
-
 
 
 

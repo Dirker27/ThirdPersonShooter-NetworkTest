@@ -98,10 +98,7 @@ void ATPSGameMode::InitializeTeams()
 	for (auto teamConfig : TeamConfigurationMap)
 	{
 		TeamInstanceFactory->CreateTeam(teamConfig.Key);
-		//TPSGameState->IndexTeams();
-
 		TeamInstanceFactory->ConfigureTeam(teamConfig.Key, teamConfig.Value->Configuration);
-		//TPSGameState->IndexTeamUnits();
 	}
 }
 
@@ -115,12 +112,11 @@ void ATPSGameMode::PopulateTeams()
 	{
 		TeamInstanceFactory->PopulateTeam(team->TeamID, roster);
 	}
-	//TPSGameState->IndexCharacters();
 }
 
 
 
-void ATPSGameMode::KillCharacter_Implementation(const FGuid characterId)
+void ATPSGameMode::KillCharacter_Implementation(const FGuid characterId, const AActor* cause)
 {
 	UE_LOG(LogTemp, Log, TEXT("RECEIVED REQUEST::KillCharacter([%s])..."), *characterId.ToString());
 	ATPSGameState* state = GetGameState<ATPSGameState>();
@@ -129,6 +125,16 @@ void ATPSGameMode::KillCharacter_Implementation(const FGuid characterId)
 	{
 		character->Die();
 	}
+
+	if (auto instigatorCharacter = Cast<ATPSCharacter>(cause))
+	{
+		if (auto team = state->GetTeam(instigatorCharacter->Identity->UnitID.TeamID))
+		{
+			team->ScoredPoints += 10;
+		}
+	}
+
+	// TODO: LOG
 }
 
 

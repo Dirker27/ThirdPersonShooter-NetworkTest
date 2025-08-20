@@ -64,6 +64,8 @@ void UTPSCharacterInstance::Die()
 {
 	IsAlive = false;
 
+	// Extend death to Actor
+	//   (may have already fired if Character-driven death)
 	if (IsValid(SpawnedActor))
 	{
 		SpawnedActor->Die();

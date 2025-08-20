@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Character/TPSCharacterBodyType.h"
+#include "Character/Types/TPSCharacterBodyType.h"
 
 #include "TPSCharacterConfiguration.generated.h"
 

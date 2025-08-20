@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "TPSCharacterBodyType.h"
-#include "TPSCharacterRank.h"
+#include "Character/Types/TPSCharacterBodyType.h"
+#include "Character/Types/TPSCharacterRank.h"
 #include "Team/TPSFactionID.h"
 #include "Team/TPSSquadRole.h"
 #include "Team/TPSUnitID.h"
@@ -29,8 +29,15 @@ public:
 //~ ==================================================================== ~//
 public:
 
+    // Unique ID - independent of UnitID.
+    //   Used for lookup and management operations from GameMode / GameState.
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    FGuid Guid;
+
+
+
     ////////////////////////////////////////////////////////
-    // Identity
+    // Name
 
     // Character's First Name - "Steve", "Bob", "Jenny", etc.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -44,10 +51,10 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     FString Callsign;
 
-    // Unique ID - independent of UnitID.
-    //   Used for lookup and management operations from GameMode / GameState.
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FGuid Guid;
+
+    ////////////////////////////////////////////////////////
+    // Details and Alignment
+
 
     // Masculine / Feminine ?
     UPROPERTY(EditAnywhere, BlueprintReadWrite)

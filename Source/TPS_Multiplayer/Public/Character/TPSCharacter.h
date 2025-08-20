@@ -12,13 +12,14 @@
 #include "TPSCharacterInventory.h"
 #include "TPSCharacterRecord.h"
 
-#include "Character/TPSCharacterLocomotionState.h"
-#include "Character/TPSCharacterBehaviorState.h"
+#include "Character/Types/TPSCharacterLocomotionState.h"
+#include "Character/Types/TPSCharacterBehaviorState.h"
 #include "Equipment/TPSEquipmentManager.h"
 #include "GAS/TPSAbilitySystemComponent.h"
 #include "GAS/Attributes/CharacterHealthAttributeSet.h"
 #include "GAS/Attributes/StandardAttributeSet.h"
 #include "GAS/Attributes/WeaponAttributeSet.h"
+#include "Types/TPSHitInfo.h"
 #include "Weapon/TPSWeapon.h"
 
 #include "TPSCharacter.generated.h"
@@ -73,19 +74,23 @@ public:
 	//////////////////////////////////////////////////////
 	// Identity
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "TPSCharacter")
 	TObjectPtr<UTPSCharacterIdentity> Identity;
 
 	//////////////////////////////////////////////////////
 	// Configuration
 
 	// Can Be Possessed by a Player
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPSCharacter|Configuration")
 	bool CanBePossessedByPlayer = false;
+
+	// Can Death be triggered by loss of Health?
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration")
+	bool CanDie = false;
 
 	// Character Attributes Configuration
 	//   Can be overridden by PlayerState on Possession.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Configuration")
 	TObjectPtr<UTPSCharacterConfiguration> Configuration;
 
 
@@ -95,21 +100,21 @@ public:
 	//   TODO: Migrate to "CharacterAttributes" Object
 
 	// Health
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Health", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health", Replicated)
 	float CurrentHealth;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Health")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health")
 	float MaxHealth;
 
 	// Armor
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Armor", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Armor", Replicated)
 	float CurrentArmor;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Armor")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Armor")
 	float MaxArmor;
 
 	// Movement Speed
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Movement", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Movement", Replicated)
 	float MovementSpeedModifier;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Movement")
 	float CurrentMaxWalkSpeed;
 
 	// Current Accuracy Tolerance (Synthetic)
@@ -118,26 +123,30 @@ public:
 
 
 	//////////////////////////////////////////////////////
-	// Persistent TPSGameState
+	// Persistent State
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State")
 	TObjectPtr<UTPSCharacterRecord> Record;
 
 
 	//////////////////////////////////////////////////////
-	// Volatile TPSGameState
+	// Volatile State
 
-	// Character TPSGameState
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState", Replicated)
-	TEnumAsByte<ETPSCharacterBehaviorState> CurrentCharacterState;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState")
-	TEnumAsByte<ETPSCharacterBehaviorState> PreviousCharacterState;
+	// Behavior State (Casual, Combat, Incapacitated, etc)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State", Replicated)
+	TEnumAsByte<ETPSCharacterBehaviorState> CurrentBehaviorState;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State")
+	TEnumAsByte<ETPSCharacterBehaviorState> PreviousBehaviorState;
 	//
-	// Locomotion TPSGameState
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState", Replicated)
+	// Locomotion State (Crouching, Sprinting, Ragdoll, etc)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State", Replicated)
 	TEnumAsByte<ETPSCharacterLocomotionState> CurrentLocomotionState;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State")
 	TEnumAsByte<ETPSCharacterLocomotionState> PreviousLocomotionState;
+	//
+	// Has death been triggered?
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool HasDeathTriggered;
 	//
 	// IsAlive (Synthetic)
 	//   True if Character is not Incapacitated.
@@ -156,31 +165,34 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float IdleSeconds;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FTPSHitInfo LastHit;
+
 
 	//////////////////////////////////////////////////////
 	// Targeting
 
 	// Target Rotation - Derived from Target Location (Replicated to peer clients)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Targeting", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting", Replicated)
 	FRotator TargetLookRotation;
 	//
 	// Should Target Location drive Target Rotation?
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Targeting")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
 	bool IsTargetingLocation;
 	//
 	// Target Location - Provided by LOCAL Controller (Not Replicated)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Targeting")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
 	FVector TargetLookLocation;
 	// Current Look Location - Iterps to TargetLocation
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Targeting")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
 	FVector CurrentLookLocation;
 	// Interp rate for CurrentLookLocation;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Targeting")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
 	float LookTargetInterpRate = 0.8f;
 
 
 	////////////////////////////////////////////////////////
-	// Equipment TPSGameState
+	// Equipment State
 
 	// Current Equipped Weapon (Synthetic)
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -189,48 +201,48 @@ public:
 	////////////////////////////////////////////////////////
 	// Controller Input
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input", Replicated)
 	bool IsBoosting;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input", Replicated)
 	bool IsCrouchInputReceived;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input", Replicated)
 	bool IsAiming;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input", Replicated)
 	bool IsFiring;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input", Replicated)
 	bool IsEquipping;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input", Replicated)
 	bool IsReloading;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input", Replicated)
 	bool IsInteracting;
 	//
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Input", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input", Replicated)
 	bool IsInMenu;
 
 	//////////////////////////////////////////////////////
 	// UI Visibility
 
 	// Shows full diagnostic data to peer client/server
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Render")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Render")
 	bool IsDebugEnabled = false;
 	//
 	// "Highlight" character to peer display (turn on shiny shader)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Render")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Render")
 	bool IsFocused = false;
 	//
 	// Shows name/health data to peer client/server
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Render")
-	bool ShouldRenderUnitFrame = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Render")
+	bool IsUnitFrameEnabled = true;
 	//
 	// Shows simple debug data to peer client
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|TPSGameState|Render")
-	bool ShouldRenderDebugFrame = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Render")
+	bool IsDebugFrameEnabled = true;
 
 
 
@@ -242,9 +254,10 @@ public:
 	////////////////////////////////////////////////////////
 	// Ability Extensions
 	
-	// Boost
+	// Boost - Called from Gameplay Ability.
 	UFUNCTION(BlueprintCallable)
 	void StartBoost();
+	// Trigger additional animations and SFX for Boost ability. (Blueprint Extension)
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnBoostAbilityStart();
 	//
@@ -253,9 +266,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnBoostAbilityEnd();
 	//
-	// Aim
+	// Aim - Called from Gameplay Ability.
 	UFUNCTION(BlueprintCallable)
 	void StartAim();
+	// Trigger animations and SFX for Aim ability. (Blueprint Extension)
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnAimAbilityStart();
 	//
@@ -264,45 +278,54 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnAimAbilityEnd();
 	//
-	// Fire Weapon
+	// Fire Weapon - Called from Gameplay Ability.
 	UFUNCTION(BlueprintCallable)
 	void StartFireWeapon();
+	// Trigger animations and SFX for Fire Weapon action started. (Blueprint Extension)
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnFireWeaponAbilityStart();
 	// Called when fire is actually performed to trigger animations
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void OnFirePerformed();
 	//
+	// Stop Firing Weapon - Called from Gameplay Ability.
 	UFUNCTION(BlueprintCallable)
 	void EndFireWeapon();
+	// Trigger animations and SFX for ending Fire Weapon. (Blueprint Extension)
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnFireWeaponAbilityEnd();
 	//
-	// EquipWeapon ("Ready")
+	// EquipWeapon ("Ready") - Called from Gameplay Ability
 	UFUNCTION(BlueprintCallable)
 	void StartEquipWeapon();
+	// Trigger additional animations and SFX for Equipping Weapon. (Blueprint Extension)
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnEquipWeaponAbilityStart();
 	//
+	// EndEquipWeapon ("FinishReady") - Called from Gameplay Ability
 	UFUNCTION(BlueprintCallable)
 	void EndEquipWeapon();
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnEquipWeaponAbilityEnd();
 	//
-	// UnEquipWeapon ("UnReady")
+	// UnEquipWeapon ("UnReady") - Called from Gameplay Ability
 	UFUNCTION(BlueprintCallable)
 	void StartUnEquipWeapon();
+	// Trigger additional animations and SFX for UnEquipping Weapon. (Blueprint Extension)
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnUnEquipWeaponAbilityStart();
 	//
+	// UnEquipWeapon ("Finish UnReady") - Called from Gameplay Ability
 	UFUNCTION(BlueprintCallable)
 	void EndUnEquipWeapon();
+	// Trigger additional animations and SFX for UnEquipping Weapon. (Blueprint Extension)
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnUnEquipWeaponAbilityEnd();
 	//
-	// Reload Weapon
+	// Reload Weapon - Called from Gameplay Ability
 	UFUNCTION(BlueprintCallable)
 	void StartReloadWeapon();
+	// Trigger additional animations and SFX for Reloading weapon. (Blueprint Extension)
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnReloadWeaponAbilityStart();
 	//
@@ -311,14 +334,17 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnReloadWeaponAbilityEnd();
 	//
-	// Interact
+	// Interact Start - Called from Gameplay Ability
 	UFUNCTION(BlueprintCallable)
 	void StartInteract();
+	// Trigger additional animations and SFX for Interact Start. (Blueprint Extension)
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnInteractAbilityStart();
 	//
+	// Interact End - Called from Gameplay Ability
 	UFUNCTION(BlueprintCallable)
 	void EndInteract();
+	// Trigger additional animations and SFX for Interact End. (Blueprint Extension)
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnInteractAbilityEnd();
 
@@ -363,7 +389,7 @@ public:
 
 	// CharacterState
 	UFUNCTION(BlueprintCallable)
-	void ApplyCharacterState(const ETPSCharacterBehaviorState CharacterState);
+	void ApplyBehaviorState(const ETPSCharacterBehaviorState CharacterState);
 	UFUNCTION(BlueprintCallable)
 	void RevertCharacterState();
 	//
@@ -391,24 +417,44 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetBaseSpeedForCharacterState(const ETPSCharacterBehaviorState CharacterState);
 	//
-	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated, Please use the new function"))
 	float GetSpeedModifierForLocomotionState(const ETPSCharacterLocomotionState LocomotionState);
 	//
 	// Apply calculated MovementSpeed
 	UFUNCTION(BlueprintCallable)
 	float UpdateCharacterSpeedForCurrentState();
-
+	//
+	// Are there any actions ongoing that would be considered "Active"?
+	//   (aiming, firing, equipping, etc)
+	//   Determines whether a character is in full SPRINT vs simply boosting.
 	UFUNCTION(BlueprintCallable)
 	bool IsActionActive() const;
 
 
+	// "Are we dead yet?"
+	//    Evaluated in OnTick() to allow for alternative sources of death than strict damage.
+	//    (Fell out of world, overly idle, etc)
+	UFUNCTION(BlueprintCallable)
+	bool IsDeathConditionMet();
+
+
 	// Character Death
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void Die();
-	UFUNCTION(BlueprintCallable)
-	void PerformDeath();
+	//
+	// Start the process of dying
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void StartDeath();
+	// Finish Dying (Blueprint Extension)
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnDeath();
+	void OnDeathStart();
+	//
+	// Finish the process of dying - Called by Blueprint
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void CompleteDeath();
+	// Finish Dying (Blueprint Extension)
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDeathComplete();
 
 
 

@@ -1,7 +1,10 @@
 // (C) ToasterCat Studios 2025
 
 #pragma once
+
 #include "Equipment/TPSEquipmentLoadout.h"
+
+#include "Team/TPSSquadRole.h"
 
 #include "TPSCommandUnitConfiguration.generated.h"
 

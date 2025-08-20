@@ -99,7 +99,7 @@ private:
 public:
 	// Respawn
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void KillCharacter(const FGuid characterId);
+	void KillCharacter(const FGuid characterId, const AActor* cause);
 
 	// Respawn
 	UFUNCTION(Server, Reliable, BlueprintCallable)
