@@ -7,6 +7,7 @@
 
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
+
 #include "TPSCharacterConfiguration.h"
 #include "TPSCharacterIdentity.h"
 #include "TPSCharacterInventory.h"
@@ -100,19 +101,19 @@ public:
 	//   TODO: Migrate to "CharacterAttributes" Object
 
 	// Health
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health")
 	float CurrentHealth;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Health")
 	float MaxHealth;
 
 	// Armor
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Armor", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Armor")
 	float CurrentArmor;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Armor")
 	float MaxArmor;
 
 	// Movement Speed
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Movement", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Movement")
 	float MovementSpeedModifier;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Movement")
 	float CurrentMaxWalkSpeed;

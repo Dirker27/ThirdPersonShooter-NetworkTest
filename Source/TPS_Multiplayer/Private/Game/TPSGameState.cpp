@@ -9,6 +9,10 @@ ATPSGameState::ATPSGameState()
 {
     bReplicates = true;
     bReplicateUsingRegisteredSubObjectList = true;
+
+    CombatLog = CreateDefaultSubobject<UTPSCombatLog>("CombatLog");
+
+    GameClockSeconds = 0;
 }
 
 
@@ -23,6 +27,12 @@ void ATPSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
     DOREPLIFETIME(ThisClass, CombatLog);
 }
+
+void ATPSGameState::OnTick(float deltaTime)
+{
+    GameClockSeconds += deltaTime;
+}
+
 
 
 int ATPSGameState::GetTeamScore(const ETPSTeamID teamId)
@@ -194,7 +204,7 @@ UTPSCharacterInstance* ATPSGameState::GetCharacter(const FGuid characterId)
     // lazy JIT index
     if (CharactersById.IsEmpty())
     {
-        IndexTeamUnits();
+        IndexCharacters();
     }
 
     // perform quick fetch (use indexes)

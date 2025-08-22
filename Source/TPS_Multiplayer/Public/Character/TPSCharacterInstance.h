@@ -81,7 +81,8 @@ public:
     UFUNCTION(BlueprintCallable)
     virtual void DestroyActor();
 
-
+    UFUNCTION(BlueprintCallable)
+    ATPSCharacter* GetSpawnedActor() const { return SpawnedActor; }
 
 private:
     UFUNCTION()

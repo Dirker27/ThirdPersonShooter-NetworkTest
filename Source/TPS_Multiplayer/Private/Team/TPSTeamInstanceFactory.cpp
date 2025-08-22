@@ -4,9 +4,6 @@
 
 #include "Game/TPSGameState.h"
 #include "Kismet/GameplayStatics.h"
-#include "Net/UnrealNetwork.h"
-
-#include "Team/TPSFireTeam.h"
 
 #include "Util/TPSFunctionLibrary.h"
 

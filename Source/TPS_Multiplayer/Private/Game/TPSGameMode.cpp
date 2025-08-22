@@ -7,6 +7,7 @@
 #include "Game/TPSGameState.h"
 #include "Game/TPSSpawnFormation.h"
 #include "Team/TPSTeamInstanceFactory.h"
+#include "Types/TPSReport.h"
 #include "World/TPSWorldManager.h"
 
 //~ ====================================================================== ~//
@@ -54,8 +55,7 @@ void ATPSGameMode::IndexSpawnPoints()
 
 void ATPSGameMode::SpawnTeam(ETPSTeamID teamId)
 {
-	ATPSGameState* state = GetGameState<ATPSGameState>();
-	if (UTPSTeamInstance* t = state->GetTeam(teamId))
+	if (UTPSTeamInstance* t = State()->GetTeam(teamId))
 	{
 		_SpawnUnit(t->RootUnit, t->SpawnPool);
 	}
@@ -63,7 +63,7 @@ void ATPSGameMode::SpawnTeam(ETPSTeamID teamId)
 
 void ATPSGameMode::SpawnUnit(FTPSUnitID unitId)
 {
-	ATPSGameState* state = GetGameState<ATPSGameState>();
+	ATPSGameState* state = State();
 
 	UTPSTeamInstance* team = state->GetTeam(unitId.TeamID);
 	if (UTPSCommandStructure* unit = state->GetUnit(unitId))
@@ -105,10 +105,8 @@ void ATPSGameMode::InitializeTeams()
 
 void ATPSGameMode::PopulateTeams()
 {
-	ATPSGameState* state = GetGameState<ATPSGameState>();
-
 	TArray<TObjectPtr<UTPSCharacterInstance>> roster;
-	for (auto team : state->Teams)
+	for (auto team : State()->Teams)
 	{
 		TeamInstanceFactory->PopulateTeam(team->TeamID, roster);
 	}
@@ -116,7 +114,7 @@ void ATPSGameMode::PopulateTeams()
 
 
 
-void ATPSGameMode::KillCharacter_Implementation(const FGuid characterId, const AActor* cause)
+void ATPSGameMode::KillCharacter_Implementation(const FGuid characterId)
 {
 	UE_LOG(LogTemp, Log, TEXT("RECEIVED REQUEST::KillCharacter([%s])..."), *characterId.ToString());
 	ATPSGameState* state = GetGameState<ATPSGameState>();
@@ -124,18 +122,46 @@ void ATPSGameMode::KillCharacter_Implementation(const FGuid characterId, const A
 	if (auto character = state->GetCharacter(characterId))
 	{
 		character->Die();
+
+		auto report = GenerateEliminationReportForCharacterDeath(character);
+		state->CombatLog->LogEliminationEvent(report);
+
+		OnCharacterElimination(report);
 	}
 
-	if (auto instigatorCharacter = Cast<ATPSCharacter>(cause))
+	/*if (auto instigatorCharacter = Cast<ATPSCharacter>(cause))
 	{
 		if (auto team = state->GetTeam(instigatorCharacter->Identity->UnitID.TeamID))
 		{
 			team->ScoredPoints += 10;
 		}
-	}
+	}*/
 
 	// TODO: LOG
 }
+
+FTPSEliminationReport ATPSGameMode::GenerateEliminationReportForCharacterDeath(UTPSCharacterInstance* victim) const
+{
+	UTPSCharacterInstance* killerInstance = nullptr;
+	FName killMethod;
+
+	if (auto victimActor = victim->GetSpawnedActor())
+	{
+		FTPSHitInfo lastHit = victimActor->LastHit;
+		if (auto killerActor = Cast<ATPSCharacter>(victimActor->LastHit.Instigator))
+		{
+			killerInstance = State()->GetCharacter(killerActor->Identity->Guid);
+			if (auto killWeapon = killerActor->GetEquippedWeapon())
+			{
+				killMethod = FName(killWeapon->GetName());
+			}
+		}
+	}
+
+	return FTPSEliminationReport(victim, killerInstance, killMethod,
+		UGameplayStatics::GetTimeSeconds(this));
+}
+
 
 
 void ATPSGameMode::RequestRespawn_Implementation(ATPSPlayerController* playerController)
@@ -164,8 +190,7 @@ AActor* ATPSGameMode::FindSpawnPointForCharacter(UTPSCharacterInstance* instance
 		return nullptr;
 	}
 
-	ATPSGameState* state = GetGameState<ATPSGameState>();
-	if (UTPSTeamInstance* team = state->GetTeam(instance->Identity->UnitID.TeamID))
+	if (UTPSTeamInstance* team = State()->GetTeam(instance->Identity->UnitID.TeamID))
 	{
 		return team->SpawnPool->FindBestSpawnPointForSquadRole(instance->Identity->SquadRole);
 	}

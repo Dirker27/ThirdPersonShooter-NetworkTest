@@ -44,6 +44,7 @@ public:
 //  LIVE STATE
 //~ ==================================================================== ~//
 public:
+    // TODO: Create a "scoreboard" record for more detailed attribution.
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
     int ScoredPoints;
 

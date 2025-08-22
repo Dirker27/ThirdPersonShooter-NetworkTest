@@ -71,7 +71,7 @@ ATPSCharacter::ATPSCharacter()
 	IsInMenu = false;
 	TargetLookRotation = FRotator::ZeroRotator;
 
-
+	CanDie = true;
 	HasDeathTriggered = false;
 }
 
@@ -84,13 +84,8 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	//DOREPLIFETIME(ATPSCharacter, CurrentHealth);
-	//DOREPLIFETIME(ATPSCharacter, CurrentArmor);
-
 	DOREPLIFETIME(ATPSCharacter, CurrentLocomotionState);
 	DOREPLIFETIME(ATPSCharacter, CurrentBehaviorState);
-
-	//DOREPLIFETIME(ATPSCharacter, MovementSpeedModifier);
 
 	DOREPLIFETIME(ATPSCharacter, IsBoosting);
 	DOREPLIFETIME(ATPSCharacter, IsCrouchInputReceived);
@@ -169,10 +164,8 @@ void ATPSCharacter::Tick(float deltaTime)
 		if (IsDeathConditionMet() && !HasDeathTriggered)
 		{
 			ATPSGameMode* gameMode = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this));
-			gameMode->KillCharacter(Identity->Guid, LastHit.Instigator);
-
-
-			//Die();
+			gameMode->KillCharacter(Identity->Guid);
+			Die();
 		}
 	}
 

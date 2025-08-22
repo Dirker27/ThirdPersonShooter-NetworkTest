@@ -4,7 +4,7 @@
 
 #include "Equipment/TPSEquipmentLoadout.h"
 
-#include "Team/TPSSquadRole.h"
+#include "Team/Types/TPSSquadRole.h"
 
 #include "TPSCommandUnitConfiguration.generated.h"
 

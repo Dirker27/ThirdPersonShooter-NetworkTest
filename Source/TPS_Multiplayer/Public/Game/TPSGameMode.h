@@ -10,7 +10,7 @@
 #include "Player/TPSPlayerController.h"
 #include "Game/TPSGameConfiguration.h"
 #include "Team/TPSTeamInstanceFactory.h"
-#include "World/TPSCombatLog.h"
+#include "Types/TPSReport.h"
 #include "World/TPSWorldManager.h"
 
 #include "TPSGameMode.generated.h"
@@ -97,9 +97,13 @@ private:
 	////////////////////////////////////////////////////////
 	// Gameplay Functions
 public:
-	// Respawn
+	// Character Death - invoked by admin or character on death detection
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void KillCharacter(const FGuid characterId, const AActor* cause);
+	void KillCharacter(const FGuid characterId);
+
+	// Event Listener
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnCharacterElimination(FTPSEliminationReport elimination);
 
 	// Respawn
 	UFUNCTION(Server, Reliable, BlueprintCallable)
@@ -116,6 +120,18 @@ public:
 
 	virtual AActor* FindPlayerStart_Implementation(AController* Player, const FString& IncomingName = L"") override;
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
+
+
+	// Helper - Provides TPSGameState to self and peers.
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ATPSGameState* State() const { return GetGameState<ATPSGameState>(); }
+
+
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FTPSEliminationReport GenerateEliminationReportForCharacterDeath(UTPSCharacterInstance* victim) const;
+
 
 //~ ==================================================================== ~//
 //  CONSOLE COMMANDS (Developer-only API)

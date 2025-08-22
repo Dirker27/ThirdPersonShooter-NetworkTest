@@ -17,6 +17,14 @@ enum ETPSLogLevel : int
 };
 
 
+UENUM(BlueprintType)
+enum ETPSLogEventType : int
+{
+	MESSAGE,
+	SYSTEM,
+};
+
+
 UCLASS()
 class TPS_MULTIPLAYER_API UTPSLog : public UBlueprintFunctionLibrary
 {

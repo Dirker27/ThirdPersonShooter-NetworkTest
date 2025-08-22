@@ -6,7 +6,7 @@
 #include "GameFramework/GameState.h"
 
 #include "Player/TPSPlayerState.h"
-#include "World/TPSCombatLog.h"
+#include "Log/TPSCombatLog.h"
 
 #include "TPSGameState.generated.h"
 
@@ -26,6 +26,7 @@ public:
 	ATPSGameState();
 
 protected:
+	virtual void OnTick(float deltaTime);
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 //~ ==================================================================== ~//
@@ -33,8 +34,8 @@ protected:
 //~ ==================================================================== ~//
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-	TArray<int> TeamScores;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float GameClockSeconds;
 
 	// All Teams instantiated in the World
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)

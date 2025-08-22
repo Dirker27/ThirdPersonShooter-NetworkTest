@@ -4,11 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
-#include "GameFramework/PlayerStart.h"
-#include "Team/TPSSquadRole.h"
 
-#include "Team/TPSTeamID.h"
-#include "Team/TPSUnitID.h"
+#include "Team/Types/TPSSquadRole.h"
+#include "Team/Types/TPSUnitID.h"
 
 #include "TPSSpawnPoint.generated.h"
 
