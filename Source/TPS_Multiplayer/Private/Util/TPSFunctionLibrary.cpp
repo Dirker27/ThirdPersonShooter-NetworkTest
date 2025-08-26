@@ -169,3 +169,29 @@ FString UTPSFunctionLibrary::GetAbbreviationForRank(const ETPSCharacterRank rank
 {
     return TPSCharacterRankAbbreviationString(rank);
 }
+
+FTPSUnitID UTPSFunctionLibrary::MakeChildUnitID(FTPSUnitID parentId, ETPSHierarchicalLevel childLevel, int childNumber)
+{
+    FTPSUnitID id = FTPSUnitID();
+    id.Hierarchy = FTPSUnitHierarchy::AppendLevelNumber(id.Hierarchy, id.UnitLevel, id.UnitNumber);
+    id.TeamID = parentId.TeamID;
+    id.UnitLevel = childLevel;
+    id.UnitNumber = childNumber;
+
+    return id;
+}
+
+
+
+FString UTPSFunctionLibrary::GetFormalDisplayNameForCharacter(const UTPSCharacterInstance* character)
+{
+    FString displayName = TPSCharacterRankAbbreviationString(character->OpId.Rank) + ". ";
+    displayName += character->OpId.FirstName + " ";
+    if (!character->OpId.Callsign.IsEmpty())
+    {
+        displayName += "'" + character->OpId.Callsign + "'";
+    }
+    displayName += character->OpId.LastName;
+
+    return displayName;
+}

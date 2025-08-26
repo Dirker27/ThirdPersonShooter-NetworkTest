@@ -32,8 +32,11 @@ protected:
 //~ ==================================================================== ~//
 
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<UTPSCharacterIdentity> Identity;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    FTPSOperatorIdentity OpId;
+
+    //UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    //TObjectPtr<UTPSCharacterIdentity> Identity;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UTPSCharacterConfiguration> Configuration;

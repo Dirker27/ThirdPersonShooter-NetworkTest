@@ -63,8 +63,8 @@ public:
 
 
 
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UTPSHierarchicalCollection* GetSubCollection(FTPSUnitID id);
+	//UFUNCTION(BlueprintCallable, BlueprintPure)
+	//UTPSHierarchicalCollection* GetSubCollection(FTPSUnitID id);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	TArray<UTPSHierarchicalCollection*> GetAllSubCollections();

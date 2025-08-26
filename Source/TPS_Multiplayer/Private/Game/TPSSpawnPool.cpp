@@ -71,7 +71,7 @@ ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForUnitAndSquadRole(const FTPSU
 		}
 
 		// Near Fit - keep scanning
-		if (auto unitNumber = unitId.Hierarchy.Find(sp->AssignedUnit.UnitLevel))
+		/*if (auto unitNumber = unitId.Hierarchy.Find(sp->AssignedUnit.UnitLevel))
 		{
 			if (*unitNumber == sp->AssignedUnit.UnitNumber
 				&& sp->PreferredSquadRoleToSpawn == role 
@@ -80,7 +80,7 @@ ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForUnitAndSquadRole(const FTPSU
 				bestSpawn = sp;
 				bestLevel = sp->AssignedUnit.UnitLevel;				
 			}
-		}
+		}*/
 	}
 
 	return bestSpawn;

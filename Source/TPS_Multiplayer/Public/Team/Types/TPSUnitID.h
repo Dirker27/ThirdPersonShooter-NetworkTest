@@ -17,6 +17,81 @@
  *   ie: there can be an 'Abel Squad' on the other Team as well as your own.
  */
 USTRUCT(BlueprintType)
+struct TPS_MULTIPLAYER_API FTPSUnitHierarchy
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int UnitNumber = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int FireteamNumber = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int SquadNumber = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int PlatoonNumber = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int CompanyNumber = 0;
+
+	FTPSUnitHierarchy()
+	{		
+	}
+
+	static FTPSUnitHierarchy AppendLevelNumber(FTPSUnitHierarchy hierarchy, ETPSHierarchicalLevel level, int number)
+	{
+		FTPSUnitHierarchy h = hierarchy;
+		switch (level)
+		{
+		case ETPSHierarchicalLevel::UNIT:
+			h.UnitNumber = number;
+			break;
+		case ETPSHierarchicalLevel::FIRE_TEAM:
+			h.FireteamNumber = number;
+			break;
+		case ETPSHierarchicalLevel::SQUAD:
+			h.SquadNumber = number;
+			break;
+		case ETPSHierarchicalLevel::PLATOON:
+			h.PlatoonNumber = number;
+			break;
+		case ETPSHierarchicalLevel::COMPANY:
+			h.CompanyNumber = number;
+			break;
+		}
+		return h;
+	}
+
+	static int GetNumberForLevel(FTPSUnitHierarchy hierarchy, ETPSHierarchicalLevel level)
+	{
+		switch (level)
+		{
+		case ETPSHierarchicalLevel::UNIT:
+			return hierarchy.UnitNumber;
+		case ETPSHierarchicalLevel::FIRE_TEAM:
+			return hierarchy.FireteamNumber;
+		case ETPSHierarchicalLevel::SQUAD:
+			return hierarchy.SquadNumber;
+		case ETPSHierarchicalLevel::PLATOON:
+			return hierarchy.PlatoonNumber;
+		case ETPSHierarchicalLevel::COMPANY:
+			return hierarchy.CompanyNumber;
+		default:
+			return 0;
+		}
+	}
+};
+
+
+/**
+ * Identifier to specify an exact unit in a given Team.
+ *
+ * Will be unique for each team, but may be duplicated across multiple teams.
+ *   ie: there can be an 'Abel Squad' on the other Team as well as your own.
+ */
+USTRUCT(BlueprintType)
 struct TPS_MULTIPLAYER_API FTPSUnitID
 {
 	GENERATED_BODY()
@@ -31,7 +106,7 @@ struct TPS_MULTIPLAYER_API FTPSUnitID
 	int UnitNumber;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<ETPSHierarchicalLevel, int> Hierarchy;
+	FTPSUnitHierarchy Hierarchy;
 
 	/*TPS_MULTIPLAYER_API static inline const FTPSUnitID UnSet = {
 		ETPSTeamID::Independent,
@@ -69,6 +144,17 @@ private:
 		}
 		return hash;
 	}
+
+	static uint64 _hash(FTPSUnitHierarchy hierarchy)
+	{
+		uint64 hash = 0;
+		hash += hierarchy.UnitNumber;
+		hash += hierarchy.FireteamNumber << 4;
+		hash += hierarchy.SquadNumber << 8;
+		hash += hierarchy.PlatoonNumber << 12;
+		hash += hierarchy.CompanyNumber << 16;
+		return hash;
+	}
 };
 
 
@@ -77,11 +163,28 @@ static FString TPSUnitIdToString(const FTPSUnitID unitId)
 	FString str = _TPSHierarchicalLevelToString(unitId.UnitLevel) + "-"
 		+ TPSTeamIdToString(unitId.TeamID) + "_";
 
-	for (auto lvl : unitId.Hierarchy)
+
+	if (unitId.Hierarchy.CompanyNumber > 0)
 	{
-		str += _TPSHierarchicalLevelAbbreviationToString(lvl.Key);
-		str.AppendInt(lvl.Value);
+		str += "C";
+		str.AppendInt(unitId.Hierarchy.CompanyNumber);
 	}
+	if (unitId.Hierarchy.PlatoonNumber > 0)
+	{
+		str += "P";
+		str.AppendInt(unitId.Hierarchy.PlatoonNumber);
+	}
+	if (unitId.Hierarchy.SquadNumber > 0)
+	{
+		str += "S";
+		str.AppendInt(unitId.Hierarchy.SquadNumber);
+	}
+	if (unitId.Hierarchy.FireteamNumber > 0)
+	{
+		str += "F";
+		str.AppendInt(unitId.Hierarchy.FireteamNumber);
+	}
+
 	str += _TPSHierarchicalLevelAbbreviationToString(unitId.UnitLevel);
 	str.AppendInt(unitId.UnitNumber);
 
@@ -97,4 +200,7 @@ class UTPSUnitIdentifier : public UDataAsset
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FTPSUnitID ID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<ETPSHierarchicalLevel, int> Hierarchy;
 };

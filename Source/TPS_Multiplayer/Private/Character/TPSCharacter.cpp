@@ -8,8 +8,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
+#include "Character/TPSCharacterInstance.h"
 #include "Player/TPSPlayerController.h"
 #include "Player/TPSPlayerState.h"
+
 
 
 //~ ======================================================================= ~//
@@ -23,8 +25,8 @@ ATPSCharacter::ATPSCharacter()
 	//- Sub-Components ------------------------------------=
 	//
 	// TODO: Initialize or load these from persistent store
-	Identity = CreateDefaultSubobject<UTPSCharacterIdentity>(TEXT("DefaultIdentity"));
-	Record = CreateDefaultSubobject<UTPSCharacterRecord>(TEXT("DefaultRecord"));
+	//Identity = CreateDefaultSubobject<UTPSCharacterIdentity>(TEXT("DefaultIdentity"));
+	//Record = CreateDefaultSubobject<UTPSCharacterRecord>(TEXT("DefaultRecord"));
 	Configuration = CreateDefaultSubobject<UTPSCharacterConfiguration>(TEXT("DefaultConfiguration"));
 	//
 	Inventory = CreateDefaultSubobject<UTPSCharacterInventory>(TEXT("Inventory"));
@@ -169,7 +171,7 @@ void ATPSCharacter::Tick(float deltaTime)
 		if (IsDeathConditionMet() && !HasDeathTriggered)
 		{
 			ATPSGameMode* gameMode = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this));
-			gameMode->KillCharacter(Identity->Guid);
+			if (IsValid(CharacterInstance)) { gameMode->KillCharacter(CharacterInstance->OpId.Guid); }
 			Die();
 		}
 	}
@@ -261,7 +263,10 @@ void ATPSCharacter::SyncComponentsFromState()
 //  SYNTHETIC GETTERS
 //~ ============================================================= ~//
 
-
+FTPSOperatorIdentity ATPSCharacter::Identity()
+{
+	return IsValid(CharacterInstance) ? CharacterInstance->OpId : FTPSOperatorIdentity();
+}
 
 bool ATPSCharacter::IsAlive() const
 {
@@ -736,7 +741,7 @@ UAbilitySystemComponent* ATPSCharacter::GetAbilitySystemComponent() const {
 void ATPSCharacter::SetupAbilitySystem()
 {
 	if (!IsValid(AbilitySystem)) { return; }
-	UE_LOG(LogTemp, Log, TEXT("Initializing ASC for Character[%s]..."), *Identity->Guid.ToString());
+	//UE_LOG(LogTemp, Log, TEXT("Initializing ASC for Character[%s]..."), *Identity->Guid.ToString());
 
 	AbilitySystem->InitializeBaseAbilitiesAndEffects();
 
@@ -749,7 +754,7 @@ void ATPSCharacter::SetupAbilitySystem()
 		.AddUObject(this, &ThisClass::OnMovementAttributeChanged);
 
 	// Print
-	UE_LOG(LogTemp, Log, TEXT("ASC for Character[%s] initialized."), *Identity->Guid.ToString());
+	//UE_LOG(LogTemp, Log, TEXT("ASC for Character[%s] initialized."), *Identity->Guid.ToString());
 	/*for (auto ability : AbilitySystem->GetActivatableAbilities())
 	{
 		UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
@@ -790,7 +795,7 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* playerInputCompon
 {
 	Super::SetupPlayerInputComponent(playerInputComponent);
 
-	UE_LOG(LogTemp, Log, TEXT("Character[%s]::SetupInputComponent()"), *Identity->Guid.ToString());
+	//UE_LOG(LogTemp, Log, TEXT("Character[%s]::SetupInputComponent()"), *Identity->Guid.ToString());
 	AbilitySystem->BindToInputComponent(playerInputComponent);
 }
 

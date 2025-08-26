@@ -9,7 +9,7 @@
 
 UTPSCharacterInstance::UTPSCharacterInstance()
 {
-	Identity = CreateDefaultSubobject<UTPSCharacterIdentity>(TEXT("Identity"));
+	//Identity = CreateDefaultSubobject<UTPSCharacterIdentity>(TEXT("Identity"));
 	Configuration = CreateDefaultSubobject<UTPSCharacterConfiguration>(TEXT("Configuration"));
 	Record = CreateDefaultSubobject<UTPSCharacterRecord>(TEXT("Record"));
 }
@@ -19,6 +19,7 @@ void UTPSCharacterInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, Instigator);
+	DOREPLIFETIME(ThisClass, OpId);
 
 	DOREPLIFETIME(ThisClass, SpawnedActor);
 	DOREPLIFETIME(ThisClass, IsAlive);
@@ -37,7 +38,7 @@ void UTPSCharacterInstance::SpawnActor(TSubclassOf<ATPSCharacter> actorTemplate,
 		spawnPoint->GetTransform());
 
 	characterActor->CharacterInstance = this;
-	characterActor->Identity = Identity;
+	//characterActor->Identity = OpId;
 	characterActor->Configuration = Configuration;
 	characterActor->EquipmentManager->Loadout = Loadout;
 

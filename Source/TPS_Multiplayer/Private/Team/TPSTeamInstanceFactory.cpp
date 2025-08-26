@@ -122,11 +122,12 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandStructure* node)
 		UTPSCharacterInstance* instance = _NewCharacter();
 		node->AddMember(instance);
 		//
-		instance->Identity->FirstName = "Karl";
-		instance->Identity->Callsign = "Callsign";
-		instance->Identity->LastName = UTPSFunctionLibrary::GetNameForUnitID(
-			instance->Identity->UnitID);
-		instance->Identity->CharacterBodyType = 
+		instance->OpId.Guid = FGuid::NewGuid();
+		instance->OpId.FirstName = "Karl";
+		instance->OpId.Callsign = "Callsign";
+		instance->OpId.LastName = UTPSFunctionLibrary::GetNameForUnitID(
+			instance->OpId.UnitID);
+		instance->OpId.CharacterBodyType = 
 			(FMath::RandRange(0, 1) > 0)
 				? ETPSCharacterBodyType::Male
 				: ETPSCharacterBodyType::Female;
@@ -136,26 +137,26 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandStructure* node)
 		//
 		// TODO: [PC-174] Derive this from UnitSchema in FTPSCommandUnitConfiguration
 		//
-		instance->Identity->SquadRole = ETPSSquadRole::Rifleman;
-		if (i == 2) { instance->Identity->SquadRole = ETPSSquadRole::AutomaticRifleman; }
+		instance->OpId.SquadRole = ETPSSquadRole::Rifleman;
+		if (i == 2) { instance->OpId.SquadRole = ETPSSquadRole::AutomaticRifleman; }
 		//
-		instance->Identity->Rank = ETPSCharacterRank::Private;
+		instance->OpId.Rank = ETPSCharacterRank::Private;
 		if (i == 0)
 		{
-			instance->Identity->SquadRole = ETPSSquadRole::Leader;
+			instance->OpId.SquadRole = ETPSSquadRole::Leader;
 
 			switch (node->UnitID.UnitLevel) {
 			case ETPSHierarchicalLevel::FIRE_TEAM:
-				instance->Identity->Rank = ETPSCharacterRank::Corporal;
+				instance->OpId.Rank = ETPSCharacterRank::Corporal;
 				break;
 			case ETPSHierarchicalLevel::SQUAD:
-				instance->Identity->Rank = ETPSCharacterRank::Sergeant;
+				instance->OpId.Rank = ETPSCharacterRank::Sergeant;
 				break;
 			case ETPSHierarchicalLevel::PLATOON:
-				instance->Identity->Rank = ETPSCharacterRank::Lieutenant;
+				instance->OpId.Rank = ETPSCharacterRank::Lieutenant;
 				break;
 			case ETPSHierarchicalLevel::COMPANY:
-				instance->Identity->Rank = ETPSCharacterRank::Captain;
+				instance->OpId.Rank = ETPSCharacterRank::Captain;
 				break;
 			}
 			node->SetLeader(instance);
@@ -163,7 +164,7 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandStructure* node)
 
 		// Assign Loadout based on SquadRole
 		if (auto l = node->Configuration.MemberLoadoutMap
-				.Find(instance->Identity->SquadRole))
+				.Find(instance->OpId.SquadRole))
 		{
 			instance->Loadout = *l;
 		}
@@ -175,6 +176,8 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandStructure* node)
 			state->Characters.Add(instance);
 			state->AddReplicatedSubObject(instance);
 		}
+
+		
 	}
 
 	for (auto subUnit : node->GetAllSubCollections())
@@ -199,7 +202,7 @@ void UTPSTeamInstanceFactory::PopulateTeam(ETPSTeamID teamId, TArray<UTPSCharact
 void UTPSTeamInstanceFactory::ActivateCharacter(UTPSCharacterInstance* instance)
 {
 	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
-	if (UTPSTeamInstance* team = state->GetTeam(instance->Identity->UnitID.TeamID))
+	if (UTPSTeamInstance* team = state->GetTeam(instance->OpId.UnitID.TeamID))
 	{
 		team->ActiveMembers.Add(instance);
 		/*team->ActiveMembers.Add(
@@ -218,9 +221,9 @@ void UTPSTeamInstanceFactory::AssignCharacterToTeam(ETPSTeamID team, UTPSCharact
 void UTPSTeamInstanceFactory::AssignCharacterToTeamUnit(FTPSUnitID unitId, UTPSCharacterInstance* character)
 {
 	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
-	if (UTPSCommandStructure* existingUnit = state->GetUnit(character->Identity->UnitID))
+	if (UTPSCommandStructure* existingUnit = state->GetUnit(character->OpId.UnitID))
 	{
-		existingUnit->RemoveMember(character->Identity->UnitID.UnitNumber);
+		existingUnit->RemoveMember(character->OpId.UnitID.UnitNumber);
 	}
 
 	if (UTPSCommandStructure* unit = state->GetUnit(unitId))

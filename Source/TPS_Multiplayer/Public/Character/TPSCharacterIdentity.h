@@ -16,16 +16,10 @@
  *
  * If we were to serialize this Character as a PERSON, what would we see?
  */
-UCLASS(BlueprintType)
-class TPS_MULTIPLAYER_API UTPSCharacterIdentity : public UObject
+USTRUCT(BlueprintType)
+struct TPS_MULTIPLAYER_API FTPSOperatorIdentity
 {
     GENERATED_BODY()
-
-public:
-    UTPSCharacterIdentity();
-
-protected:
-    virtual bool IsSupportedForNetworking() const override { return true; }
 
 //~ ==================================================================== ~//
 //  ATTRIBUTES
@@ -79,13 +73,27 @@ public:
     // Character's "Class" / Role in their Squad
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     ETPSSquadRole SquadRole;
+};
 
+/**
+ * ID Card Pointer
+ */
+UCLASS(BlueprintType)
+class TPS_MULTIPLAYER_API UTPSCharacterIdentity : public UObject
+{
+    GENERATED_BODY()
 
-    ////////////////////////////////////////////////////////
-    // Convenience Getters
+public:
+    UTPSCharacterIdentity();
 
-    // Get full character name as raw text - ie: "Sgt. Jose 'Boomer' Ramirez"
-    UFUNCTION(BlueprintCallable, BlueprintPure)
-    FString GetFormalDisplayName() const;
+protected:
+    virtual bool IsSupportedForNetworking() const override { return true; }
 
+    //~ ==================================================================== ~//
+    //  ATTRIBUTES
+    //~ ==================================================================== ~//
+public:
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FTPSOperatorIdentity OpID;
 };

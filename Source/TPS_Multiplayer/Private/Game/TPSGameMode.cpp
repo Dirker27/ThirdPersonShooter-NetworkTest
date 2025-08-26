@@ -77,8 +77,8 @@ void ATPSGameMode::_SpawnUnit(UTPSCommandStructure* unit, UTPSSpawnPool* spawnPo
 	for (auto instance : unit->GetAllMembers())
 	{
 		AActor* spawn = spawnPool->FindBestSpawnPointForUnitAndSquadRole(
-			instance->Identity->UnitID,
-			instance->Identity->SquadRole);
+			instance->OpId.UnitID,
+			instance->OpId.SquadRole);
 
 		instance->SpawnActor(PlayerCharacterTemplate, spawn);
 
@@ -139,7 +139,7 @@ FTPSEliminationReport ATPSGameMode::GenerateEliminationReportForCharacterDeath(U
 
 	if (auto killerActor = Cast<ATPSCharacter>(eliminatee->LastHit.Instigator))
 	{
-		killerInstance = State()->GetCharacter(killerActor->Identity->Guid);
+		killerInstance = killerActor->CharacterInstance;
 		if (auto killWeapon = killerActor->GetEquippedWeapon())
 		{
 			killMethod = FName(killWeapon->GetName());
@@ -181,9 +181,9 @@ AActor* ATPSGameMode::FindSpawnPointForCharacter(UTPSCharacterInstance* instance
 		return nullptr;
 	}
 
-	if (UTPSTeamInstance* team = State()->GetTeam(instance->Identity->UnitID.TeamID))
+	if (UTPSTeamInstance* team = State()->GetTeam(instance->OpId.UnitID.TeamID))
 	{
-		return team->SpawnPool->FindBestSpawnPointForSquadRole(instance->Identity->SquadRole);
+		return team->SpawnPool->FindBestSpawnPointForSquadRole(instance->OpId.SquadRole);
 	}
 
 	return FindPlayerStart(nullptr);

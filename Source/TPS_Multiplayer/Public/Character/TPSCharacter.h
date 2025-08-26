@@ -84,8 +84,11 @@ public:
 	//////////////////////////////////////////////////////
 	// Identity
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "TPSCharacter", Replicated)
-	TObjectPtr<UTPSCharacterIdentity> Identity;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "TPSCharacter", Replicated)
+	//TObjectPtr<UTPSCharacterIdentity> Identity;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FTPSOperatorIdentity Identity();
 
 	//////////////////////////////////////////////////////
 	// Configuration
@@ -135,8 +138,8 @@ public:
 	//////////////////////////////////////////////////////
 	// Persistent State
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State", Replicated)
-	TObjectPtr<UTPSCharacterRecord> Record;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State", Replicated)
+	//TObjectPtr<UTPSCharacterRecord> Record;
 
 
 	//////////////////////////////////////////////////////

@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 
 #include "Character/TPSCharacter.h"
+#include "Character/TPSCharacterInstance.h"
 
 #include "TPSFunctionLibrary.generated.h"
 
@@ -61,4 +62,11 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static int64 GetHashForUnitHierarchy(const FTPSUnitID unitId);
 
+	// Make a UnitID that is the child of a given parent.
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FTPSUnitID MakeChildUnitID(FTPSUnitID parentId, ETPSHierarchicalLevel childLevel, int childNumber);
+
+	// Get full character name as raw text - ie: "Sgt. Jose 'Boomer' Ramirez"
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FString GetFormalDisplayNameForCharacter(const UTPSCharacterInstance* character);
 };
