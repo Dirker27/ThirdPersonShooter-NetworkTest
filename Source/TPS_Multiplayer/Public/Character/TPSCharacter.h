@@ -20,10 +20,11 @@
 #include "GAS/Attributes/CharacterHealthAttributeSet.h"
 #include "GAS/Attributes/StandardAttributeSet.h"
 #include "GAS/Attributes/WeaponAttributeSet.h"
-#include "Types/TPSHitInfo.h"
 #include "Weapon/TPSWeapon.h"
 
 #include "TPSCharacter.generated.h"
+
+class UTPSCharacterInstance;
 
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUpdateCharacterAttributeDisplay);
@@ -66,6 +67,14 @@ private:
 	bool ShouldNotify = false;
 
 
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+	TObjectPtr<UTPSCharacterInstance> CharacterInstance;
+
+	void BindToCharacterInstance(UTPSCharacterInstance* instance)
+	{
+		CharacterInstance = instance;
+	}
 
 //~ ======================================================================== ~//
 //  STATE
@@ -75,7 +84,7 @@ public:
 	//////////////////////////////////////////////////////
 	// Identity
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "TPSCharacter")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "TPSCharacter", Replicated)
 	TObjectPtr<UTPSCharacterIdentity> Identity;
 
 	//////////////////////////////////////////////////////
@@ -91,7 +100,7 @@ public:
 
 	// Character Attributes Configuration
 	//   Can be overridden by PlayerState on Possession.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Configuration")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Configuration", Replicated)
 	TObjectPtr<UTPSCharacterConfiguration> Configuration;
 
 
@@ -126,12 +135,14 @@ public:
 	//////////////////////////////////////////////////////
 	// Persistent State
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State", Replicated)
 	TObjectPtr<UTPSCharacterRecord> Record;
 
 
 	//////////////////////////////////////////////////////
 	// Volatile State
+	//
+	// TODO: Migrate to Instance(?) and convert to synthetic getters
 
 	// Behavior State (Casual, Combat, Incapacitated, etc)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State", Replicated)
@@ -146,7 +157,7 @@ public:
 	TEnumAsByte<ETPSCharacterLocomotionState> PreviousLocomotionState;
 	//
 	// Has death been triggered?
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
 	bool HasDeathTriggered;
 	//
 	// IsAlive (Synthetic)
@@ -165,9 +176,6 @@ public:
 	//
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float IdleSeconds;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FTPSHitInfo LastHit;
 
 
 	//////////////////////////////////////////////////////

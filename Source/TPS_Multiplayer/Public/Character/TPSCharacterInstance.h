@@ -7,6 +7,7 @@
 #include "TPSCharacterIdentity.h"
 #include "TPSCharacterRecord.h"
 #include "Equipment/TPSEquipmentLoadout.h"
+#include "Types/TPSHitInfo.h"
 
 #include "TPSCharacterInstance.generated.h"
 
@@ -23,7 +24,7 @@ public:
 
 protected:
     virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
-    virtual bool IsSupportedForNetworking() const override;
+    virtual bool IsSupportedForNetworking() const override { return true; }
 
 
 //~ ==================================================================== ~//
@@ -45,6 +46,12 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
     bool IsAlive = true;
+
+
+
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    FTPSHitInfo LastHit;
 
 
 

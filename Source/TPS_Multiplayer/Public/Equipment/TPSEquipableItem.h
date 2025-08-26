@@ -56,7 +56,7 @@ protected:
 
 public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    TWeakObjectPtr<UAbilitySystemComponent> OwnerAsc;
+    TObjectPtr<UAbilitySystemComponent> OwnerAsc;
 
 //~ ========================================================================= ~//
 //  ATTRIBUTES

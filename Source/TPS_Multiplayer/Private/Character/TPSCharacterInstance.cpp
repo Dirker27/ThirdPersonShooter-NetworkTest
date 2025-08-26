@@ -20,13 +20,9 @@ void UTPSCharacterInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 
 	DOREPLIFETIME(ThisClass, Instigator);
 
-	DOREPLIFETIME(ThisClass, IsAlive);
 	DOREPLIFETIME(ThisClass, SpawnedActor);
-}
-
-bool UTPSCharacterInstance::IsSupportedForNetworking() const
-{
-	return true;
+	DOREPLIFETIME(ThisClass, IsAlive);
+	DOREPLIFETIME(ThisClass, LastHit);
 }
 
 
@@ -40,6 +36,7 @@ void UTPSCharacterInstance::SpawnActor(TSubclassOf<ATPSCharacter> actorTemplate,
 		actorTemplate,
 		spawnPoint->GetTransform());
 
+	characterActor->CharacterInstance = this;
 	characterActor->Identity = Identity;
 	characterActor->Configuration = Configuration;
 	characterActor->EquipmentManager->Loadout = Loadout;

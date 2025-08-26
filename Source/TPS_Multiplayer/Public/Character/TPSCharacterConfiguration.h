@@ -14,6 +14,9 @@ class TPS_MULTIPLAYER_API UTPSCharacterConfiguration : public UDataAsset
 {
     GENERATED_BODY()
 
+protected:
+    virtual bool IsSupportedForNetworking() const override { return true; }
+
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     ETPSCharacterBodyType BodyType;

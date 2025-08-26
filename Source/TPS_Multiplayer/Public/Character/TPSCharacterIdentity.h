@@ -24,6 +24,9 @@ class TPS_MULTIPLAYER_API UTPSCharacterIdentity : public UObject
 public:
     UTPSCharacterIdentity();
 
+protected:
+    virtual bool IsSupportedForNetworking() const override { return true; }
+
 //~ ==================================================================== ~//
 //  ATTRIBUTES
 //~ ==================================================================== ~//
@@ -76,4 +79,13 @@ public:
     // Character's "Class" / Role in their Squad
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     ETPSSquadRole SquadRole;
+
+
+    ////////////////////////////////////////////////////////
+    // Convenience Getters
+
+    // Get full character name as raw text - ie: "Sgt. Jose 'Boomer' Ramirez"
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    FString GetFormalDisplayName() const;
+
 };

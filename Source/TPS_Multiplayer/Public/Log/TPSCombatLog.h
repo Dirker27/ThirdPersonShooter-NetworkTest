@@ -13,15 +13,16 @@ enum ETPSCombatLogEntryType : int
     GameStart,
     GameOver,
 
+    Elimination,
+
     PlayerKilled,
     PlayerJoined,
     PlayerLeft,
 
     BotKilled,
 
-    SquadOrder,
-    PlatoonOrder,
-    TeamOrder,
+    OrderIssued,
+    OrderComplete,
 
     ScoreAlert,
     ObjectiveUpdated
@@ -33,8 +34,11 @@ class UTPSCombatLogEntry : public UObject
 {
 	GENERATED_BODY()
 
+public:
+    UTPSCombatLogEntry() { }
+
 protected:
-    virtual bool IsSupportedForNetworking() const;
+    virtual bool IsSupportedForNetworking() const { return true; }
 
 public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -53,9 +57,15 @@ public:
 
 
 UCLASS(BlueprintType)
-class UTPSKillEvent : public UTPSCombatLogEntry
+class UTPSEliminationEvent : public UTPSCombatLogEntry
 {
     GENERATED_BODY()
+
+public:
+    UTPSEliminationEvent() { Type = Elimination; }
+
+protected:
+    //virtual bool IsSupportedForNetworking() const { return true; }
 
 public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -105,6 +115,7 @@ public:
 
 protected:
     virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+    virtual bool IsSupportedForNetworking() const override { return true; }
 
 protected:
     // Full log - SERVER-only

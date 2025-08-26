@@ -84,6 +84,11 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(ATPSCharacter, CharacterInstance);
+	//DOREPLIFETIME(ATPSCharacter, Identity);
+	//DOREPLIFETIME(ATPSCharacter, Configuration);
+	//DOREPLIFETIME(ATPSCharacter, Record);
+
 	DOREPLIFETIME(ATPSCharacter, CurrentLocomotionState);
 	DOREPLIFETIME(ATPSCharacter, CurrentBehaviorState);
 

@@ -126,39 +126,30 @@ void ATPSGameMode::KillCharacter_Implementation(const FGuid characterId)
 		auto report = GenerateEliminationReportForCharacterDeath(character);
 		state->CombatLog->LogEliminationEvent(report);
 
+		// Broadcast Event -> BP GameMode handler
 		OnCharacterElimination(report);
 	}
-
-	/*if (auto instigatorCharacter = Cast<ATPSCharacter>(cause))
-	{
-		if (auto team = state->GetTeam(instigatorCharacter->Identity->UnitID.TeamID))
-		{
-			team->ScoredPoints += 10;
-		}
-	}*/
-
-	// TODO: LOG
 }
 
-FTPSEliminationReport ATPSGameMode::GenerateEliminationReportForCharacterDeath(UTPSCharacterInstance* victim) const
+
+FTPSEliminationReport ATPSGameMode::GenerateEliminationReportForCharacterDeath(UTPSCharacterInstance* eliminatee) const
 {
 	UTPSCharacterInstance* killerInstance = nullptr;
 	FName killMethod;
 
-	if (auto victimActor = victim->GetSpawnedActor())
+	if (auto killerActor = Cast<ATPSCharacter>(eliminatee->LastHit.Instigator))
 	{
-		FTPSHitInfo lastHit = victimActor->LastHit;
-		if (auto killerActor = Cast<ATPSCharacter>(victimActor->LastHit.Instigator))
+		killerInstance = State()->GetCharacter(killerActor->Identity->Guid);
+		if (auto killWeapon = killerActor->GetEquippedWeapon())
 		{
-			killerInstance = State()->GetCharacter(killerActor->Identity->Guid);
-			if (auto killWeapon = killerActor->GetEquippedWeapon())
-			{
-				killMethod = FName(killWeapon->GetName());
-			}
+			killMethod = FName(killWeapon->GetName());
 		}
 	}
 
-	return FTPSEliminationReport(victim, killerInstance, killMethod,
+	return FTPSEliminationReport(
+		eliminatee, 
+		killerInstance, 
+		killMethod,
 		UGameplayStatics::GetTimeSeconds(this));
 }
 

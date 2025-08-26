@@ -14,15 +14,16 @@ struct TPS_MULTIPLAYER_API FTPSHitInfo
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FHitResult HitInfo;
 
+	// The Character/Pawn that sent the hit
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<AActor> Instigator;
 
+	// The Player/AI Controller responsible
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<AController> Owner;
 
-
-	// TODO: Timestamp / Expiry protocol
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float Timestamp;
 };
 
 

@@ -97,7 +97,7 @@ public:
     ATPSCharacter* OwningCharacter;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    TWeakObjectPtr<UAbilitySystemComponent> OwnerAsc;
+    TObjectPtr<UAbilitySystemComponent> OwnerAsc;
 
     // Lifetime
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPSProjectile|State")

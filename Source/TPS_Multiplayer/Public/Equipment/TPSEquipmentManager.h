@@ -52,11 +52,11 @@ protected:
 
     // Parent Mesh - Bound on Startup
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
-    TWeakObjectPtr<USkeletalMeshComponent> TargetMesh;
+    TObjectPtr<USkeletalMeshComponent> TargetMesh;
 
     // Owner's AbilitySystem (integrates to equipment w/ owner GAS) - Bound on Startup
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
-    TWeakObjectPtr<UAbilitySystemComponent> OwnerAsc;
+    TObjectPtr<UAbilitySystemComponent> OwnerAsc;
 
     // HarnessSlot -> Mesh SocketName (MountPoint setup only)
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")

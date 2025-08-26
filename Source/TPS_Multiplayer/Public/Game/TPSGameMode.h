@@ -16,6 +16,11 @@
 #include "TPSGameMode.generated.h"
 
 
+/**
+ * 
+ *
+ * No point in replicating - GameMode is SERVER-ONLY.
+ */
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSGameMode : public AGameMode
 {
@@ -103,7 +108,7 @@ public:
 
 	// Event Listener
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnCharacterElimination(FTPSEliminationReport elimination);
+	void OnCharacterElimination(const FTPSEliminationReport elimination);
 
 	// Respawn
 	UFUNCTION(Server, Reliable, BlueprintCallable)
@@ -130,7 +135,7 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FTPSEliminationReport GenerateEliminationReportForCharacterDeath(UTPSCharacterInstance* victim) const;
+	FTPSEliminationReport GenerateEliminationReportForCharacterDeath(UTPSCharacterInstance* eliminatee) const;
 
 
 //~ ==================================================================== ~//

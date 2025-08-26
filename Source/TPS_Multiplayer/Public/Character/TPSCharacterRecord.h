@@ -16,6 +16,9 @@ class TPS_MULTIPLAYER_API UTPSCharacterRecord : public UObject
 {
     GENERATED_BODY()
 
+protected:
+    virtual bool IsSupportedForNetworking() const override { return true; }
+
 //~ ==================================================================== ~//
 //  ATTRIBUTES
 //~ ==================================================================== ~//

@@ -3,20 +3,22 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
-
-void UTPSCombatLogEntry::IsSupportedForNetworking() const
+FString UTPSCombatLogEntry::ToString()
 {
-	return true;
+	return FString::Printf(TEXT("[%f]-[%s]::[%s]"),
+		Timestamp,
+		*ID.ToString(),
+		*FString::FromInt(Type));
 }
 
-
-
-
-
-
-
-
-
+FString UTPSEliminationEvent::ToString()
+{
+	return FString::Printf(TEXT("[%s]:|Character[%s] KILLED Character[%s] with [%s]|"),
+		*Super::ToString(),
+		*KillerName.ToString(),
+		*VictimName.ToString(),
+		*KillMethod.ToString());
+}
 
 
 
@@ -25,7 +27,7 @@ void UTPSCombatLogEntry::IsSupportedForNetworking() const
 
 UTPSCombatLog::UTPSCombatLog()
 {
-
+	SetIsReplicatedByDefault(true);
 }
 
 void UTPSCombatLog::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -36,27 +38,9 @@ void UTPSCombatLog::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& 
 }
 
 
-FString UTPSCombatLogEntry::ToString()
-{
-	return FString::Printf(TEXT("[%f]-[%s]::[%s]"),
-		Timestamp,
-		*ID.ToString(),
-		*FString::FromInt(Type));
-}
-
-FString UTPSKillEvent::ToString()
-{
-	return FString::Printf(TEXT("[%s]:|Character[%s] KILLED Character[%s] with [%s]|"),
-		*Super::ToString(),
-		*KillerName.ToString(),
-		*VictimName.ToString(),
-		*KillMethod.ToString());
-}
-
-
 void UTPSCombatLog::LogEliminationEvent(FTPSEliminationReport report)
 {
-	UTPSKillEvent* entry = NewObject<UTPSKillEvent>(this);
+	UTPSEliminationEvent* entry = NewObject<UTPSEliminationEvent>(this);
 	entry->ID = FGuid::NewGuid();
 	entry->Type = PlayerKilled;
 	entry->Timestamp = report.Timestamp;

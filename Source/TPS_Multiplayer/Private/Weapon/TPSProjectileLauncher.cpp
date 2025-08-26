@@ -85,7 +85,7 @@ void ATPSProjectileLauncher::LaunchProjectiles_Multicast_Implementation(const TA
 		p->SetOwner(GetOwner());
 		p->SetInstigator(GetInstigator());
 
-		if (IsValid(OwnerAsc.Get()))
+		if (IsValid(OwnerAsc))
 		{
 			p->OwnerAsc = OwnerAsc;
 		}
