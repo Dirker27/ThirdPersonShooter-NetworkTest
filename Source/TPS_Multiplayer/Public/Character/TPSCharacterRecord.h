@@ -4,6 +4,31 @@
 
 #include "TPSCharacterRecord.generated.h"
 
+
+USTRUCT(BlueprintType)
+struct TPS_MULTIPLAYER_API FTPSOperatorRecord
+{
+    GENERATED_BODY()
+
+    // XP Points
+    UMETA("XP")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int ExperiencePoints;
+
+    // Lifetime Kill Count
+    UMETA("Kills")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int KillCount;
+
+    // Lifetime Mission Count
+    UMETA("Deployments")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int Deploymentcount;
+
+    // TODO: Store events, interactions, stats (Alpha Demo)
+};
+
+
 /**
  * A Character's recorded stats, history, and experience.
  *
@@ -23,10 +48,6 @@ protected:
 //  ATTRIBUTES
 //~ ==================================================================== ~//
 public:
-    // XP Points
-    UMETA("XP")
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    int ExperiencePoints;
-
-    // TODO: Store events, interactions, stats (Alpha Demo)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FTPSOperatorRecord Record;
 };

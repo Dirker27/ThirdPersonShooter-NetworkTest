@@ -35,8 +35,8 @@ bool UTPSHierarchicalCollection::RemoveMember(const int idNumber)
 
 	if (auto member = Members[idNumber])
 	{
-		member->OpId.UnitID.Hierarchy = FTPSUnitHierarchy();
-		member->OpId.UnitID.UnitNumber = 0;
+		member->Identity.UnitID.Hierarchy = FTPSUnitHierarchy();
+		member->Identity.UnitID.UnitNumber = 0;
 
 		return true;
 	}
@@ -152,10 +152,10 @@ TArray<UTPSCharacterInstance*> UTPSHierarchicalCollection::GetAllMembers()
 
 void UTPSHierarchicalCollection::UpdateUnitIdForMember(UTPSCharacterInstance* member, int id)
 {
-	member->OpId.UnitID.UnitNumber = id;
-	member->OpId.UnitID.TeamID = UnitID.TeamID;
+	member->Identity.UnitID.UnitNumber = id;
+	member->Identity.UnitID.TeamID = UnitID.TeamID;
 
-	member->OpId.UnitID.Hierarchy = FTPSUnitHierarchy::AppendLevelNumber(
+	member->Identity.UnitID.Hierarchy = FTPSUnitHierarchy::AppendLevelNumber(
 		UnitID.Hierarchy, UnitID.UnitLevel, UnitID.UnitNumber);
 }
 
@@ -169,7 +169,7 @@ void UTPSHierarchicalCollection::UpdateUnitIdForSubCollection(UTPSHierarchicalCo
 
 	for (auto subSubMember : subCollection->GetAllMembers())
 	{
-		subCollection->UpdateUnitIdForMember(subSubMember, subSubMember->OpId.UnitID.UnitNumber);
+		subCollection->UpdateUnitIdForMember(subSubMember, subSubMember->Identity.UnitID.UnitNumber);
 	}
 
 	for (auto subSubUnit : subCollection->GetAllSubCollections())

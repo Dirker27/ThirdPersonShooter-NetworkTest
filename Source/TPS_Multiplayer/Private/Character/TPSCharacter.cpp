@@ -87,9 +87,6 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ATPSCharacter, CharacterInstance);
-	//DOREPLIFETIME(ATPSCharacter, Identity);
-	//DOREPLIFETIME(ATPSCharacter, Configuration);
-	//DOREPLIFETIME(ATPSCharacter, Record);
 
 	DOREPLIFETIME(ATPSCharacter, CurrentLocomotionState);
 	DOREPLIFETIME(ATPSCharacter, CurrentBehaviorState);
@@ -107,9 +104,43 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ATPSCharacter, TargetLookRotation);
 }
 
+// Called from CLIENT on update
+void ATPSCharacter::OnRep_CharacterInstance()
+{
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] OnRep_CharacterInstance[%s]"), *CharacterInstance->Identity.Guid.ToString());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] OnRep_CharacterInstance[%s]"), *CharacterInstance->Identity.Guid.ToString());
+	}
+
+	InitializeFromInstance(CharacterInstance);
+}
+
+
+void ATPSCharacter::InitializeFromInstance(UTPSCharacterInstance* instance)
+{
+	if (!IsValid(instance))
+	{
+		UE_LOG(LogTemp, Log, TEXT("FAILED to initialize Character[%s] - invalid Instance provided."), *GetName());
+		return;
+	}
+
+	// TODO: Sync Attributes
+
+	ShouldNotify = true;
+	OnInitializeFromInstance(instance);
+}
+
+
+
+
 void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	UE_LOG(LogTemp, Log, TEXT("Character[%s]::BeginPlay"), *GetName());
 
 	// Init ASC
 	AbilitySystem->InitAbilityActorInfo(this, this); // <- required for all ASC consumers
@@ -136,6 +167,12 @@ void ATPSCharacter::BeginPlay()
 
 
 	CurrentLookLocation = TargetLookLocation;
+
+
+	if (IsValid(CharacterInstance))
+	{
+		InitializeFromInstance(CharacterInstance);
+	}
 }
 
 
@@ -171,7 +208,7 @@ void ATPSCharacter::Tick(float deltaTime)
 		if (IsDeathConditionMet() && !HasDeathTriggered)
 		{
 			ATPSGameMode* gameMode = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this));
-			if (IsValid(CharacterInstance)) { gameMode->KillCharacter(CharacterInstance->OpId.Guid); }
+			if (IsValid(CharacterInstance)) { gameMode->KillCharacter(CharacterInstance->Identity.Guid); }
 			Die();
 		}
 	}
@@ -263,14 +300,30 @@ void ATPSCharacter::SyncComponentsFromState()
 //  SYNTHETIC GETTERS
 //~ ============================================================= ~//
 
-FTPSOperatorIdentity ATPSCharacter::Identity()
+FTPSOperatorIdentity ATPSCharacter::GetIdentity()
 {
-	return IsValid(CharacterInstance) ? CharacterInstance->OpId : FTPSOperatorIdentity();
+	return IsValid(CharacterInstance)
+		? CharacterInstance->Identity
+		: FTPSOperatorIdentity();
+}
+
+FTPSOperatorConfiguration ATPSCharacter::GetConfiguration()
+{
+	return IsValid(CharacterInstance)
+		? CharacterInstance->Configuration
+		: FTPSOperatorConfiguration();
+}
+
+bool ATPSCharacter::IsInitialized() const
+{
+	return IsValid(CharacterInstance);
 }
 
 bool ATPSCharacter::IsAlive() const
 {
-	return (CurrentBehaviorState != Incapacitated);
+	return IsValid(CharacterInstance)
+		? CharacterInstance->IsAlive
+		: (CurrentBehaviorState != Incapacitated);
 }
 bool ATPSCharacter::IsCrouching() const
 {

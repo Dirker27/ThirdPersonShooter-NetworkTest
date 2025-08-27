@@ -33,16 +33,13 @@ protected:
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-    FTPSOperatorIdentity OpId;
+    FTPSOperatorIdentity Identity;
 
-    //UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    //TObjectPtr<UTPSCharacterIdentity> Identity;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    FTPSOperatorConfiguration Configuration;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<UTPSCharacterConfiguration> Configuration;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<UTPSCharacterRecord> Record;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    FTPSOperatorRecord Record;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UTPSEquipmentLoadout> Loadout = nullptr;

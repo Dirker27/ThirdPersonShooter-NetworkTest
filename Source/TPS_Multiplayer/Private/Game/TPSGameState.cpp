@@ -77,7 +77,7 @@ void ATPSGameState::IndexCharacters()
 
     for (auto character : Characters)
     {
-        CharactersById.Add(character->OpId.Guid, character);
+        CharactersById.Add(character->Identity.Guid, character);
     }
 }
 
@@ -216,7 +216,7 @@ UTPSCharacterInstance* ATPSGameState::GetCharacter(const FGuid characterId)
     // perform slow fetch (fallback)
     for (auto character : Characters)
     {
-        if (character->OpId.Guid == characterId)
+        if (character->Identity.Guid == characterId)
         {
             return character;
         }

@@ -85,7 +85,7 @@ public:
     FTPSMountOffset WeaponHolsterOffset = FTPSMountOffset();
 
     /////////////////////////////////////////////////////////////////
-    // TPSGameState
+    // State
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipable|Effects")
     TArray<FActiveGameplayEffectHandle> AppliedActiveEffectHandles;

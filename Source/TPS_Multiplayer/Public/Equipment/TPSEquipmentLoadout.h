@@ -12,7 +12,24 @@
 #include "TPSEquipmentLoadout.generated.h"
 
 /**
- * TPSGameState object for a character's weapons, equipment, and gear.
+ * State object for a character's weapons, equipment, and gear.
+ */
+USTRUCT(BlueprintType)
+struct TPS_MULTIPLAYER_API FTPSOperatorLoadout
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TMap<TEnumAsByte<ETPSWeaponSlot>, TSubclassOf<ATPSWeapon>> WeaponsBySlot;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TMap<TEnumAsByte<ETPSGearSlot>, TSubclassOf<ATPSGearItem>> GearBySlot;
+};
+
+
+
+/**
+ * State object container for a character's equipment Loadout
  */
 UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSEquipmentLoadout : public UDataAsset
@@ -20,6 +37,9 @@ class TPS_MULTIPLAYER_API UTPSEquipmentLoadout : public UDataAsset
     GENERATED_BODY()
 
 public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FTPSOperatorLoadout Loadout;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TMap<TEnumAsByte<ETPSWeaponSlot>, TSubclassOf<ATPSWeapon>> WeaponsBySlot;
 

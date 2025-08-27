@@ -185,13 +185,13 @@ FTPSUnitID UTPSFunctionLibrary::MakeChildUnitID(FTPSUnitID parentId, ETPSHierarc
 
 FString UTPSFunctionLibrary::GetFormalDisplayNameForCharacter(const UTPSCharacterInstance* character)
 {
-    FString displayName = TPSCharacterRankAbbreviationString(character->OpId.Rank) + ". ";
-    displayName += character->OpId.FirstName + " ";
-    if (!character->OpId.Callsign.IsEmpty())
+    FString displayName = TPSCharacterRankAbbreviationString(character->Identity.Rank) + ". ";
+    displayName += character->Identity.FirstName + " ";
+    if (!character->Identity.Callsign.IsEmpty())
     {
-        displayName += "'" + character->OpId.Callsign + "'";
+        displayName += "'" + character->Identity.Callsign + "'";
     }
-    displayName += character->OpId.LastName;
+    displayName += character->Identity.LastName;
 
     return displayName;
 }

@@ -64,17 +64,48 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FUpdateCharacterAttributeDisplay NotifyDisplayWidgets;
 private:
+	// Trigger a broadcast to all listening display widgets to perform an Update cycle.
+	//   Should set to 'true' whenever states or attributes are changed.
 	bool ShouldNotify = false;
 
 
+	//////////////////////////////////////////////////////
+	// Inventory System
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	TObjectPtr<UTPSEquipmentManager> EquipmentManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	TObjectPtr<UTPSCharacterInventory> Inventory;
+
+
+
+//~ ======================================================================== ~//
+//  INSTANCE LINKING
+//~ ======================================================================== ~//
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_CharacterInstance)
 	TObjectPtr<UTPSCharacterInstance> CharacterInstance;
 
+	UFUNCTION()
+	void OnRep_CharacterInstance();
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSCharacterInstance* GetCharacterInstance() { return CharacterInstance; }
+
+	UFUNCTION(BlueprintCallable)
 	void BindToCharacterInstance(UTPSCharacterInstance* instance)
 	{
 		CharacterInstance = instance;
 	}
+
+	UFUNCTION(BlueprintCallable)
+	void InitializeFromInstance(UTPSCharacterInstance* instance);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void OnInitializeFromInstance(UTPSCharacterInstance* instance);
+
 
 //~ ======================================================================== ~//
 //  STATE
@@ -84,14 +115,14 @@ public:
 	//////////////////////////////////////////////////////
 	// Identity
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "TPSCharacter", Replicated)
-	//TObjectPtr<UTPSCharacterIdentity> Identity;
-
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FTPSOperatorIdentity Identity();
+	FTPSOperatorIdentity GetIdentity();
 
 	//////////////////////////////////////////////////////
 	// Configuration
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FTPSOperatorConfiguration GetConfiguration();
 
 	// Can Be Possessed by a Player
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPSCharacter|Configuration")
@@ -163,6 +194,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
 	bool HasDeathTriggered;
 	//
+	// IsInitialized (Synthetic)
+	//   True if bound to CharacterInstance.
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsInitialized() const;
+	//
 	// IsAlive (Synthetic)
 	//   True if Character is not Incapacitated.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -211,7 +247,7 @@ public:
 	ATPSWeapon* GetEquippedWeapon() const;
 
 	////////////////////////////////////////////////////////
-	// Controller Input
+	// Input / Ability States
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input", Replicated)
 	bool IsBoosting;
@@ -258,6 +294,154 @@ public:
 
 
 
+//~ ======================================================================== ~//
+//  Character Business Logic
+//~ ======================================================================== ~//
+
+private:
+	// Called every frame.
+	//  Set state-driven values in subcomponents.
+	void SyncComponentsFromState();
+
+public:
+
+	////////////////////////////////////////////////////////
+	// State Modifiers
+
+	// CharacterState
+	UFUNCTION(BlueprintCallable)
+	void ApplyBehaviorState(const ETPSCharacterBehaviorState CharacterState);
+	UFUNCTION(BlueprintCallable)
+	void RevertCharacterState();
+	//
+	// LocomotionState
+	UFUNCTION(BlueprintCallable)
+	void ApplyLocomotionState(const ETPSCharacterLocomotionState LocomotionState);
+	UFUNCTION(BlueprintCallable)
+	void RevertLocomotionState();
+
+	UFUNCTION(BlueprintCallable)
+	void InterruptIdle();
+
+	UFUNCTION(BlueprintCallable)
+	void SetTargetLocation(FVector targetLocation);
+
+
+	////////////////////////////////////////////////////////
+	// Business Logic
+
+	// Determine what state we should be in.
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ETPSCharacterLocomotionState EvaluateLocomotionStateForCurrentInput();
+	//
+	// Calculate Speed
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetBaseSpeedForCharacterState(const ETPSCharacterBehaviorState CharacterState);
+	//
+	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated, Please use the new function"))
+	float GetSpeedModifierForLocomotionState(const ETPSCharacterLocomotionState LocomotionState);
+	//
+	// Apply calculated MovementSpeed
+	UFUNCTION(BlueprintCallable)
+	float UpdateCharacterSpeedForCurrentState();
+	//
+	// Are there any actions ongoing that would be considered "Active"?
+	//   (aiming, firing, equipping, etc)
+	//   Determines whether a character is in full SPRINT vs simply boosting.
+	UFUNCTION(BlueprintCallable)
+	bool IsActionActive() const;
+
+
+	// "Are we dead yet?"
+	//    Evaluated in OnTick() to allow for alternative sources of death than strict damage.
+	//    (Fell out of world, overly idle, etc)
+	UFUNCTION(BlueprintCallable)
+	bool IsDeathConditionMet();
+
+
+	// Character Death [RPC]
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void Die();
+	//
+	// Start the process of dying [Multicast]
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void StartDeath();
+	// Finish Dying (Blueprint Extension)
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDeathStart();
+	//
+	// Finish the process of dying - Called by Blueprint
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void CompleteDeath();
+	// Finish Dying (Blueprint Extension)
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDeathComplete();
+
+
+
+
+//~ ======================================================================== ~//
+//  CONTROLLER POSSESSION
+//~ ======================================================================== ~//
+protected:
+	// Bind to AbilitySystem in PlayerState
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void UnPossessed() override;
+	virtual void OnRep_PlayerState() override;
+
+
+
+
+//~ ======================================================================== ~//
+//  ABILITY SYSTEM
+//~ ======================================================================== ~//
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "Abilities")
+	UTPSAbilitySystemComponent* AbilitySystem{ nullptr };
+
+public:
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override; // IAbilitySystemInterface
+
+
+	////////////////////////////////////////////////////////
+	// GAS Attributes
+
+	// Movement, Mana, and Stamina
+	UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
+	UStandardAttributeSet* StandardAttributes{ nullptr };
+
+	// Health, Armor, and Regen
+	UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
+	UCharacterHealthAttributeSet* CharacterHealthAttributes{ nullptr };
+
+	// Damage, Accuracy, and Modifiers
+	UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
+	UWeaponAttributeSet* WeaponAttributes{ nullptr };
+
+protected:
+	// Sync's local variables from GAS attributes.
+	//   ie: CharacterHealth.Health -> CurrentHealth
+	// Called every frame.
+	UFUNCTION(BlueprintCallable)
+	void SyncAttributesFromGAS();
+
+	void OnArmorAttributeChanged(const FOnAttributeChangeData&);
+	void OnHealthAttributeChanged(const FOnAttributeChangeData&);
+	void OnMovementAttributeChanged(const FOnAttributeChangeData&);
+
+
+
+	////////////////////////////////////////////////////////
+	// Initialization (Grant Abilities to System)
+protected:
+	void SetupAbilitySystem();
+
+	////////////////////////////////////////////////////////
+	// Input Routing
+protected:
+	// Bind Input->AbilitySystem
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 
 //~ ======================================================================== ~//
 //  Blueprint Extensions
@@ -265,7 +449,7 @@ public:
 public:
 	////////////////////////////////////////////////////////
 	// Ability Extensions
-	
+
 	// Boost - Called from Gameplay Ability.
 	UFUNCTION(BlueprintCallable)
 	void StartBoost();
@@ -382,168 +566,6 @@ public:
 	static FString LocomotionStateToFString(ETPSCharacterLocomotionState s) {
 		return FString(ETPSLocomotionStateToString(s));
 	}
-
-
-
-//~ ======================================================================== ~//
-//  Character Business Logic
-//~ ======================================================================== ~//
-
-private:
-	// Called every frame.
-	//  Set state-driven values in subcomponents.
-	void SyncComponentsFromState();
-
-public:
-
-	////////////////////////////////////////////////////////
-	// TPSGameState Modifiers
-
-	// CharacterState
-	UFUNCTION(BlueprintCallable)
-	void ApplyBehaviorState(const ETPSCharacterBehaviorState CharacterState);
-	UFUNCTION(BlueprintCallable)
-	void RevertCharacterState();
-	//
-	// LocomotionState
-	UFUNCTION(BlueprintCallable)
-	void ApplyLocomotionState(const ETPSCharacterLocomotionState LocomotionState);
-	UFUNCTION(BlueprintCallable)
-	void RevertLocomotionState();
-
-	UFUNCTION(BlueprintCallable)
-	void InterruptIdle();
-
-	UFUNCTION(BlueprintCallable)
-	void SetTargetLocation(FVector targetLocation);
-
-
-	////////////////////////////////////////////////////////
-	// Business Logic
-
-	// Determine what state we should be in.
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ETPSCharacterLocomotionState EvaluateLocomotionStateForCurrentInput();
-	//
-	// Calculate Speed
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	float GetBaseSpeedForCharacterState(const ETPSCharacterBehaviorState CharacterState);
-	//
-	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated, Please use the new function"))
-	float GetSpeedModifierForLocomotionState(const ETPSCharacterLocomotionState LocomotionState);
-	//
-	// Apply calculated MovementSpeed
-	UFUNCTION(BlueprintCallable)
-	float UpdateCharacterSpeedForCurrentState();
-	//
-	// Are there any actions ongoing that would be considered "Active"?
-	//   (aiming, firing, equipping, etc)
-	//   Determines whether a character is in full SPRINT vs simply boosting.
-	UFUNCTION(BlueprintCallable)
-	bool IsActionActive() const;
-
-
-	// "Are we dead yet?"
-	//    Evaluated in OnTick() to allow for alternative sources of death than strict damage.
-	//    (Fell out of world, overly idle, etc)
-	UFUNCTION(BlueprintCallable)
-	bool IsDeathConditionMet();
-
-
-	// Character Death
-	UFUNCTION(BlueprintCallable, Server, Reliable)
-	void Die();
-	//
-	// Start the process of dying
-	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
-	void StartDeath();
-	// Finish Dying (Blueprint Extension)
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnDeathStart();
-	//
-	// Finish the process of dying - Called by Blueprint
-	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
-	void CompleteDeath();
-	// Finish Dying (Blueprint Extension)
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnDeathComplete();
-
-
-
-
-//~ ======================================================================== ~//
-//  CONTROLLER POSSESSION
-//~ ======================================================================== ~//
-protected:
-	// Bind to AbilitySystem in PlayerState
-	virtual void PossessedBy(AController* NewController) override;
-	virtual void UnPossessed() override;
-	virtual void OnRep_PlayerState() override;
-
-
-
-
-//~ ======================================================================== ~//
-//  ABILITY SYSTEM
-//~ ======================================================================== ~//
-protected:
-	UPROPERTY(VisibleAnywhere, Category = "Abilities")
-	UTPSAbilitySystemComponent* AbilitySystem{ nullptr };
-
-public:
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override; // IAbilitySystemInterface
-
-
-	////////////////////////////////////////////////////////
-	// GAS Attributes
-
-	// Movement, Mana, and Stamina
-	UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
-	UStandardAttributeSet* StandardAttributes{ nullptr };
-
-	// Health, Armor, and Regen
-	UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
-	UCharacterHealthAttributeSet* CharacterHealthAttributes{ nullptr };
-
-	// Damage, Accuracy, and Modifiers
-	UPROPERTY(VisibleAnywhere, Category = "Abilities|Attributes", Transient)
-	UWeaponAttributeSet* WeaponAttributes{ nullptr };
-
-protected:
-	// Sync's local variables from GAS attributes.
-	//   ie: CharacterHealth.Health -> CurrentHealth
-	// Called every frame.
-	UFUNCTION(BlueprintCallable)
-	void SyncAttributesFromGAS();
-
-	void OnArmorAttributeChanged(const FOnAttributeChangeData&);
-	void OnHealthAttributeChanged(const FOnAttributeChangeData&);
-	void OnMovementAttributeChanged(const FOnAttributeChangeData&);
-
-
-
-	////////////////////////////////////////////////////////
-	// Initialization (Grant Abilities to System)
-protected:
-	void SetupAbilitySystem();
-
-	////////////////////////////////////////////////////////
-	// Input Routing
-protected:
-	// Bind Input->AbilitySystem
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-
-//~ ======================================================================== ~//
-//  INVENTORY SYSTEM
-//~ ======================================================================== ~//
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory")
-	TObjectPtr<UTPSEquipmentManager> EquipmentManager;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory")
-	TObjectPtr<UTPSCharacterInventory> Inventory;
-
 
 //~ ======================================================================== ~//
 //  MISC BEHAVIOR OVERRIDES

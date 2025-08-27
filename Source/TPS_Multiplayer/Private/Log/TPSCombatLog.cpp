@@ -45,10 +45,10 @@ void UTPSCombatLog::LogEliminationEvent(FTPSEliminationReport report)
 	entry->Type = PlayerKilled;
 	entry->Timestamp = report.Timestamp;
 	entry->VictimName = IsValid(report.VictimCharacter)
-		? FName(report.VictimCharacter->OpId.FirstName)
+		? FName(report.VictimCharacter->Identity.FirstName)
 		: FName();
 	entry->KillerName = IsValid(report.KillerCharacter)
-		? FName(report.KillerCharacter->OpId.FirstName)
+		? FName(report.KillerCharacter->Identity.FirstName)
 		: FName();
 	entry->KillMethod = report.KillMethod;
 
