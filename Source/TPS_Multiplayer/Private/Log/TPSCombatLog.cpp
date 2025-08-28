@@ -34,7 +34,7 @@ void UTPSCombatLog::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UTPSCombatLog, ClientFeedMessages);
+	DOREPLIFETIME(UTPSCombatLog, ClientFeed);
 }
 
 
@@ -54,7 +54,7 @@ void UTPSCombatLog::LogEliminationEvent(FTPSEliminationReport report)
 
 
 	LogEntries.Add(entry);
-	ClientFeedMessages.Add(entry->ToString());
+	ClientFeed.Add(entry);
 
 	AddReplicatedSubObject(entry);
 }

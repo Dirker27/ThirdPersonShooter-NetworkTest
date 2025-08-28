@@ -104,43 +104,11 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ATPSCharacter, TargetLookRotation);
 }
 
-// Called from CLIENT on update
-void ATPSCharacter::OnRep_CharacterInstance()
-{
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] OnRep_CharacterInstance[%s]"), *CharacterInstance->Identity.Guid.ToString());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] OnRep_CharacterInstance[%s]"), *CharacterInstance->Identity.Guid.ToString());
-	}
-
-	InitializeFromInstance(CharacterInstance);
-}
-
-
-void ATPSCharacter::InitializeFromInstance(UTPSCharacterInstance* instance)
-{
-	if (!IsValid(instance))
-	{
-		UE_LOG(LogTemp, Log, TEXT("FAILED to initialize Character[%s] - invalid Instance provided."), *GetName());
-		return;
-	}
-
-	// TODO: Sync Attributes
-
-	ShouldNotify = true;
-	OnInitializeFromInstance(instance);
-}
-
-
-
 
 void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Log, TEXT("Character[%s]::BeginPlay"), *GetName());
+	//UE_LOG(LogTemp, Log, TEXT("Character[%s]::BeginPlay"), *GetName());
 
 	// Init ASC
 	AbilitySystem->InitAbilityActorInfo(this, this); // <- required for all ASC consumers
@@ -163,19 +131,48 @@ void ATPSCharacter::BeginPlay()
 		EquipmentManager->Initialize();
 	}
 
+
 	SyncAttributesFromGAS();
-
-
 	CurrentLookLocation = TargetLookLocation;
 
 
-	if (IsValid(CharacterInstance))
+	/*if (IsValid(CharacterInstance))
 	{
-		InitializeFromInstance(CharacterInstance);
+		Initialize();
+	}*/
+}
+
+void ATPSCharacter::Initialize()
+{
+	if (!IsValid(CharacterInstance))
+	{
+		UE_LOG(LogTemp, Log, TEXT("FAILED to initialize Character[%s] - invalid Instance provided."), *GetName());
+		return;
 	}
+
+	// TODO: Sync Attributes
+
+	ShouldNotify = true;
+
+	// Extend to Blueprints
+	//   Initialize components with Instance-defined behavior
+	OnInitialize();
 }
 
 
+void ATPSCharacter::BindToCharacterInstance(UTPSCharacterInstance* instance)
+{
+	if (!IsValid(instance)) { return; }
+
+	CharacterInstance = instance;
+	Initialize();
+}
+
+// Called from CLIENT on update
+void ATPSCharacter::OnRep_CharacterInstance()
+{
+	Initialize();
+}
 
 
 
@@ -746,14 +743,14 @@ void ATPSCharacter::OnRep_PlayerState() // client
 { 
 	Super::OnRep_PlayerState();
 
-	if (HasAuthority())
+	/*if (HasAuthority())
 	{
 		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character[%s]::OnRep_PlayerState()"), *GetName());
 	}
 	else
 	{
 		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character[%s]::OnRep_PlayerState()"), *GetName());
-	}
+	}*/
 }
 
 void ATPSCharacter::UnPossessed()

@@ -96,15 +96,14 @@ public:
 	UTPSCharacterInstance* GetCharacterInstance() { return CharacterInstance; }
 
 	UFUNCTION(BlueprintCallable)
-	void BindToCharacterInstance(UTPSCharacterInstance* instance)
-	{
-		CharacterInstance = instance;
-	}
+	void BindToCharacterInstance(UTPSCharacterInstance* instance);
 
+	// (Re)Initialize the Character based off its bound Instance
 	UFUNCTION(BlueprintCallable)
-	void InitializeFromInstance(UTPSCharacterInstance* instance);
+	void Initialize();
+	// (Re)Initialize the Character based off its bound Instance - Blueprint Extension
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void OnInitializeFromInstance(UTPSCharacterInstance* instance);
+	void OnInitialize();
 
 
 //~ ======================================================================== ~//

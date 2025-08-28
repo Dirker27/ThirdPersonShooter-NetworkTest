@@ -28,59 +28,6 @@ enum ETPSCombatLogEntryType : int
     ObjectiveUpdated
 };
 
-
-UCLASS(BlueprintType)
-class UTPSCombatLogEntry : public UObject
-{
-	GENERATED_BODY()
-
-public:
-    UTPSCombatLogEntry() { }
-
-protected:
-    virtual bool IsSupportedForNetworking() const { return true; }
-
-public:
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-    FGuid ID;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-    float Timestamp;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-    TEnumAsByte<ETPSCombatLogEntryType> Type;
-
-public:
-    UFUNCTION(BlueprintCallable)
-    virtual FString ToString();
-};
-
-
-UCLASS(BlueprintType)
-class UTPSEliminationEvent : public UTPSCombatLogEntry
-{
-    GENERATED_BODY()
-
-public:
-    UTPSEliminationEvent() { Type = Elimination; }
-
-protected:
-    //virtual bool IsSupportedForNetworking() const { return true; }
-
-public:
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    FName VictimName;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    FName KillerName;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    FName KillMethod;
-
-    virtual FString ToString() override;
-};
-
-
 USTRUCT(BlueprintType)
 struct TPS_MULTIPLAYER_API FTPSLogMessage
 {
@@ -99,6 +46,58 @@ struct TPS_MULTIPLAYER_API FTPSLogMessage
         Message = newMessage;
         //Timestamp = newTimestamp;
     }
+};
+
+
+UCLASS(BlueprintType)
+class UTPSCombatLogEntry : public UObject
+{
+	GENERATED_BODY()
+
+public:
+    UTPSCombatLogEntry() { }
+
+protected:
+    virtual bool IsSupportedForNetworking() const override { return true; }
+
+public:
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    FGuid ID;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    float Timestamp;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    TEnumAsByte<ETPSCombatLogEntryType> Type;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    FTPSLogMessage Message;
+
+public:
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    virtual FString ToString();
+};
+
+
+UCLASS(BlueprintType)
+class UTPSEliminationEvent : public UTPSCombatLogEntry
+{
+    GENERATED_BODY()
+
+public:
+    UTPSEliminationEvent() { Type = Elimination; }
+
+public:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    FName VictimName;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    FName KillerName;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    FName KillMethod;
+
+    virtual FString ToString() override;
 };
 
 
@@ -124,9 +123,11 @@ protected:
 
     // Client-visible log messages.
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-    TArray<FString> ClientFeedMessages;
+    TArray<TObjectPtr<UTPSCombatLogEntry>> ClientFeed;
 
 public:
+    UFUNCTION(BlueprintCallable)
+    TArray<UTPSCombatLogEntry*> GetClientFeed() { return ClientFeed; };
 
     UFUNCTION(BlueprintCallable)
     void LogEliminationEvent(FTPSEliminationReport report);
