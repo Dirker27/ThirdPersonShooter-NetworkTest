@@ -1,8 +1,8 @@
 // (C) ToasterCat Studios 2025
 
-#include "Util/TPSLog.h"
+#include "Util/TPSSystemLog.h"
 
-void UTPSLog::Log(const FText message, const ETPSLogLevel level)
+void UTPSSystemLog::Log(const FText message, const ETPSSystemLogLevel level)
 {
 	if (level > LogLevel) { return; }
 
@@ -14,7 +14,7 @@ void UTPSLog::Log(const FText message, const ETPSLogLevel level)
 }
 
 
-void UTPSLog::LogAuthority(const FText message, const bool authority, const ETPSLogLevel level)
+void UTPSSystemLog::LogAuthority(const FText message, const bool authority, const ETPSSystemLogLevel level)
 {
 	if (level > LogLevel) { return; }
 

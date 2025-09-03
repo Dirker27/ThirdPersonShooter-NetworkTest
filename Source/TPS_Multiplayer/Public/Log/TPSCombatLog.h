@@ -8,7 +8,7 @@
 #include "TPSCombatLog.generated.h"
 
 UENUM(BlueprintType)
-enum ETPSCombatLogEntryType : int
+enum ETPSLogEntryType : int
 {
     GameStart,
     GameOver,
@@ -34,28 +34,29 @@ struct TPS_MULTIPLAYER_API FTPSLogMessage
     GENERATED_BODY()
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    FName Message = FName();
+    FString Message;
 
     /*UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     float Timestamp;*/
 
     FTPSLogMessage() { }
 
-    FTPSLogMessage(FName newMessage)
+    FTPSLogMessage(FString newMessage)
     {
         Message = newMessage;
-        //Timestamp = newTimestamp;
     }
 };
 
 
+
+
 UCLASS(BlueprintType)
-class UTPSCombatLogEntry : public UObject
+class UTPSLogEntry : public UObject
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-    UTPSCombatLogEntry() { }
+    UTPSLogEntry() { }
 
 protected:
     virtual bool IsSupportedForNetworking() const override { return true; }
@@ -68,7 +69,7 @@ public:
     float Timestamp;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-    TEnumAsByte<ETPSCombatLogEntryType> Type;
+    TEnumAsByte<ETPSLogEntryType> Type;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
     FTPSLogMessage Message;
@@ -76,6 +77,18 @@ public:
 public:
     UFUNCTION(BlueprintCallable, BlueprintPure)
     virtual FString ToString();
+};
+
+
+
+
+UCLASS(BlueprintType)
+class UTPSCombatLogEntry : public UTPSLogEntry
+{
+	GENERATED_BODY()
+
+public:
+    UTPSCombatLogEntry() { }
 };
 
 
@@ -116,19 +129,7 @@ protected:
     virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
     virtual bool IsSupportedForNetworking() const override { return true; }
 
-protected:
-    // Full log - SERVER-only
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<TObjectPtr<UTPSCombatLogEntry>> LogEntries;
-
-    // Client-visible log messages.
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-    TArray<TObjectPtr<UTPSCombatLogEntry>> ClientFeed;
-
 public:
-    UFUNCTION(BlueprintCallable)
-    TArray<UTPSCombatLogEntry*> GetClientFeed() { return ClientFeed; };
-
     UFUNCTION(BlueprintCallable)
     void LogEliminationEvent(FTPSEliminationReport report);
 };

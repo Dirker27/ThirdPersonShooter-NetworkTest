@@ -3,12 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Containers/Queue.h"
 #include "GameFramework/GameState.h"
 
 #include "Player/TPSPlayerState.h"
 #include "Log/TPSCombatLog.h"
+#include "Team/TPSCommandStructure.h"
+#include "Team/TPSTeamInstance.h"
 
 #include "TPSGameState.generated.h"
+
+
+UDELEGATE(BlueprintAuthorityOnly)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTeamRosterUpdate);
+
+UDELEGATE(BlueprintAuthorityOnly)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCombatLogUpdate);
 
 /**
  * The TPSGameState of the Game
@@ -30,7 +40,11 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 //~ ==================================================================== ~//
-//  STATE
+//  WORLD REGISTRY
+//	--------------
+//	- Spawned Characters and Items
+//	- Teams and Sub-Units
+//	- Connected Players
 //~ ==================================================================== ~//
 
 public:
@@ -67,17 +81,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TMap<FGuid, TObjectPtr<UTPSCharacterInstance>> CharactersById;
 
-//~ ==================================================================== ~//
-//  COMPONENTS
-//~ ==================================================================== ~//
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
-	TObjectPtr<UTPSCombatLog> CombatLog;
-
-
-//~ ==================================================================== ~//
-//  OPERATIONS
-//~ ==================================================================== ~//
+	////////////////////////////////////////////////////////
+	// Indexing Operations
 private:
 
 	//UFUNCTION(NetMulticast, Reliable)
@@ -90,7 +95,8 @@ private:
 	void IndexCharacters();
 
 public:
-	//~ Team READ Operations ~//
+	////////////////////////////////////////////////////////
+	// Team CRUD
 
 	/*UFUNCTION(BlueprintCallable)
 	void CreateTeam(const ETPSTeamID teamId, const FTPSTeamConfiguration teamConfig);*/
@@ -108,9 +114,8 @@ public:
 	int GetTeamScore(const ETPSTeamID teamId);
 
 
-
-
-	//~ Command Unit READ Operations ~//
+	////////////////////////////////////////////////////////
+	// Team Sub-Unit CRUD
 
 	/*UFUNCTION(BlueprintCallable)
 	void CreateTeamUnit(const FTPSUnitID unitId, const FTPSCommandUnitConfiguration unitConfig);*/
@@ -123,7 +128,8 @@ public:
 	UTPSCharacterInstance* GetUnitLeader(const FTPSUnitID unitId);
 
 
-	//~ Character READ Operations ~//
+	////////////////////////////////////////////////////////
+	// Character CRUD
 
 	//UFUNCTION(BlueprintCallable)
 	//void CreateCharacter(const ETPSTeamID teamId);
@@ -131,4 +137,39 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSCharacterInstance* GetCharacter(const FGuid characterId);
 
+
+//~ ==================================================================== ~//
+//  COMBAT LOG
+//	----------
+//	- Kill Events
+//	- Objective Updates
+//	- Player Join/Drop Events
+//~ ==================================================================== ~//
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int ClientFeedLength = 5;
+
+	// Full log - SERVER-only
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	TArray<TObjectPtr<UTPSCombatLogEntry>> LogEntries;
+
+	// Client-visible log messages.
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)//, Replicated)
+	TArray<TObjectPtr<UTPSCombatLogEntry>> ClientMessageFeed;*/
+
+	// Broadcast Delegate - Combat Log has been Updated
+	UPROPERTY(BlueprintAssignable)
+	FCombatLogUpdate CombatLogUpdate;
+
+public:
+	////////////////////////////////////////////////////////
+	// Logging Operations
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void LogEvent(UTPSCombatLogEntry* entry);
+
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void AppendToClientFeed(UTPSCombatLogEntry* entry);
+
+	UFUNCTION(BlueprintCallable)
+	TArray<UTPSCombatLogEntry*> GetRecentLogEvents(int feedLength) const;
 };

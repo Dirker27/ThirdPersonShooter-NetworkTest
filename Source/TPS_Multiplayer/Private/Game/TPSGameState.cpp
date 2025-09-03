@@ -10,8 +10,6 @@ ATPSGameState::ATPSGameState()
     bReplicates = true;
     bReplicateUsingRegisteredSubObjectList = true;
 
-    CombatLog = CreateDefaultSubobject<UTPSCombatLog>("CombatLog");
-
     GameClockSeconds = 0;
 }
 
@@ -22,10 +20,13 @@ void ATPSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
     DOREPLIFETIME(ThisClass, Teams);
     DOREPLIFETIME(ThisClass, TeamUnits);
+
     DOREPLIFETIME(ThisClass, Characters);
+
     DOREPLIFETIME(ThisClass, Players);
 
-    DOREPLIFETIME(ThisClass, CombatLog);
+    DOREPLIFETIME(ThisClass, LogEntries);
+    //DOREPLIFETIME(ThisClass, ClientMessageFeed);
 }
 
 void ATPSGameState::OnTick(float deltaTime)
@@ -223,4 +224,42 @@ UTPSCharacterInstance* ATPSGameState::GetCharacter(const FGuid characterId)
     }
 
     return nullptr;
+}
+
+void ATPSGameState::LogEvent_Implementation(UTPSCombatLogEntry* entry)
+{
+    /*if (ClientMessageFeed.Num() >= ClientFeedLength)
+    {
+        ClientMessageFeed.Remove();
+    }
+    ClientMessageFeed.Add(entry);*/
+
+    LogEntries.Add(entry);
+    AddReplicatedSubObject(entry);
+
+    AppendToClientFeed(entry);
+}
+
+void ATPSGameState::AppendToClientFeed_Implementation(UTPSCombatLogEntry* entry)
+{
+    // STUB: Filter for Combat v World/System events
+    CombatLogUpdate.Broadcast();
+}
+
+TArray<UTPSCombatLogEntry*> ATPSGameState::GetRecentLogEvents(int feedLength) const
+{
+    TArray<UTPSCombatLogEntry*> feed;
+
+    int len = feedLength;
+    if (feedLength > LogEntries.Num())
+    {
+        len = LogEntries.Num();
+    }
+
+    for (int i = LogEntries.Num() - len; i < LogEntries.Num(); i++)
+    {
+        feed.Add(LogEntries[i]);
+    }
+
+    return feed;
 }

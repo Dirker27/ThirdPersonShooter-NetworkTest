@@ -19,7 +19,7 @@ ATPSGameMode::ATPSGameMode()
 	WorldManager = CreateDefaultSubobject<UTPSWorldManager>(TEXT("WorldState"));
 	TeamInstanceFactory = CreateDefaultSubobject<UTPSTeamInstanceFactory>(TEXT("TeamInstanceFactory"));
 	CharacterInstanceFactory = CreateDefaultSubobject<UTPSCharacterInstanceFactory>(TEXT("CharacterInstanceFactory"));
-	//CombatLog = CreateDefaultSubobject<UTPSCombatLog>(TEXT("CombatLog"));
+	CombatLog = CreateDefaultSubobject<UTPSCombatLog>(TEXT("CombatLog"));
 }
 ATPSGameMode::~ATPSGameMode() { }
 
@@ -124,7 +124,7 @@ void ATPSGameMode::KillCharacter_Implementation(const FGuid characterId)
 		character->Die();
 
 		auto report = GenerateEliminationReportForCharacterDeath(character);
-		state->CombatLog->LogEliminationEvent(report);
+		CombatLog->LogEliminationEvent(report);
 
 		// Broadcast Event -> BP GameMode handler
 		OnCharacterElimination(report);
@@ -142,7 +142,7 @@ FTPSEliminationReport ATPSGameMode::GenerateEliminationReportForCharacterDeath(U
 		killerInstance = killerActor->GetCharacterInstance();
 		if (auto killWeapon = killerActor->GetEquippedWeapon())
 		{
-			killMethod = FName(killWeapon->GetName());
+			killMethod = FName(killWeapon->Name);
 		}
 	}
 

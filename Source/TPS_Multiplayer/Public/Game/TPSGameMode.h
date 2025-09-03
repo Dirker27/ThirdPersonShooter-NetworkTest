@@ -43,6 +43,8 @@ protected:
 	TObjectPtr<UTPSWorldManager> WorldManager;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS")
 	TObjectPtr<UTPSCharacterInstanceFactory> CharacterInstanceFactory;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS")
+	TObjectPtr<UTPSCombatLog> CombatLog;
 
 //~ ==================================================================== ~//
 //  STATE

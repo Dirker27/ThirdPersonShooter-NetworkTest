@@ -1,9 +1,10 @@
 #include "Log/TPSCombatLog.h"
 
+#include "Game/TPSGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
-FString UTPSCombatLogEntry::ToString()
+FString UTPSLogEntry::ToString()
 {
 	return FString::Printf(TEXT("[%f]-[%s]::[%s]"),
 		Timestamp,
@@ -28,19 +29,21 @@ FString UTPSEliminationEvent::ToString()
 UTPSCombatLog::UTPSCombatLog()
 {
 	SetIsReplicatedByDefault(true);
+
+	//ReplicateSubobjects();
 }
 
 void UTPSCombatLog::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(UTPSCombatLog, ClientFeed);
 }
 
 
 void UTPSCombatLog::LogEliminationEvent(FTPSEliminationReport report)
 {
-	UTPSEliminationEvent* entry = NewObject<UTPSEliminationEvent>(this);
+	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
+
+	UTPSEliminationEvent* entry = NewObject<UTPSEliminationEvent>(state);
 	entry->ID = FGuid::NewGuid();
 	entry->Type = PlayerKilled;
 	entry->Timestamp = report.Timestamp;
@@ -52,10 +55,9 @@ void UTPSCombatLog::LogEliminationEvent(FTPSEliminationReport report)
 		: FName();
 	entry->KillMethod = report.KillMethod;
 
-
-	LogEntries.Add(entry);
-	ClientFeed.Add(entry);
-
-	AddReplicatedSubObject(entry);
+	//state->LogEntries.Add(entry);
+	//state->ClientMessageFeed.Add(entry->Message);
+	//state->AddReplicatedSubObject(entry);
+	state->LogEvent(entry);
 }
 
