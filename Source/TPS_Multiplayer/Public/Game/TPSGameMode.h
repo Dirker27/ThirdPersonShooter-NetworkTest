@@ -16,6 +16,9 @@
 #include "TPSGameMode.generated.h"
 
 
+UDELEGATE(BlueprintAuthorityOnly)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMatchStateUpdate);
+
 /**
  * 
  *
@@ -46,16 +49,24 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS")
 	TObjectPtr<UTPSCombatLog> CombatLog;
 
-//~ ==================================================================== ~//
-//  STATE
-//~ ==================================================================== ~//
-private:
-	/* STUB */
+	UPROPERTY(BlueprintAssignable)
+	FMatchStateUpdate MatchStateUpdate;
 
-//~ ============================================================= ~//
-//  ATTRIBUTES
-//~ ============================================================= ~//
+//~ ==================================================================== ~//
+//  CONFIGURATION
+//~ ==================================================================== ~//
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
+	FString GameTypeName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
+	FString GameTypeDescription;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
+	int PointsToWin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
+	float TimeLimitSeconds;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="TPS|Debug")
 	bool IsDebugEnabled = false;
@@ -76,6 +87,17 @@ public:
 
 	////////////////////////////////////////////////////////
 	// Gameplay Functions
+
+	// Start the match
+	//UFUNCTION(BlueprintCallable)
+	virtual void StartMatch() override;
+	virtual void EndMatch() override;
+	virtual void HandleMatchHasEnded() override;
+
+	UFUNCTION(BlueprintCallable)
+	void BroadcastMessage(FTPSBroadcastMessage message);
+
+
 
 	// Instantiates Teams in GameState with configurations defined in TeamConfigurationMap
 	UFUNCTION(BlueprintCallable)
@@ -182,7 +204,7 @@ public:
 	void SpawnBots(int numBotsToSpawn);
 
 //~ ==================================================================== ~//
-//  CONFIGURATION
+//  GAME WORLD CONFIGURATION
 //~ ==================================================================== ~//
 
 	UFUNCTION(BlueprintCallable)

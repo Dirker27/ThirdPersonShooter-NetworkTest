@@ -3,6 +3,7 @@
 #include "Game/TPSGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Util/TPSFunctionLibrary.h"
 
 FString UTPSLogEntry::ToString()
 {
@@ -12,15 +13,32 @@ FString UTPSLogEntry::ToString()
 		*FString::FromInt(Type));
 }
 
+void UTPSLogEntry::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, ID);
+	DOREPLIFETIME(ThisClass, Timestamp);
+	DOREPLIFETIME(ThisClass, Type);
+	DOREPLIFETIME(ThisClass, Message);
+}
+
+
 FString UTPSEliminationEvent::ToString()
 {
 	return FString::Printf(TEXT("[%s]:|Character[%s] KILLED Character[%s] with [%s]|"),
 		*Super::ToString(),
-		*KillerName.ToString(),
-		*VictimName.ToString(),
-		*KillMethod.ToString());
+		*Elimination.KillerCharacter->Identity.Guid.ToString(),
+		*Elimination.VictimCharacter->Identity.Guid.ToString(),
+		*Elimination.KillMethod);
 }
 
+void UTPSEliminationEvent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, Elimination);
+}
 
 
 
@@ -29,8 +47,6 @@ FString UTPSEliminationEvent::ToString()
 UTPSCombatLog::UTPSCombatLog()
 {
 	SetIsReplicatedByDefault(true);
-
-	//ReplicateSubobjects();
 }
 
 void UTPSCombatLog::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -39,25 +55,29 @@ void UTPSCombatLog::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& 
 }
 
 
-void UTPSCombatLog::LogEliminationEvent(FTPSEliminationReport report)
+void UTPSCombatLog::LogElimination(FTPSEliminationReport report)
 {
 	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
 
 	UTPSEliminationEvent* entry = NewObject<UTPSEliminationEvent>(state);
 	entry->ID = FGuid::NewGuid();
-	entry->Type = PlayerKilled;
 	entry->Timestamp = report.Timestamp;
-	entry->VictimName = IsValid(report.VictimCharacter)
-		? FName(report.VictimCharacter->Identity.FirstName)
-		: FName();
-	entry->KillerName = IsValid(report.KillerCharacter)
-		? FName(report.KillerCharacter->Identity.FirstName)
-		: FName();
-	entry->KillMethod = report.KillMethod;
+	entry->Elimination = report;
+	entry->Message.Text = entry->ToString();
 
-	//state->LogEntries.Add(entry);
-	//state->ClientMessageFeed.Add(entry->Message);
-	//state->AddReplicatedSubObject(entry);
 	state->LogEvent(entry);
 }
+
+
+void UTPSCombatLog::LogMessage(FTPSLogMessage message)
+{
+	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
+
+	UTPSCombatLogEntry* entry = NewObject<UTPSCombatLogEntry>(state);
+	entry->ID = FGuid::NewGuid();
+	entry->Timestamp = UGameplayStatics::GetTimeSeconds(this);
+
+	state->LogEvent(entry);
+}
+
 

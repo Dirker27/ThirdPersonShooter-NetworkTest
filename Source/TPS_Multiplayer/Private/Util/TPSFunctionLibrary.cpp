@@ -189,9 +189,16 @@ FString UTPSFunctionLibrary::GetFormalDisplayNameForCharacter(const UTPSCharacte
     displayName += character->Identity.FirstName + " ";
     if (!character->Identity.Callsign.IsEmpty())
     {
-        displayName += "'" + character->Identity.Callsign + "'";
+        displayName += "'" + character->Identity.Callsign + "' ";
     }
     displayName += character->Identity.LastName;
 
     return displayName;
+}
+
+FString UTPSFunctionLibrary::GetShortDisplayNameForCharacter(const UTPSCharacterInstance* character)
+{
+    return FString::Printf(TEXT("%s. %s"),
+        *TPSCharacterRankAbbreviationString(character->Identity.Rank),
+        *character->Identity.LastName);
 }

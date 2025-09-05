@@ -69,4 +69,8 @@ public:
 	// Get full character name as raw text - ie: "Sgt. Jose 'Boomer' Ramirez"
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static FString GetFormalDisplayNameForCharacter(const UTPSCharacterInstance* character);
+
+	// Get short character name as raw text - ie: "Sgt. Ramirez"
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FString GetShortDisplayNameForCharacter(const UTPSCharacterInstance* character);
 };

@@ -1,6 +1,6 @@
 // (C) ToasterCat Studios 2025
 
-#include "Game/TPSSpawnPool.h"
+#include "World/TPSSpawnPool.h"
 
 UTPSSpawnPool::UTPSSpawnPool()
 {

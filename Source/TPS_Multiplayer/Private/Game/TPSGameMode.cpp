@@ -5,9 +5,9 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Game/TPSGameState.h"
-#include "Game/TPSSpawnFormation.h"
 #include "Team/TPSTeamInstanceFactory.h"
 #include "Types/TPSReport.h"
+#include "World/TPSSpawnPoint.h"
 #include "World/TPSWorldManager.h"
 
 //~ ====================================================================== ~//
@@ -26,12 +26,57 @@ ATPSGameMode::~ATPSGameMode() { }
 void ATPSGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::BeginPlay()"));
 }
 
 
 //~ ====================================================================== ~//
 //  OPERATIONS
 //~ ====================================================================== ~//
+
+void ATPSGameMode::StartMatch()
+{
+	Super::StartMatch();
+	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::StartMatch()"));
+
+	State()->TimeRemainingSeconds = TimeLimitSeconds;
+	State()->WinningTeam = ETPSTeamID::Independent;
+
+	MatchStateUpdate.Broadcast();
+}
+
+void ATPSGameMode::EndMatch()
+{
+	Super::EndMatch();
+	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::EndMatch()"));
+
+	MatchStateUpdate.Broadcast();
+}
+
+void ATPSGameMode::HandleMatchHasEnded()
+{
+	Super::HandleMatchHasEnded();
+	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::HandleMatchHasEnded()"));
+}
+
+
+void ATPSGameMode::BroadcastMessage(FTPSBroadcastMessage message)
+{
+	if (IsValid(State()->BroadcastMessage))
+	{
+		State()->RemoveReplicatedSubObject(State()->BroadcastMessage);
+	}
+
+	UTPSBroadcastMessageObject* messageObj = NewObject<UTPSBroadcastMessageObject>(State());
+	messageObj->Message = message;
+	State()->BroadcastMessage = messageObj;
+	State()->AddReplicatedSubObject(messageObj);
+
+	CombatLog->LogMessage(FTPSLogMessage(message.Heading, message.SubHeading));
+
+	MatchStateUpdate.Broadcast();
+}
+
 
 void ATPSGameMode::IndexSpawnPoints()
 {
@@ -124,7 +169,7 @@ void ATPSGameMode::KillCharacter_Implementation(const FGuid characterId)
 		character->Die();
 
 		auto report = GenerateEliminationReportForCharacterDeath(character);
-		CombatLog->LogEliminationEvent(report);
+		CombatLog->LogElimination(report);
 
 		// Broadcast Event -> BP GameMode handler
 		OnCharacterElimination(report);
@@ -135,14 +180,14 @@ void ATPSGameMode::KillCharacter_Implementation(const FGuid characterId)
 FTPSEliminationReport ATPSGameMode::GenerateEliminationReportForCharacterDeath(UTPSCharacterInstance* eliminatee) const
 {
 	UTPSCharacterInstance* killerInstance = nullptr;
-	FName killMethod;
+	FString killMethod = "Divine Intervention";
 
 	if (auto killerActor = Cast<ATPSCharacter>(eliminatee->LastHit.Instigator))
 	{
 		killerInstance = killerActor->GetCharacterInstance();
 		if (auto killWeapon = killerActor->GetEquippedWeapon())
 		{
-			killMethod = FName(killWeapon->Name);
+			killMethod = killWeapon->Name;
 		}
 	}
 

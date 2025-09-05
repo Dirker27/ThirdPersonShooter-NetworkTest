@@ -6,8 +6,8 @@
 
 #include "Equipment/TPSEquipableItem.h"
 #include "Reticle/TPSReticle.h"
-#include "Weapon/TPSWeaponSlot.h"
-#include "Weapon/TPSWeaponType.h"
+#include "Weapon/Types/TPSWeaponSlot.h"
+#include "Weapon/Types/TPSWeaponType.h"
 #include "Weapon/TPSWeaponConfiguration.h"
 #include "Weapon/TPSWeaponState.h"
 

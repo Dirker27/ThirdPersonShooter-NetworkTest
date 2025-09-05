@@ -19,14 +19,14 @@ struct TPS_MULTIPLAYER_API FTPSEliminationReport
 	UTPSCharacterInstance* KillerCharacter = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FName KillMethod = FName();
+	FString KillMethod;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float Timestamp = 0;
 
 	FTPSEliminationReport() { }
 
-	FTPSEliminationReport(UTPSCharacterInstance* victim, UTPSCharacterInstance* killer, FName method, float timestamp)
+	FTPSEliminationReport(UTPSCharacterInstance* victim, UTPSCharacterInstance* killer, FString method, float timestamp)
 	{
 		VictimCharacter = victim;
 		KillerCharacter = killer;

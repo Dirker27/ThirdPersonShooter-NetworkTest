@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Game/TPSSpawnPoint.h"
+#include "World/TPSSpawnPoint.h"
 
 #include "TPSSpawnFormation.generated.h"
 

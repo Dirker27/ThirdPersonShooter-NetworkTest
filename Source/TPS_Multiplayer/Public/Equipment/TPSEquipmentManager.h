@@ -7,7 +7,7 @@
 
 #include "Equipment/TPSEquipmentSlot.h"
 #include "Equipment/TPSEquipmentLoadout.h"
-#include "Weapon/TPSWeaponSlot.h"
+#include "Weapon/Types/TPSWeaponSlot.h"
 
 #include "TPSEquipmentManager.generated.h"
 

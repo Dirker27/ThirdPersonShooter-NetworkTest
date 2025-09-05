@@ -2,7 +2,7 @@
 
 #include "Team/TPSTeamInstance.h"
 
-#include "Game/TPSSpawnPool.h"
+#include "World/TPSSpawnPool.h"
 #include "Net/UnrealNetwork.h"
 
 UTPSTeamInstance::UTPSTeamInstance()

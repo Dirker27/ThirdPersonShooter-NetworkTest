@@ -48,6 +48,18 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     FString Callsign;
 
+    //UFUNCTION(BlueprintCallable)
+    FString FullName() const
+    {
+        return Callsign.IsEmpty()
+            ? FString::Printf(TEXT("%s %s"),
+                *FirstName,
+                *LastName)
+            : FString::Printf(TEXT("%s '%s' %s"),
+                *FirstName,
+                *Callsign,
+                *LastName);
+    }
 
     ////////////////////////////////////////////////////////
     // Details and Alignment

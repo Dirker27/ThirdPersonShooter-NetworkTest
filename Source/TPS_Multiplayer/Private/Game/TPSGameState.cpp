@@ -10,7 +10,7 @@ ATPSGameState::ATPSGameState()
     bReplicates = true;
     bReplicateUsingRegisteredSubObjectList = true;
 
-    GameClockSeconds = 0;
+    TimeRemainingSeconds = 0;
 }
 
 
@@ -26,12 +26,11 @@ void ATPSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
     DOREPLIFETIME(ThisClass, Players);
 
     DOREPLIFETIME(ThisClass, LogEntries);
-    //DOREPLIFETIME(ThisClass, ClientMessageFeed);
 }
 
 void ATPSGameState::OnTick(float deltaTime)
 {
-    GameClockSeconds += deltaTime;
+    TimeRemainingSeconds -= deltaTime;
 }
 
 
@@ -228,19 +227,13 @@ UTPSCharacterInstance* ATPSGameState::GetCharacter(const FGuid characterId)
 
 void ATPSGameState::LogEvent_Implementation(UTPSCombatLogEntry* entry)
 {
-    /*if (ClientMessageFeed.Num() >= ClientFeedLength)
-    {
-        ClientMessageFeed.Remove();
-    }
-    ClientMessageFeed.Add(entry);*/
-
     LogEntries.Add(entry);
     AddReplicatedSubObject(entry);
 
-    AppendToClientFeed(entry);
+    BroadcastLogEventToClientFeed(entry);
 }
 
-void ATPSGameState::AppendToClientFeed_Implementation(UTPSCombatLogEntry* entry)
+void ATPSGameState::BroadcastLogEventToClientFeed_Implementation(UTPSCombatLogEntry* entry)
 {
     // STUB: Filter for Combat v World/System events
     CombatLogUpdate.Broadcast();

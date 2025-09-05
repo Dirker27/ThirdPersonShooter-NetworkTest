@@ -4,11 +4,10 @@
 
 #include "CoreMinimal.h"
 
-#include "Game/TPSSpawnPool.h"
-
 #include "TPSCommandStructure.h"
 #include "TPSTeamConfiguration.h"
 #include "TPSTeamID.h"
+#include "World/TPSSpawnPool.h"
 
 #include "TPSTeamInstance.generated.h"
 

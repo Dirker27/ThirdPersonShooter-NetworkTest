@@ -10,6 +10,7 @@
 #include "Log/TPSCombatLog.h"
 #include "Team/TPSCommandStructure.h"
 #include "Team/TPSTeamInstance.h"
+#include "Types/TPSBroadcastMessage.h"
 
 #include "TPSGameState.generated.h"
 
@@ -40,17 +41,29 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 //~ ==================================================================== ~//
+//  GAME STATE
+//	----------
+//	- Timer
+//	- Leading Team
+//~ ==================================================================== ~//
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float TimeRemainingSeconds;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
+	TEnumAsByte<ETPSTeamID> WinningTeam;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<UTPSBroadcastMessageObject> BroadcastMessage;
+
+//~ ==================================================================== ~//
 //  WORLD REGISTRY
 //	--------------
 //	- Spawned Characters and Items
 //	- Teams and Sub-Units
 //	- Connected Players
 //~ ==================================================================== ~//
-
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float GameClockSeconds;
-
 	// All Teams instantiated in the World
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	TArray<TObjectPtr<UTPSTeamInstance>> Teams;
@@ -66,7 +79,6 @@ public:
 	// All PlayerStates *ever* instantiated in the World
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	TArray<TObjectPtr<ATPSPlayerState>> Players;
-
 
 	////////////////////////////////////////////////////////
 	// Local-only indices
@@ -149,13 +161,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int ClientFeedLength = 5;
 
-	// Full log - SERVER-only
+	// Full log
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	TArray<TObjectPtr<UTPSCombatLogEntry>> LogEntries;
-
-	// Client-visible log messages.
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)//, Replicated)
-	TArray<TObjectPtr<UTPSCombatLogEntry>> ClientMessageFeed;*/
 
 	// Broadcast Delegate - Combat Log has been Updated
 	UPROPERTY(BlueprintAssignable)
@@ -168,7 +176,7 @@ public:
 	void LogEvent(UTPSCombatLogEntry* entry);
 
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
-	void AppendToClientFeed(UTPSCombatLogEntry* entry);
+	void BroadcastLogEventToClientFeed(UTPSCombatLogEntry* entry);
 
 	UFUNCTION(BlueprintCallable)
 	TArray<UTPSCombatLogEntry*> GetRecentLogEvents(int feedLength) const;

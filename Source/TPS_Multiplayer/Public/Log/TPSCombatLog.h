@@ -10,22 +10,18 @@
 UENUM(BlueprintType)
 enum ETPSLogEntryType : int
 {
-    GameStart,
-    GameOver,
+    MATCH_START,
+    MATCH_OVER,
 
-    Elimination,
+    ELIMINATION,
 
-    PlayerKilled,
-    PlayerJoined,
-    PlayerLeft,
+    PLAYER_JOINED,
+    PLAYER_LEFT,
 
-    BotKilled,
+    ORDER_ISSUED,
+    ORDER_COMPLETE,
 
-    OrderIssued,
-    OrderComplete,
-
-    ScoreAlert,
-    ObjectiveUpdated
+    SCORE
 };
 
 USTRUCT(BlueprintType)
@@ -33,17 +29,23 @@ struct TPS_MULTIPLAYER_API FTPSLogMessage
 {
     GENERATED_BODY()
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    FString Message;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FString Text;
 
-    /*UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    float Timestamp;*/
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FString SubText;
 
     FTPSLogMessage() { }
 
     FTPSLogMessage(FString newMessage)
     {
-        Message = newMessage;
+        Text = newMessage;
+    }
+
+    FTPSLogMessage(FString newMessage, FString subText)
+    {
+        Text = newMessage;
+        SubText = subText;
     }
 };
 
@@ -60,18 +62,19 @@ public:
 
 protected:
     virtual bool IsSupportedForNetworking() const override { return true; }
+    virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
     FGuid ID;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
     float Timestamp;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
     TEnumAsByte<ETPSLogEntryType> Type;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
     FTPSLogMessage Message;
 
 public:
@@ -98,17 +101,14 @@ class UTPSEliminationEvent : public UTPSCombatLogEntry
     GENERATED_BODY()
 
 public:
-    UTPSEliminationEvent() { Type = Elimination; }
+    UTPSEliminationEvent() { Type = ELIMINATION; }
+
+protected:
+    virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    FName VictimName;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    FName KillerName;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    FName KillMethod;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+    FTPSEliminationReport Elimination;
 
     virtual FString ToString() override;
 };
@@ -131,7 +131,10 @@ protected:
 
 public:
     UFUNCTION(BlueprintCallable)
-    void LogEliminationEvent(FTPSEliminationReport report);
+    void LogElimination(FTPSEliminationReport report);
+
+    UFUNCTION(BlueprintCallable)
+    void LogMessage(FTPSLogMessage message);
 };
 
 
