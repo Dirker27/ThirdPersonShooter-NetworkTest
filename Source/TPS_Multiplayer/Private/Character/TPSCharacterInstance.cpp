@@ -5,7 +5,6 @@
 #include "Net/UnrealNetwork.h"
 
 #include "Character/TPSCharacter.h"
-#include "Character/TPSCharacterRecord.h"
 
 UTPSCharacterInstance::UTPSCharacterInstance()
 {

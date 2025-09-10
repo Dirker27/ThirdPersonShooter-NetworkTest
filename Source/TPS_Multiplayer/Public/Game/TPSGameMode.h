@@ -15,10 +15,6 @@
 
 #include "TPSGameMode.generated.h"
 
-
-UDELEGATE(BlueprintAuthorityOnly)
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMatchStateUpdate);
-
 /**
  * 
  *
@@ -49,8 +45,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS")
 	TObjectPtr<UTPSCombatLog> CombatLog;
 
-	UPROPERTY(BlueprintAssignable)
-	FMatchStateUpdate MatchStateUpdate;
 
 //~ ==================================================================== ~//
 //  CONFIGURATION
@@ -66,7 +60,7 @@ public:
 	int PointsToWin;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
-	float TimeLimitSeconds;
+	double TimeLimitSeconds;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="TPS|Debug")
 	bool IsDebugEnabled = false;
@@ -92,7 +86,10 @@ public:
 	//UFUNCTION(BlueprintCallable)
 	virtual void StartMatch() override;
 	virtual void EndMatch() override;
+	virtual void HandleMatchHasStarted() override;
 	virtual void HandleMatchHasEnded() override;
+
+	//virtual bool ReadyToEndMatch() const override;
 
 	UFUNCTION(BlueprintCallable)
 	void BroadcastMessage(FTPSBroadcastMessage message);

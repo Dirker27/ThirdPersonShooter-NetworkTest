@@ -2,21 +2,27 @@
 
 #include "Game/TPSGameState.h"
 
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+// (C) ToasterCat Studios 2025
+
 #include "Team/TPSTeamInstanceFactory.h"
 
 ATPSGameState::ATPSGameState()
 {
+    PrimaryActorTick.bCanEverTick = true;
     bReplicates = true;
     bReplicateUsingRegisteredSubObjectList = true;
-
-    TimeRemainingSeconds = 0;
 }
 
 
 void ATPSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(ThisClass, MatchTimeLimitSeconds);
+    DOREPLIFETIME(ThisClass, TimeMatchStarted);
+    DOREPLIFETIME(ThisClass, TimeMatchEnded);
 
     DOREPLIFETIME(ThisClass, Teams);
     DOREPLIFETIME(ThisClass, TeamUnits);
@@ -30,9 +36,21 @@ void ATPSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 void ATPSGameState::OnTick(float deltaTime)
 {
-    TimeRemainingSeconds -= deltaTime;
+
 }
 
+double ATPSGameState::GetTimeRemainingSeconds() const
+{
+    if (TimeMatchStarted < 0)
+    {
+        return 1;
+    }
+
+    double timeElapsed = UGameplayStatics::GetTimeSeconds(this)
+        - TimeMatchStarted;
+
+    return MatchTimeLimitSeconds - timeElapsed;
+}
 
 
 int ATPSGameState::GetTeamScore(const ETPSTeamID teamId)

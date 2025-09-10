@@ -14,6 +14,19 @@
 
 #include "TPSGameState.generated.h"
 
+UENUM(BlueprintType)
+enum ETPSMatchPhase : int
+{
+	INITIALIZATION,
+	SETUP,
+	COMBAT,
+	CONSEQUENCE,
+	TEARDOWN
+};
+
+
+UDELEGATE(BlueprintAuthorityOnly)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMatchStateUpdate);
 
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTeamRosterUpdate);
@@ -41,14 +54,38 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 //~ ==================================================================== ~//
-//  GAME STATE
-//	----------
+//  MATCH STATE
+//	-----------
 //	- Timer
 //	- Leading Team
 //~ ==================================================================== ~//
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float TimeRemainingSeconds;
+	UPROPERTY(BlueprintAssignable)
+	FMatchStateUpdate MatchStateUpdate;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+	TEnumAsByte<ETPSMatchPhase> MatchPhase;
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateMatchPhase(ETPSMatchPhase newPhase)
+	{
+		MatchPhase = newPhase;
+		MatchStateUpdate.Broadcast();
+	}
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+	float MatchTimeLimitSeconds = -1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+	double TimeMatchStarted = -1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+	double TimeMatchEnded = -1;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	double GetTimeRemainingSeconds() const;
+
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	TEnumAsByte<ETPSTeamID> WinningTeam;
