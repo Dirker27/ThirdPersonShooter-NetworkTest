@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include "Equipment/TPSEquipmentLoadout.h"
+#include "Model/TPSHierarchicalCollectionLevel.h"
+#include "Team/Types/TPSSquadRole.h"
+
 #include "TPSTeamConfiguration.generated.h"
 
 /**
@@ -16,22 +20,22 @@ struct FTPSTeamConfiguration
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ETPSHierarchicalLevel HighestSupportedCommandLevel = ETPSHierarchicalLevel::PLATOON;
+	TEnumAsByte<ETPSHierarchicalLevel> HighestSupportedCommandLevel = ETPSHierarchicalLevel::PLATOON;
 
 	// Defines number of Members directly assigned to each level
 	//   ie: Leader units and "HeadQuarters" Squad members
 	//   (TODO: Migrate to "ForceHierarchy"/"TeamSchema" object)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<ETPSHierarchicalLevel, int> MemberCapacityMap;
+	TMap<TEnumAsByte<ETPSHierarchicalLevel>, int> MemberCapacityMap;
 
 	// Defines Squads-per-Platoon, Units-per-Fireteam, etc
 	//   (TODO: Migrate to "ForceHierarchy"/"TeamSchema" object)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<ETPSHierarchicalLevel, int> SubUnitCapacityMap;
+	TMap<TEnumAsByte<ETPSHierarchicalLevel>, int> SubUnitCapacityMap;
 
 	// Defines what Loadout each SquadRole should spawn with.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<ETPSSquadRole, UTPSEquipmentLoadout*> MemberLoadoutMap;
+	TMap<TEnumAsByte<ETPSSquadRole>, UTPSEquipmentLoadout*> MemberLoadoutMap;
 };
 
 

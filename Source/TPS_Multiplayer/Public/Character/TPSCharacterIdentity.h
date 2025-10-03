@@ -84,7 +84,7 @@ public:
 
     // Character's "Class" / Role in their Squad
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    ETPSSquadRole SquadRole;
+    TEnumAsByte<ETPSSquadRole> SquadRole;
 };
 
 /**

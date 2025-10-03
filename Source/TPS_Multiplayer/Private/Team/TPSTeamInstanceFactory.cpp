@@ -176,7 +176,6 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandStructure* node)
 			state->Characters.Add(instance);
 			state->AddReplicatedSubObject(instance);
 		}
-
 		
 	}
 

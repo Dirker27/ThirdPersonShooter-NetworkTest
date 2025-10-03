@@ -83,7 +83,6 @@ public:
 	// Gameplay Functions
 
 	// Start the match
-	//UFUNCTION(BlueprintCallable)
 	virtual void StartMatch() override;
 	virtual void EndMatch() override;
 	virtual void HandleMatchHasStarted() override;
@@ -93,6 +92,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void BroadcastMessage(FTPSBroadcastMessage message);
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateMatchPhase(ETPSMatchPhase phase);
+
+
+
 
 
 

@@ -26,7 +26,7 @@ public:
 	int MaxNumMembers;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<ETPSSquadRole, UTPSEquipmentLoadout*> MemberLoadoutMap;
+	TMap<TEnumAsByte<ETPSSquadRole>, UTPSEquipmentLoadout*> MemberLoadoutMap;
 
 	// TODO: Leader Inheritance Policy, Structure expand/coalesce rules, additional commands, etc
 };

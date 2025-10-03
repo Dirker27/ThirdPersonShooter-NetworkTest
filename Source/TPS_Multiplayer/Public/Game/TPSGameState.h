@@ -19,8 +19,9 @@ enum ETPSMatchPhase : int
 {
 	INITIALIZATION,
 	SETUP,
-	COMBAT,
-	CONSEQUENCE,
+	ENGAGEMENT,
+	WITHDRAWAL,
+	RECOLLECTION,
 	TEARDOWN
 };
 
@@ -32,7 +33,10 @@ UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTeamRosterUpdate);
 
 UDELEGATE(BlueprintAuthorityOnly)
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCombatLogUpdate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMessageUpdate);
+
+UDELEGATE(BlueprintAuthorityOnly)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLogUpdate);
 
 /**
  * The TPSGameState of the Game
@@ -53,6 +57,8 @@ protected:
 	virtual void OnTick(float deltaTime);
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+
+
 //~ ==================================================================== ~//
 //  MATCH STATE
 //	-----------
@@ -60,7 +66,7 @@ protected:
 //	- Leading Team
 //~ ==================================================================== ~//
 public:
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, Replicated)
 	FMatchStateUpdate MatchStateUpdate;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
@@ -85,13 +91,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	double GetTimeRemainingSeconds() const;
 
-
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	TEnumAsByte<ETPSTeamID> WinningTeam;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TObjectPtr<UTPSBroadcastMessageObject> BroadcastMessage;
+
 
 //~ ==================================================================== ~//
 //  WORLD REGISTRY
@@ -101,6 +104,10 @@ public:
 //	- Connected Players
 //~ ==================================================================== ~//
 public:
+	// Broadcast Delegate - Team/Character/Player Roster Updated
+	UPROPERTY(BlueprintAssignable, Replicated)
+	FTeamRosterUpdate RosterUpdate;
+
 	// All Teams instantiated in the World
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	TArray<TObjectPtr<UTPSTeamInstance>> Teams;
@@ -187,6 +194,8 @@ public:
 	UTPSCharacterInstance* GetCharacter(const FGuid characterId);
 
 
+
+
 //~ ==================================================================== ~//
 //  COMBAT LOG
 //	----------
@@ -195,6 +204,10 @@ public:
 //	- Player Join/Drop Events
 //~ ==================================================================== ~//
 public:
+	// Broadcast Delegate - Combat Log has been Updated
+	UPROPERTY(BlueprintAssignable, Replicated)
+	FLogUpdate LogUpdate;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int ClientFeedLength = 5;
 
@@ -202,19 +215,40 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	TArray<TObjectPtr<UTPSCombatLogEntry>> LogEntries;
 
-	// Broadcast Delegate - Combat Log has been Updated
-	UPROPERTY(BlueprintAssignable)
-	FCombatLogUpdate CombatLogUpdate;
-
 public:
 	////////////////////////////////////////////////////////
 	// Logging Operations
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void LogEvent(UTPSCombatLogEntry* entry);
 
-	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
-	void BroadcastLogEventToClientFeed(UTPSCombatLogEntry* entry);
-
 	UFUNCTION(BlueprintCallable)
 	TArray<UTPSCombatLogEntry*> GetRecentLogEvents(int feedLength) const;
+
+
+
+
+//~ ==================================================================== ~//
+//  BROADCAST MESSAGE QUEUE
+//	-----------------------
+//	- Team Objective Updates
+//	- Player Death Events
+//~ ==================================================================== ~//
+
+protected:
+	// Broadcast Delegate - Combat Log has been Updated
+	UPROPERTY(BlueprintAssignable, Replicated)
+	FMessageUpdate MessageUpdate;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
+	TObjectPtr<UTPSBroadcastMessageObject> BroadcastMessage;
+
+public:
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void UpdateBroadcastMessage(FTPSBroadcastMessage message);
+
+	UFUNCTION(BlueprintCallable)
+	UTPSBroadcastMessageObject* GetBroadcastMessage() { return BroadcastMessage; }
+
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void BroadcastMessageUpdate();
 };

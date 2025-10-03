@@ -100,7 +100,7 @@ struct TPS_MULTIPLAYER_API FTPSUnitID
 	TEnumAsByte<ETPSTeamID> TeamID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ETPSHierarchicalLevel UnitLevel;
+	TEnumAsByte<ETPSHierarchicalLevel> UnitLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int UnitNumber;
@@ -200,7 +200,4 @@ class UTPSUnitIdentifier : public UDataAsset
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FTPSUnitID ID;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<ETPSHierarchicalLevel, int> Hierarchy;
 };

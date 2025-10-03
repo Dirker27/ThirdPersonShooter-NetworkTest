@@ -29,7 +29,7 @@ public:
 
     // Preferred Squad Role to spawn at this 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    ETPSSquadRole PreferredSquadRoleToSpawn;
+    TEnumAsByte<ETPSSquadRole> PreferredSquadRoleToSpawn;
 
 public:
     UFUNCTION(BlueprintCallable)

@@ -43,15 +43,13 @@ void ATPSGameMode::StartMatch()
 	State()->TimeMatchStarted = UGameplayStatics::GetTimeSeconds(this);
 	State()->WinningTeam = ETPSTeamID::Independent;
 
-	//MatchStateUpdate.Broadcast();
+	State()->MatchStateUpdate.Broadcast();
 }
 
 void ATPSGameMode::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
 	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::HandleMatchHasStarted()"));
-
-	MatchStateUpdate.Broadcast();
 }
 
 
@@ -60,34 +58,29 @@ void ATPSGameMode::EndMatch()
 	Super::EndMatch();
 	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::EndMatch()"));
 
-	//MatchStateUpdate.Broadcast();
+	State()->MatchStateUpdate.Broadcast();
 }
 
 void ATPSGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
 	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::HandleMatchHasEnded()"));
-
-	MatchStateUpdate.Broadcast();
 }
 
 
 void ATPSGameMode::BroadcastMessage(FTPSBroadcastMessage message)
 {
-	if (IsValid(State()->BroadcastMessage))
-	{
-		State()->RemoveReplicatedSubObject(State()->BroadcastMessage);
-	}
-
-	UTPSBroadcastMessageObject* messageObj = NewObject<UTPSBroadcastMessageObject>(State());
-	messageObj->Message = message;
-	State()->BroadcastMessage = messageObj;
-	State()->AddReplicatedSubObject(messageObj);
+	State()->UpdateBroadcastMessage(message);
 
 	CombatLog->LogMessage(FTPSLogMessage(message.Heading, message.SubHeading));
-
-	MatchStateUpdate.Broadcast();
 }
+
+
+void ATPSGameMode::UpdateMatchPhase(ETPSMatchPhase phase)
+{
+	State()->UpdateMatchPhase(phase);
+}
+
 
 
 void ATPSGameMode::IndexSpawnPoints()

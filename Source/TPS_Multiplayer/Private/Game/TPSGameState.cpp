@@ -20,23 +20,32 @@ void ATPSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+    // Match State
+    DOREPLIFETIME(ThisClass, MatchStateUpdate);
+    DOREPLIFETIME(ThisClass, MatchPhase);
     DOREPLIFETIME(ThisClass, MatchTimeLimitSeconds);
     DOREPLIFETIME(ThisClass, TimeMatchStarted);
     DOREPLIFETIME(ThisClass, TimeMatchEnded);
+    DOREPLIFETIME(ThisClass, WinningTeam);
 
+    // WorldState
+    DOREPLIFETIME(ThisClass, RosterUpdate);
     DOREPLIFETIME(ThisClass, Teams);
     DOREPLIFETIME(ThisClass, TeamUnits);
-
     DOREPLIFETIME(ThisClass, Characters);
-
     DOREPLIFETIME(ThisClass, Players);
 
+    // Log
+    DOREPLIFETIME(ThisClass, LogUpdate);
     DOREPLIFETIME(ThisClass, LogEntries);
+
+    // Message Queue
+    DOREPLIFETIME(ThisClass, MessageUpdate);
+    DOREPLIFETIME(ThisClass, BroadcastMessage);
 }
 
 void ATPSGameState::OnTick(float deltaTime)
 {
-
 }
 
 double ATPSGameState::GetTimeRemainingSeconds() const
@@ -243,19 +252,21 @@ UTPSCharacterInstance* ATPSGameState::GetCharacter(const FGuid characterId)
     return nullptr;
 }
 
+
+
+//~ ==================================================================== ~//
+//  LOGGING Operations
+//~ ==================================================================== ~//
+
+
 void ATPSGameState::LogEvent_Implementation(UTPSCombatLogEntry* entry)
 {
     LogEntries.Add(entry);
     AddReplicatedSubObject(entry);
 
-    BroadcastLogEventToClientFeed(entry);
+    LogUpdate.Broadcast();
 }
 
-void ATPSGameState::BroadcastLogEventToClientFeed_Implementation(UTPSCombatLogEntry* entry)
-{
-    // STUB: Filter for Combat v World/System events
-    CombatLogUpdate.Broadcast();
-}
 
 TArray<UTPSCombatLogEntry*> ATPSGameState::GetRecentLogEvents(int feedLength) const
 {
@@ -273,4 +284,28 @@ TArray<UTPSCombatLogEntry*> ATPSGameState::GetRecentLogEvents(int feedLength) co
     }
 
     return feed;
+}
+
+
+
+
+void ATPSGameState::UpdateBroadcastMessage_Implementation(FTPSBroadcastMessage message)
+{
+    if (IsValid(BroadcastMessage))
+    {
+        RemoveReplicatedSubObject(BroadcastMessage);
+        BroadcastMessage = nullptr;
+    }
+
+    UTPSBroadcastMessageObject* messageObj = NewObject<UTPSBroadcastMessageObject>(this);
+    messageObj->Message = message;
+    BroadcastMessage = messageObj;
+    AddReplicatedSubObject(messageObj);
+
+    BroadcastMessageUpdate();
+}
+
+void ATPSGameState::BroadcastMessageUpdate_Implementation()
+{
+    MessageUpdate.Broadcast();
 }

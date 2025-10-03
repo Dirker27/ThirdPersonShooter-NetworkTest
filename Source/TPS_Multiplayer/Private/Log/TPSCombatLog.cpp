@@ -76,6 +76,8 @@ void UTPSCombatLog::LogMessage(FTPSLogMessage message)
 	UTPSCombatLogEntry* entry = NewObject<UTPSCombatLogEntry>(state);
 	entry->ID = FGuid::NewGuid();
 	entry->Timestamp = UGameplayStatics::GetTimeSeconds(this);
+	entry->Message.Text = message.Text;
+	entry->Message.SubText = message.SubText;
 
 	state->LogEvent(entry);
 }

@@ -6,7 +6,7 @@
 
 // A Character's "Class" by a different name.
 UENUM(BlueprintType)
-enum class ETPSSquadRole : uint8
+enum ETPSSquadRole : int
 {
     NONE = 0,
 
