@@ -4,13 +4,11 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
-// (C) ToasterCat Studios 2025
 
 #include "Team/TPSTeamInstanceFactory.h"
 
 ATPSGameState::ATPSGameState()
 {
-    PrimaryActorTick.bCanEverTick = true;
     bReplicates = true;
     bReplicateUsingRegisteredSubObjectList = true;
 }
@@ -21,7 +19,6 @@ void ATPSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     // Match State
-    DOREPLIFETIME(ThisClass, MatchStateUpdate);
     DOREPLIFETIME(ThisClass, MatchPhase);
     DOREPLIFETIME(ThisClass, MatchTimeLimitSeconds);
     DOREPLIFETIME(ThisClass, TimeMatchStarted);
@@ -29,36 +26,71 @@ void ATPSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
     DOREPLIFETIME(ThisClass, WinningTeam);
 
     // WorldState
-    DOREPLIFETIME(ThisClass, RosterUpdate);
     DOREPLIFETIME(ThisClass, Teams);
     DOREPLIFETIME(ThisClass, TeamUnits);
     DOREPLIFETIME(ThisClass, Characters);
     DOREPLIFETIME(ThisClass, Players);
 
     // Log
-    DOREPLIFETIME(ThisClass, LogUpdate);
     DOREPLIFETIME(ThisClass, LogEntries);
 
     // Message Queue
-    DOREPLIFETIME(ThisClass, MessageUpdate);
     DOREPLIFETIME(ThisClass, BroadcastMessage);
 }
 
-void ATPSGameState::OnTick(float deltaTime)
+
+void ATPSGameState::UpdateMatchPhase_Implementation(ETPSMatchPhase newPhase)
 {
+    MatchPhase = newPhase;
+    MatchStateUpdate.Broadcast();
 }
+
+void ATPSGameState::OnRep_MatchPhase()
+{
+    MatchStateUpdate.Broadcast();
+}
+
+
+
+
 
 double ATPSGameState::GetTimeRemainingSeconds() const
 {
     if (TimeMatchStarted < 0)
     {
-        return 1;
+        return 0;
     }
 
     double timeElapsed = UGameplayStatics::GetTimeSeconds(this)
         - TimeMatchStarted;
 
     return MatchTimeLimitSeconds - timeElapsed;
+}
+
+FString ATPSGameState::GetTimeRemainingSecondsAsString() const
+{
+    double timeRemainingSeconds = GetTimeRemainingSeconds();
+
+    if (timeRemainingSeconds <= 0)
+    {
+        return "00.00";
+    }
+
+    int hours = static_cast<int>(timeRemainingSeconds) / 3600;
+    int minutes = (static_cast<int>(timeRemainingSeconds) / 60) % 60;
+    double seconds = static_cast<int>(timeRemainingSeconds) % 60;
+
+    if (hours > 0)
+    {
+        return FString::Printf(TEXT("%2.i:%2.i:%2.0f"),
+            hours, minutes, seconds);
+    }
+    else if (minutes > 0)
+    {
+        return FString::Printf(TEXT("%2.i:%2.0f"), minutes, seconds);
+    }
+
+    return FString::Printf(TEXT("%2.2f"), timeRemainingSeconds);
 }
 
 
@@ -267,6 +299,12 @@ void ATPSGameState::LogEvent_Implementation(UTPSCombatLogEntry* entry)
     LogUpdate.Broadcast();
 }
 
+void ATPSGameState::OnRep_LogEntries()
+{
+    LogUpdate.Broadcast();
+}
+
+
 
 TArray<UTPSCombatLogEntry*> ATPSGameState::GetRecentLogEvents(int feedLength) const
 {
@@ -299,13 +337,15 @@ void ATPSGameState::UpdateBroadcastMessage_Implementation(FTPSBroadcastMessage m
 
     UTPSBroadcastMessageObject* messageObj = NewObject<UTPSBroadcastMessageObject>(this);
     messageObj->Message = message;
+    messageObj->TimestampDisplayStarted = UGameplayStatics::GetRealTimeSeconds(this);
     BroadcastMessage = messageObj;
     AddReplicatedSubObject(messageObj);
 
-    BroadcastMessageUpdate();
+    MessageUpdate.Broadcast();
+    //BroadcastMessageUpdate();
 }
 
-void ATPSGameState::BroadcastMessageUpdate_Implementation()
+void ATPSGameState::OnRep_BroadcastMessage()
 {
-    MessageUpdate.Broadcast();
+    MatchStateUpdate.Broadcast();
 }

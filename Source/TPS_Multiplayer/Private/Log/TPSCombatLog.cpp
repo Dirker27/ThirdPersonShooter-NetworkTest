@@ -1,3 +1,5 @@
+// (C) ToasterCat Studios 2025
+
 #include "Log/TPSCombatLog.h"
 
 #include "Game/TPSGameState.h"
@@ -81,5 +83,4 @@ void UTPSCombatLog::LogMessage(FTPSLogMessage message)
 
 	state->LogEvent(entry);
 }
-
 

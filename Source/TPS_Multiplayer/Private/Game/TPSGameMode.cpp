@@ -41,9 +41,6 @@ void ATPSGameMode::StartMatch()
 
 	State()->MatchTimeLimitSeconds = TimeLimitSeconds;
 	State()->TimeMatchStarted = UGameplayStatics::GetTimeSeconds(this);
-	State()->WinningTeam = ETPSTeamID::Independent;
-
-	State()->MatchStateUpdate.Broadcast();
 }
 
 void ATPSGameMode::HandleMatchHasStarted()
@@ -57,8 +54,6 @@ void ATPSGameMode::EndMatch()
 {
 	Super::EndMatch();
 	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::EndMatch()"));
-
-	State()->MatchStateUpdate.Broadcast();
 }
 
 void ATPSGameMode::HandleMatchHasEnded()

@@ -47,6 +47,9 @@ class UTPSBroadcastMessageObject : public UObject
 public:
     UTPSBroadcastMessageObject() { }
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float TimestampDisplayStarted = 0;
+
 protected:
     virtual bool IsSupportedForNetworking() const override { return true; }
     virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override

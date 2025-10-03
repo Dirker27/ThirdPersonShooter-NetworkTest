@@ -1,8 +1,9 @@
-// (C) ToasterCat Studios 2024
+// (C) ToasterCat Studios 2025
 
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TPSMatchPhase.h"
 #include "Containers/Queue.h"
 #include "GameFramework/GameState.h"
 
@@ -13,18 +14,6 @@
 #include "Types/TPSBroadcastMessage.h"
 
 #include "TPSGameState.generated.h"
-
-UENUM(BlueprintType)
-enum ETPSMatchPhase : int
-{
-	INITIALIZATION,
-	SETUP,
-	ENGAGEMENT,
-	WITHDRAWAL,
-	RECOLLECTION,
-	TEARDOWN
-};
-
 
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMatchStateUpdate);
@@ -39,7 +28,7 @@ UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLogUpdate);
 
 /**
- * The TPSGameState of the Game
+ * The State of the Game
  *   - Spawned Characters
  *   - Active Teams and Members
  *   - Spawned Weapons/Equipment
@@ -54,7 +43,6 @@ public:
 	ATPSGameState();
 
 protected:
-	virtual void OnTick(float deltaTime);
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 
@@ -65,19 +53,20 @@ protected:
 //	- Timer
 //	- Leading Team
 //~ ==================================================================== ~//
-public:
-	UPROPERTY(BlueprintAssignable, Replicated)
+protected:
+	// Broadcast Delegate - MatchState
+	UPROPERTY(BlueprintAssignable)
 	FMatchStateUpdate MatchStateUpdate;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
-	TEnumAsByte<ETPSMatchPhase> MatchPhase;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_MatchPhase)
+	TEnumAsByte<ETPSMatchPhase> MatchPhase = UnInitialized;
 
-	UFUNCTION(BlueprintCallable)
-	void UpdateMatchPhase(ETPSMatchPhase newPhase)
-	{
-		MatchPhase = newPhase;
-		MatchStateUpdate.Broadcast();
-	}
+public:
+	UFUNCTION()
+	void OnRep_MatchPhase();
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void UpdateMatchPhase(ETPSMatchPhase newPhase);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
 	float MatchTimeLimitSeconds = -1;
@@ -91,8 +80,11 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	double GetTimeRemainingSeconds() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FString GetTimeRemainingSecondsAsString() const;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
-	TEnumAsByte<ETPSTeamID> WinningTeam;
+	TObjectPtr<UTPSTeamInstance> WinningTeam = nullptr;
 
 
 
@@ -103,11 +95,12 @@ public:
 //	- Teams and Sub-Units
 //	- Connected Players
 //~ ==================================================================== ~//
-public:
+protected:
 	// Broadcast Delegate - Team/Character/Player Roster Updated
-	UPROPERTY(BlueprintAssignable, Replicated)
+	UPROPERTY(BlueprintAssignable)
 	FTeamRosterUpdate RosterUpdate;
 
+public:
 	// All Teams instantiated in the World
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	TArray<TObjectPtr<UTPSTeamInstance>> Teams;
@@ -205,15 +198,18 @@ public:
 //~ ==================================================================== ~//
 public:
 	// Broadcast Delegate - Combat Log has been Updated
-	UPROPERTY(BlueprintAssignable, Replicated)
+	UPROPERTY(BlueprintAssignable)
 	FLogUpdate LogUpdate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int ClientFeedLength = 5;
 
 	// Full log
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing=OnRep_LogEntries)
 	TArray<TObjectPtr<UTPSCombatLogEntry>> LogEntries;
+
+	UFUNCTION()
+	void OnRep_LogEntries();
 
 public:
 	////////////////////////////////////////////////////////
@@ -236,19 +232,18 @@ public:
 
 protected:
 	// Broadcast Delegate - Combat Log has been Updated
-	UPROPERTY(BlueprintAssignable, Replicated)
+	UPROPERTY(BlueprintAssignable)
 	FMessageUpdate MessageUpdate;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
+	// Message that is currently displayed to ALL connected Player UIs
+	//   (Match Start, Match End, System Events, etc...)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, ReplicatedUsing=OnRep_BroadcastMessage)
 	TObjectPtr<UTPSBroadcastMessageObject> BroadcastMessage;
+
+	UFUNCTION()
+	void OnRep_BroadcastMessage();
 
 public:
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void UpdateBroadcastMessage(FTPSBroadcastMessage message);
-
-	UFUNCTION(BlueprintCallable)
-	UTPSBroadcastMessageObject* GetBroadcastMessage() { return BroadcastMessage; }
-
-	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
-	void BroadcastMessageUpdate();
 };
