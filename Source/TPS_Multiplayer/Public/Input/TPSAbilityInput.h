@@ -18,6 +18,7 @@ enum class EAbilityInput : uint8
 	Boost = 12 UMETA(DisplayName = "Boost"),
 	UnBoost = 13 UMETA(DisplayName = "UnBoost"),
 	Crouch = 14 UMETA(DisplayName = "Crouch"),
+	ShoulderSwap = 19 UMETA(DisplayName = "ShoulderSwap"),
 
 	// Primary Actions
 	PrimaryAttack,

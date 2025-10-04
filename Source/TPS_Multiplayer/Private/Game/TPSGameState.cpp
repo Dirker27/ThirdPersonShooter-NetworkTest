@@ -82,15 +82,15 @@ FString ATPSGameState::GetTimeRemainingSecondsAsString() const
 
     if (hours > 0)
     {
-        return FString::Printf(TEXT("%2.i:%2.i:%2.0f"),
+        return FString::Printf(TEXT("%02d:%02d:%02.0f"),
             hours, minutes, seconds);
     }
-    else if (minutes > 0)
+    if (minutes > 0)
     {
-        return FString::Printf(TEXT("%2.i:%2.0f"), minutes, seconds);
+        return FString::Printf(TEXT("%02d:%02.0f"), minutes, seconds);
     }
 
-    return FString::Printf(TEXT("%2.2f"), timeRemainingSeconds);
+    return FString::Printf(TEXT("%02.02f"), timeRemainingSeconds);
 }
 
 

@@ -157,6 +157,14 @@ void ATPSGameMode::PopulateTeams()
 	}
 }
 
+void ATPSGameMode::SpawnTeams()
+{
+	TArray<TObjectPtr<UTPSCharacterInstance>> roster;
+	for (auto team : State()->Teams)
+	{
+		SpawnTeam(team->TeamID);
+	}
+}
 
 
 void ATPSGameMode::KillCharacter_Implementation(const FGuid characterId)

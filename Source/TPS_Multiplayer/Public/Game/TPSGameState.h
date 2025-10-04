@@ -83,6 +83,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FString GetTimeRemainingSecondsAsString() const;
 
+	// Team that has been declared the "winners" for the match
+	//   Will only be set when the active phase of the match has concluded.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	TObjectPtr<UTPSTeamInstance> WinningTeam = nullptr;
 
@@ -130,17 +132,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TMap<FGuid, TObjectPtr<UTPSCharacterInstance>> CharactersById;
 
-	////////////////////////////////////////////////////////
-	// Indexing Operations
 private:
-
-	//UFUNCTION(NetMulticast, Reliable)
 	void IndexTeams();
-
-	//UFUNCTION(NetMulticast, Reliable)
 	void IndexTeamUnits();
-
-	//UFUNCTION(NetMulticast, Reliable)
 	void IndexCharacters();
 
 public:
@@ -150,15 +144,23 @@ public:
 	/*UFUNCTION(BlueprintCallable)
 	void CreateTeam(const ETPSTeamID teamId, const FTPSTeamConfiguration teamConfig);*/
 
+	// Retrieve a Team Instance that matches the provided TeamID
+	//   Will be NULL if Team Instance was not created in the current match.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSTeamInstance* GetTeam(const ETPSTeamID teamId);
 
+	// Retrieve the number of Active (alive) members on a given team.
+	//   Returns ZERO if Team Instance does not exist for provided ID.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetActiveTeamMemberCount(const ETPSTeamID teamId);
 
+	// Retrieves the Total number of team members, alive or dead.
+	//   Returns ZERO if Team Instance does not exist for provided ID.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetTotalTeamMemberCount(const ETPSTeamID teamId);
 
+	// Retrieves the current score for a given team.
+	//   Returns ZERO if Team Instance does not exist for provided ID.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetTeamScore(const ETPSTeamID teamId);
 

@@ -50,20 +50,29 @@ protected:
 //  CONFIGURATION
 //~ ==================================================================== ~//
 public:
+	// Display name for the GameType - "DeathMatch", "Capture the Flag", etc.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
 	FString GameTypeName;
 
+	// Descriptor for the GameType
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
 	FString GameTypeDescription;
 
+	// Points required for a team to win the round.
+	// TODO: Allow for differing win conditions and target values.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
 	int PointsToWin;
 
+	// Time limit for the active phase of the match.
+	// TODO: Add time limits for each match phase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
 	double TimeLimitSeconds;
 
+	// Should we run in DEBUG mode?
+	// TODO: Cascade this setting to peer actors that support Debug modes.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="TPS|Debug")
 	bool IsDebugEnabled = false;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPS|Configuration")
 	TSubclassOf<ATPSCharacter> PlayerCharacterTemplate;
@@ -113,6 +122,10 @@ public:
 	//   Should be invoked *after* Teams have been instantiated in order to index them.
 	UFUNCTION(BlueprintCallable)
 	void IndexSpawnPoints();
+
+	// Spawn all teams with Instances defined entire team.
+	UFUNCTION(BlueprintCallable)
+	void SpawnTeams();
 
 	// Spawn an entire team.
 	UFUNCTION(BlueprintCallable)
