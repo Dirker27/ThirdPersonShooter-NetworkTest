@@ -16,7 +16,7 @@ enum class EAbilityInput : uint8
 	Interact = 00 UMETA(DisplayName = "Interact"),
 	PrimaryAttack = 01 UMETA(DisplayName = "PrimaryAttack"),
 	SecondaryAttack = 02 UMETA(DisplayName = "SecondaryAttack"),
-	Aim = 03 UMETA(DisplayName = "Look / Aim"),
+	Aim = 03 UMETA(DisplayName = "Aim / Zoom"),
 
 
 	// Locomotion
