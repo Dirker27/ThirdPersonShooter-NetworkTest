@@ -10,28 +10,29 @@
 UENUM(BlueprintType)
 enum class EAbilityInput : uint8
 {
-	None = 0 UMETA(DisplayName = "NONE"),
-	Interact = 1,
+	None = 100,
+
+	// Primary Actions
+	Interact = 00 UMETA(DisplayName = "Interact"),
+	PrimaryAttack = 01 UMETA(DisplayName = "PrimaryAttack"),
+	SecondaryAttack = 02 UMETA(DisplayName = "SecondaryAttack"),
+	Aim = 03 UMETA(DisplayName = "Look / Aim"),
+
 
 	// Locomotion
 	Mantle = 10,
 	Boost = 12 UMETA(DisplayName = "Boost"),
 	UnBoost = 13 UMETA(DisplayName = "UnBoost"),
 	Crouch = 14 UMETA(DisplayName = "Crouch"),
-	ShoulderSwap = 19 UMETA(DisplayName = "ShoulderSwap"),
-
-	// Primary Actions
-	PrimaryAttack,
-	SecondaryAttack,
-	Aim,
+	SwitchStance = 19 UMETA(DisplayName = "Switch Stance"),
 
 	// Weapon Handling
-	UnEquip = 30 UMETA(DisplayName = "EquipSlot0"),
-	EquipPrimary = 31 UMETA(DisplayName = "EquipSlot1"),
-	EquipSecondary = 32 UMETA(DisplayName = "EquipSlot2"),
-	EquipTertiary = 33 UMETA(DisplayName = "EquipSlot3"),
-	EquipLethalEquipment = 34 UMETA(DisplayName = "EquipSlot4"),
-	EquipTacticalEquipment = 35 UMETA(DisplayName = "EquipSlot5"),
+	UnEquip = 30 UMETA(DisplayName = "Equip Slot 0"),
+	EquipPrimary = 31 UMETA(DisplayName = "Equip Slot 1"),
+	EquipSecondary = 32 UMETA(DisplayName = "Equip Slot 2"),
+	EquipTertiary = 33 UMETA(DisplayName = "Equip Slot 3"),
+	EquipLethalEquipment = 34 UMETA(DisplayName = "Equip Slot 4"),
+	EquipTacticalEquipment = 35 UMETA(DisplayName = "Equip Slot 5"),
 	Reload = 36 UMETA(DisplayName = "Reload"),
 
 	// Possession
@@ -42,9 +43,16 @@ enum class EAbilityInput : uint8
 	PickupItem,
 	DropItem,
 
-	// System
-	PauseMenu,
-	InGameMenu,
+	// Menus and UI
+	UI_Confirm = 90 UMETA(DispalyName = "UI Select / Confirm"),
+	UI_Cancel = 91 UMETA(DisplayName = "UI Back / Cancel"),
+	UI_Up = 92 UMETA(DisplayName = "UI Selection Up"),
+	UI_Down = 93 UMETA(DisplayName = "UI Selection Down"),
+	UI_Left = 94 UMETA(DisplayName = "UI Selection Left"),
+	UI_Right = 95 UMETA(DisplayName = "UI Selection Right"),
+
+	UI_CharacterMenu = 98,
+	UI_SystemMenu = 99,
 
 	// Debug Abilities
 	StopTime,

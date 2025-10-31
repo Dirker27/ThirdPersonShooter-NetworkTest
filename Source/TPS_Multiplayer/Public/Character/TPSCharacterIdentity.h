@@ -7,6 +7,7 @@
 #include "Team/Types/TPSFactionID.h"
 #include "Team/Types/TPSSquadRole.h"
 #include "Team/Types/TPSUnitID.h"
+#include "Types/TPSCharacterStance.h"
 
 #include "TPSCharacterIdentity.generated.h"
 
@@ -65,9 +66,13 @@ public:
     // Details and Alignment
 
 
-    // Masculine / Feminine ?
+    // Masculine or Feminine ?
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     ETPSCharacterBodyType CharacterBodyType;
+
+    // Left or Right-Handed ?
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    ETPSCharacterStance PreferredStance;
 
     // Current Rank - granted and recognized independently of XP
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

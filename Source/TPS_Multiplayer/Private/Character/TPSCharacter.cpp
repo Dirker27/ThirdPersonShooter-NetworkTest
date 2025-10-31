@@ -524,6 +524,7 @@ bool ATPSCharacter::IsActionActive() const
 		|| IsEquipping
 		|| IsReloading
 		|| IsInteracting
+		|| IsTransitioning
 		|| IsInMenu;
 }
 
@@ -696,6 +697,37 @@ void ATPSCharacter::EndInteract()
 	IsInteracting = false;
 	OnInteractAbilityEnd();
 }
+
+// - SWITCH STANCE -//
+
+void ATPSCharacter::StartSwitchStance()
+{
+	Stance = (Stance == ETPSCharacterStance::Right)
+		? ETPSCharacterStance::Left
+		: ETPSCharacterStance::Right;
+
+	IsTransitioning = true;
+	OnSwitchStanceAbilityStart();
+}
+void ATPSCharacter::EndSwitchStance()
+{
+	IsTransitioning = false;
+	OnSwitchStanceAbilityEnd();
+}
+
+// - ENTER / EXIT MENU -//
+
+void ATPSCharacter::StartUseMenu()
+{
+	IsInMenu = true;
+	OnUseMenuAbilityStart();
+}
+void ATPSCharacter::EndUseMenu()
+{
+	IsInMenu = false;
+	OnUseMenuAbilityEnd();
+}
+
 
 
 // Blueprint Hook for on-fallout death animation.

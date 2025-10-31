@@ -11,10 +11,10 @@
 #include "TPSCharacterConfiguration.h"
 #include "TPSCharacterIdentity.h"
 #include "TPSCharacterInventory.h"
-#include "TPSCharacterRecord.h"
 
 #include "Character/Types/TPSCharacterLocomotionState.h"
 #include "Character/Types/TPSCharacterBehaviorState.h"
+#include "Character/Types/TPSCharacterStance.h"
 #include "Equipment/TPSEquipmentManager.h"
 #include "GAS/TPSAbilitySystemComponent.h"
 #include "GAS/Attributes/CharacterHealthAttributeSet.h"
@@ -25,6 +25,7 @@
 #include "TPSCharacter.generated.h"
 
 class UTPSCharacterInstance;
+
 
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUpdateCharacterAttributeDisplay);
@@ -189,6 +190,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State")
 	TEnumAsByte<ETPSCharacterLocomotionState> PreviousLocomotionState;
 	//
+	// Stance (Right/Left-Handed)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State", Replicated)
+	TEnumAsByte<ETPSCharacterStance> Stance;
+	//
 	// Has death been triggered?
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
 	bool HasDeathTriggered;
@@ -268,6 +273,9 @@ public:
 	//
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input", Replicated)
 	bool IsInteracting;
+	//
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input", Replicated)
+	bool IsTransitioning;
 	//
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input", Replicated)
 	bool IsInMenu;
@@ -542,7 +550,30 @@ public:
 	// Trigger additional animations and SFX for Interact End. (Blueprint Extension)
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnInteractAbilityEnd();
-
+	//
+	// Switch Stance - Called from Gameplay Ability.
+	UFUNCTION(BlueprintCallable)
+	void StartSwitchStance();
+	// Trigger additional animations and SFX for Boost ability. (Blueprint Extension)
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnSwitchStanceAbilityStart();
+	//
+	UFUNCTION(BlueprintCallable)
+	void EndSwitchStance();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnSwitchStanceAbilityEnd();
+	//
+	// Switch Stance - Called from Gameplay Ability.
+	UFUNCTION(BlueprintCallable)
+	void StartUseMenu();
+	// Trigger additional animations and SFX for Boost ability. (Blueprint Extension)
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnUseMenuAbilityStart();
+	//
+	UFUNCTION(BlueprintCallable)
+	void EndUseMenu();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnUseMenuAbilityEnd();
 
 	////////////////////////////////////////////////////////
 	// Behavior Overrides
