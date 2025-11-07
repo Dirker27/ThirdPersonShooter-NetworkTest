@@ -184,6 +184,10 @@ FTPSUnitID UTPSFunctionLibrary::MakeChildUnitID(FTPSUnitID parentId, ETPSHierarc
 
 FString UTPSFunctionLibrary::GetFormalDisplayNameForCharacter(const UTPSCharacterInstance* character)
 {
+    if (!IsValid(character)) {
+        return "#CHARACTER#";
+    }
+
     FString displayName = TPSCharacterRankAbbreviationString(character->Identity.Rank) + ". ";
     displayName += character->Identity.FirstName + " ";
     if (!character->Identity.Callsign.IsEmpty())
@@ -197,7 +201,9 @@ FString UTPSFunctionLibrary::GetFormalDisplayNameForCharacter(const UTPSCharacte
 
 FString UTPSFunctionLibrary::GetShortDisplayNameForCharacter(const UTPSCharacterInstance* character)
 {
-    return FString::Printf(TEXT("%s. %s"),
-        *TPSCharacterRankAbbreviationString(character->Identity.Rank),
-        *character->Identity.LastName);
+    return IsValid(character)
+            ? FString::Printf(TEXT("%s. %s"),
+                *TPSCharacterRankAbbreviationString(character->Identity.Rank),
+                *character->Identity.LastName)
+            : "#CHARACTER#";
 }
