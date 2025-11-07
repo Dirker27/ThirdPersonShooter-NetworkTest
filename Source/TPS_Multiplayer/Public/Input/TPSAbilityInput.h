@@ -17,6 +17,7 @@ enum class EAbilityInput : uint8
 	PrimaryAttack = 01 UMETA(DisplayName = "PrimaryAttack"),
 	SecondaryAttack = 02 UMETA(DisplayName = "SecondaryAttack"),
 	Aim = 03 UMETA(DisplayName = "Aim / Zoom"),
+	Reload = 04 UMETA(DisplayName = "Reload"),
 
 
 	// Locomotion
@@ -26,22 +27,25 @@ enum class EAbilityInput : uint8
 	Crouch = 14 UMETA(DisplayName = "Crouch"),
 	SwitchStance = 19 UMETA(DisplayName = "Switch Stance"),
 
-	// Weapon Handling
+	// Equipment / Inventory Management
 	UnEquip = 30 UMETA(DisplayName = "Equip Slot 0"),
 	EquipPrimary = 31 UMETA(DisplayName = "Equip Slot 1"),
 	EquipSecondary = 32 UMETA(DisplayName = "Equip Slot 2"),
 	EquipTertiary = 33 UMETA(DisplayName = "Equip Slot 3"),
 	EquipLethalEquipment = 34 UMETA(DisplayName = "Equip Slot 4"),
 	EquipTacticalEquipment = 35 UMETA(DisplayName = "Equip Slot 5"),
-	Reload = 36 UMETA(DisplayName = "Reload"),
+	PickupItem = 38 UMETA(DisplayName = "Pick Up Item"),
+	DropItem = 39 UMETA(DisplayName = "Drop Item"),
 
 	// Possession
 	PossessTarget = 50 UMETA(DisplayName = "Possess"),
 	PossessMenu = 51 UMETA(DisplayName = "PossessMenu"),
 
-	// Inventory Management
-	PickupItem,
-	DropItem,
+	// Commands
+	PingLocation = 60 UMETA(DisplayName = "CMD Ping Location"),
+	MoveToLocation = 60 UMETA(DisplayName = "CMD Move to Location"),
+	AttackTarget = 60 UMETA(DisplayName = "CMD Attack Target"),
+
 
 	// Menus and UI
 	UI_Confirm = 90 UMETA(DispalyName = "UI Select / Confirm"),
