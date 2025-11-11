@@ -702,9 +702,9 @@ void ATPSCharacter::EndInteract()
 
 void ATPSCharacter::StartSwitchStance()
 {
-	Stance = (Stance == ETPSCharacterStance::Right)
-		? ETPSCharacterStance::Left
-		: ETPSCharacterStance::Right;
+	Stance = (Stance == ETPSCharacterStance::RightHanded)
+		? ETPSCharacterStance::LeftHanded
+		: ETPSCharacterStance::RightHanded;
 
 	IsTransitioning = true;
 	OnSwitchStanceAbilityStart();

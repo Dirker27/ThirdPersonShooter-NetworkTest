@@ -2,6 +2,28 @@
 
 #include "Util/TPSSystemLog.h"
 
+
+FLinearColor UTPSSystemLog::GetColorForLog(ETPSLogSource source)
+{
+	switch (source)
+	{
+	case PlayerController:
+		return FLinearColor::Yellow;
+	case PlayerState:
+		return FLinearColor::FromSRGBColor(FColor::FromHex("00FFFFAA"));
+	case AIController:
+		return FLinearColor::FromSRGBColor(FColor::Magenta);
+	case Character:
+		return FLinearColor::Blue;
+	case GameMode:
+		return FLinearColor::FromSRGBColor(FColor::White);
+	case GameState:
+		return FLinearColor::Green;
+	}
+	return FLinearColor::Black;
+}
+
+
 void UTPSSystemLog::Log(const FText message, const ETPSSystemLogLevel level)
 {
 	if (level > LogLevel) { return; }

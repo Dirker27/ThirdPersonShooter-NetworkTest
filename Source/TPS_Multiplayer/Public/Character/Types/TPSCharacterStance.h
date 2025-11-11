@@ -10,8 +10,8 @@
  * The Character's current Stance - are they shooting right or left-handed?
  */
 UENUM(BlueprintType)
-enum class ETPSCharacterStance : uint8
+enum ETPSCharacterStance : int
 {
-	Right,
-	Left
+	RightHanded,
+	LeftHanded
 };

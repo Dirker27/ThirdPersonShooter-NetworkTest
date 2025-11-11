@@ -9,7 +9,7 @@
 
 static const FLinearColor TEXT_COLOR_ABILITY_LOG = FLinearColor::Yellow;
 
-UCLASS()
+UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSConstants : public UObject
 {
 	GENERATED_BODY()

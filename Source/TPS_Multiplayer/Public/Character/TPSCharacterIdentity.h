@@ -72,7 +72,7 @@ public:
 
     // Left or Right-Handed ?
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    ETPSCharacterStance PreferredStance;
+    TEnumAsByte<ETPSCharacterStance> PreferredStance;
 
     // Current Rank - granted and recognized independently of XP
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

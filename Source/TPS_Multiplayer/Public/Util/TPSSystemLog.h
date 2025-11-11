@@ -21,16 +21,35 @@ UENUM(BlueprintType)
 enum ETPSLogEventType : int
 {
 	MESSAGE,
-	SYSTEM,
+	SYSTEM
 };
 
 
-UCLASS()
+UENUM(BlueprintType)
+enum ETPSLogSource : int
+{
+	PlayerController,
+	PlayerState,
+
+	AIController,
+	Character,
+
+	GameMode,
+
+	GameState
+};
+
+
+UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSSystemLog : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 	
 public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FLinearColor GetColorForLog(ETPSLogSource source);
+
+
 	UFUNCTION(BlueprintCallable)
 	static void Log(const FText message, const ETPSSystemLogLevel level = INFO);
 
