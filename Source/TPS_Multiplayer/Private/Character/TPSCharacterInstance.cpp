@@ -41,9 +41,10 @@ void UTPSCharacterInstance::SpawnActor(TSubclassOf<ATPSCharacter> actorTemplate,
 	//characterActor->Identity = Identity;
 	//characterActor->Configuration = Configuration;
 	characterActor->EquipmentManager->Loadout = Loadout;
+	characterActor->BindToCharacterInstance(this);
 
 	characterActor->FinishSpawning(spawnPoint->GetTransform(), /*bIsDefaultTransform=*/ true);
-	characterActor->BindToCharacterInstance(this);
+	characterActor->SpawnDefaultController();
 
 	SpawnedActor = characterActor;
 
