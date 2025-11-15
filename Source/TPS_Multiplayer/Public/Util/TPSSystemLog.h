@@ -33,6 +33,7 @@ enum ETPSLogSource : int
 
 	AIController,
 	Character,
+	Weapon,
 
 	GameMode,
 

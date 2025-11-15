@@ -14,7 +14,9 @@ FLinearColor UTPSSystemLog::GetColorForLog(ETPSLogSource source)
 	case AIController:
 		return FLinearColor::FromSRGBColor(FColor::Magenta);
 	case Character:
-		return FLinearColor::Blue;
+		return FLinearColor::FromSRGBColor(FColor::Blue);
+	case Weapon:
+		return FLinearColor::FromSRGBColor(FColor::Red);
 	case GameMode:
 		return FLinearColor::FromSRGBColor(FColor::White);
 	case GameState:

@@ -471,7 +471,7 @@ void UTPSEquipmentManager::ConfigureHarnessSlots()
     GearHarnessMap.Add(Vest, Chestpiece);
     GearHarnessMap.Add(Pack, Backpack);
 }
-
+ 
 
 
 

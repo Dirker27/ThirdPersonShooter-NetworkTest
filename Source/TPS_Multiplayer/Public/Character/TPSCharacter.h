@@ -134,7 +134,7 @@ public:
 
 	// Character Attributes Configuration
 	//   Can be overridden by PlayerState on Possession.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Configuration", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Configuration", Replicated)
 	TObjectPtr<UTPSCharacterConfiguration> Configuration;
 
 
