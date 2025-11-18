@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
 
-#include "Team/Types/TPSSquadRole.h"
-#include "Team/Types/TPSUnitID.h"
+#include "Army/Unit/TPSSquadRole.h"
+#include "Army/Unit/TPSUnitID.h"
 
 #include "TPSSpawnPoint.generated.h"
 

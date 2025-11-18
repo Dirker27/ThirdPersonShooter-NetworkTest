@@ -9,7 +9,7 @@
 
 #include "Player/TPSPlayerState.h"
 #include "Log/TPSCombatLog.h"
-#include "Team/TPSCommandStructure.h"
+#include "Army/Unit/TPSCommandStructure.h"
 #include "Team/TPSTeamInstance.h"
 #include "Types/TPSBroadcastMessage.h"
 

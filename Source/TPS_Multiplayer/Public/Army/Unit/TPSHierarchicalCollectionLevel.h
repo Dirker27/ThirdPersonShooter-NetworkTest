@@ -70,7 +70,7 @@ static FString _TPSHierarchicalLevelToString(ETPSHierarchicalLevel level)
 		return "Army";
 	case ETPSHierarchicalLevel::ROOT:
 	default:
-		return "-UNIT-";
+		return "[UNIT]";
 	}
 }
 

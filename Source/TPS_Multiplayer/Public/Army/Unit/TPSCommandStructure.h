@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "Team/TPSCommandUnitConfiguration.h"
-#include "Team/TPSCommandGroup.h"
+#include "Army/Unit/TPSCommandUnitConfiguration.h"
+#include "Army/Unit/TPSCommandGroup.h"
+#include "Character/TPSCharacterInstance.h"
 
 #include "TPSCommandStructure.generated.h"
 

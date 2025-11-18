@@ -1,6 +1,6 @@
 // (C) ToasterCat Studios 2025
 
-#include "Team/TPSCommandStructure.h"
+#include "Army/Unit/TPSCommandStructure.h"
 
 #include "Net/UnrealNetwork.h"
 

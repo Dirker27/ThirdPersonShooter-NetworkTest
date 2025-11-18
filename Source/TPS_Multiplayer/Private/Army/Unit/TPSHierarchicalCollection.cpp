@@ -1,6 +1,6 @@
 // (C) ToasterCat Studios 2025
 
-#include "Model/TPSHierarchicalCollection.h"
+#include "Army/Unit/TPSHierarchicalCollection.h"
 
 UTPSHierarchicalCollection::UTPSHierarchicalCollection()
 {

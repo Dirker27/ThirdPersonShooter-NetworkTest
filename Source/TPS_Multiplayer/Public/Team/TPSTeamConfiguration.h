@@ -3,8 +3,8 @@
 #pragma once
 
 #include "Equipment/TPSEquipmentLoadout.h"
-#include "Model/TPSHierarchicalCollectionLevel.h"
-#include "Team/Types/TPSSquadRole.h"
+#include "Army/Unit/TPSHierarchicalCollectionLevel.h"
+#include "Army/Unit/TPSSquadRole.h"
 
 #include "TPSTeamConfiguration.generated.h"
 

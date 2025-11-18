@@ -6,15 +6,15 @@
 
 #include "Army/Unit/TPSUnitID.h"
 
-#include "TPSArmyIdentity.generated.h"
+#include "TPSUnitIdentity.generated.h"
 
 /**
- * Characterizes a given army.
+ * Characterizes a given unit.
  *
  * Banner colors, tactical style, favorite pizza toppings, etc.
  */
 UCLASS(BlueprintType)
-class UTPSArmyIdentity : public UDataAsset
+class UTPSUnitIdentity : public UDataAsset
 {
 	GENERATED_BODY()
 
@@ -26,7 +26,7 @@ public:
 	FLinearColor BannerColor = FLinearColor::Black;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTPSUnitIdentifier* FlagshipUnit ;
+	UTPSUnitIdentifier* FlagshipUnit;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGuid LeadCharacterId;

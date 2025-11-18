@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 
-#include "TPSCommandStructure.h"
 #include "TPSTeamConfiguration.h"
 #include "TPSTeamID.h"
+
+#include "Army/Unit/TPSCommandStructure.h"
 #include "World/TPSSpawnPool.h"
 
 #include "TPSTeamInstance.generated.h"

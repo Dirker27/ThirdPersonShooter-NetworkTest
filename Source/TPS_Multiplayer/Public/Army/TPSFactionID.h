@@ -7,8 +7,14 @@
 #include "TPSFactionID.generated.h"
 
 
-// GAME FACTIONS
-//   Delineated from "Teams" to allow for Multi-Faction teams (alliances) and Intra-Faction conflicts.
+/**
+ * GAME FACTIONS - Who a player's Army is fighting *for*.
+ *
+ * Delineated from "Teams" and "Armies" to allow for Multi-Faction coalitions and Intra-Faction conflicts.
+ *   An Army will have one faction it is allied to. Teams may have multiple armies of differing allegiances.
+ *
+ * See Design Doc for Faction Details: https://www.notion.so/Factions-28f37b4ab2e8808bb08cfa9e9c846db3
+ */
 UENUM(BlueprintType)
 enum ETPSFactionID : int
 {

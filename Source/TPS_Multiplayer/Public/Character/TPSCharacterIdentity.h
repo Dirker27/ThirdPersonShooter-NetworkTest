@@ -4,9 +4,9 @@
 
 #include "Character/Types/TPSCharacterBodyType.h"
 #include "Character/Types/TPSCharacterRank.h"
-#include "Team/Types/TPSFactionID.h"
-#include "Team/Types/TPSSquadRole.h"
-#include "Team/Types/TPSUnitID.h"
+#include "Army/TPSFactionID.h"
+#include "Army/Unit/TPSSquadRole.h"
+#include "Army/Unit/TPSUnitID.h"
 #include "Types/TPSCharacterStance.h"
 
 #include "TPSCharacterIdentity.generated.h"

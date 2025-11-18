@@ -4,8 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Team/TPSCommandStructure.h"
-#include "World/TPSSpawnPool.h"
+#include "Army/Unit/TPSCommandStructure.h"
 
 #include "TPSArmy.generated.h"
 

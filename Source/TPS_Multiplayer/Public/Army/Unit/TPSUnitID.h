@@ -4,7 +4,7 @@
 
 #include "Components/ActorComponent.h"
 
-#include "Model/TPSHierarchicalCollectionLevel.h"
+#include "Army/Unit/TPSHierarchicalCollectionLevel.h"
 #include "Team/TPSTeamID.h"
 
 #include "TPSUnitID.generated.h"

@@ -7,11 +7,9 @@
 
 #include "AbilitySystemInterface.h"
 #include "Army/TPSArmyID.h"
-#include "Equipment/TPSEquipmentLoadout.h"
 #include "GAS/GASAbilitySet.h"
 #include "Team/TPSTeamID.h"
-#include "Team/Types/TPSFactionID.h"
-//#include "Team/TPSTeamID.h"
+#include "Army/TPSFactionID.h"
 
 #include "TPSPlayerState.generated.h"
 

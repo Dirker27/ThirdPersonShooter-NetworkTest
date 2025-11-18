@@ -4,10 +4,9 @@
 
 #include "CoreMinimal.h"
 
-#include "TPSHierarchicalCollectionLevel.h"
-
+#include "TPSUnitID.h"
+#include "Army/Unit/TPSHierarchicalCollectionLevel.h"
 #include "Character/TPSCharacterInstance.h"
-#include "GameFramework/Actor.h"
 
 #include "TPSHierarchicalCollection.generated.h"
 

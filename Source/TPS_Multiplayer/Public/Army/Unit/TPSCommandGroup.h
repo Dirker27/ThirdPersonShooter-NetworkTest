@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Model/TPSHierarchicalCollection.h"
+#include "Army/Unit/TPSHierarchicalCollection.h"
 
 #include "TPSCommandGroup.generated.h"
 
