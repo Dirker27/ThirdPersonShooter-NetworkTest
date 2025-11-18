@@ -11,6 +11,9 @@
 
 #include "TPSHierarchicalCollection.generated.h"
 
+UDELEGATE(BlueprintAuthorityOnly)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnitUpdate);
+
 /**
  * A Hierarchical Trie-structure that represents a group of entities (team characters)
  *
@@ -24,6 +27,10 @@ class TPS_MULTIPLAYER_API UTPSHierarchicalCollection : public UObject
 public:
 	UTPSHierarchicalCollection();
 
+
+	// Broadcast Delegate - Team/Character/Player Roster Updated
+	UPROPERTY(BlueprintAssignable)
+	FUnitUpdate UnitUpdate;
 
 	// Composite UnitID - unique to the active trie (but not globally)
 	//

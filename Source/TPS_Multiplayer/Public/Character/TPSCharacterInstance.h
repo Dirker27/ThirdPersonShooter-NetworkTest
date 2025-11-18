@@ -11,6 +11,11 @@
 
 #include "TPSCharacterInstance.generated.h"
 
+
+UDELEGATE(BlueprintAuthorityOnly)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUpdateCharacterInstanceDisplay);
+
+
 /**
  * Describes a Character independent of their spawned actor representation.
  */
@@ -25,6 +30,19 @@ public:
 protected:
     virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
     virtual bool IsSupportedForNetworking() const override { return true; }
+
+
+//~ ======================================================================== ~//
+//  COMPONENTS
+//~ ======================================================================== ~//
+public:
+
+    //////////////////////////////////////////////////////
+    // Display Widgets
+
+    // Broadcast Delegate
+    UPROPERTY(BlueprintAssignable)
+    FUpdateCharacterInstanceDisplay NotifyDisplayWidgets;
 
 
 //~ ==================================================================== ~//

@@ -6,8 +6,11 @@
 #include "GameFramework/PlayerState.h"
 
 #include "AbilitySystemInterface.h"
+#include "Army/TPSArmyID.h"
 #include "Equipment/TPSEquipmentLoadout.h"
 #include "GAS/GASAbilitySet.h"
+#include "Team/TPSTeamID.h"
+#include "Team/Types/TPSFactionID.h"
 //#include "Team/TPSTeamID.h"
 
 #include "TPSPlayerState.generated.h"
@@ -29,6 +32,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 //~ ======================================================================== ~//
 //  COMPONENTS
@@ -50,18 +54,16 @@ private:
 public:
 
 	////////////////////////////////////////////////////////
-	// TPSGameState
+	// Team Affiliations
 
-	/* TODO: [PC-132] Configure Player Loadout + Faction/Team for initial Spawn.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ETPSTeamID TeamID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	TEnumAsByte<ETPSTeamID> TeamID;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ETPSFactionID FactionID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	TEnumAsByte<ETPSFactionID> FactionID;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UTPSEquipmentLoadout> SpawnLoadout;
-	*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	FTPSArmyID Army;
 
 //~ ======================================================================== ~//
 //  ABILITY SYSTEM

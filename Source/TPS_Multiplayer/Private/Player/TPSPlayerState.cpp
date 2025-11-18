@@ -3,6 +3,7 @@
 #include "Player/TPSPlayerState.h"
 
 #include "Character/TPSCharacter.h"
+#include "Net/UnrealNetwork.h"
 
 ATPSPlayerState::ATPSPlayerState()
 {
@@ -13,6 +14,16 @@ ATPSPlayerState::ATPSPlayerState()
 ATPSPlayerState::~ATPSPlayerState() {
 	// destruct
 }
+
+void ATPSPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, TeamID);
+	DOREPLIFETIME(ThisClass, FactionID);
+	DOREPLIFETIME(ThisClass, Army);
+}
+
 
 void ATPSPlayerState::BeginPlay() {
 	Super::BeginPlay();

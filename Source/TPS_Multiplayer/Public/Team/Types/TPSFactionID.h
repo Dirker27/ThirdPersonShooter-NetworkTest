@@ -10,7 +10,7 @@
 // GAME FACTIONS
 //   Delineated from "Teams" to allow for Multi-Faction teams (alliances) and Intra-Faction conflicts.
 UENUM(BlueprintType)
-enum class ETPSFactionID : uint8
+enum ETPSFactionID : int
 {
 	Unaffiliated = 0 UMETA(DisplayName = "Unaffiliated"),
 
@@ -22,6 +22,8 @@ enum class ETPSFactionID : uint8
 	//
 	// Greater Bay [GB]
 	Bay = 12 UMETA(DisplayName = "Geater Bay"),
+	// Northern Union [NU]
+	Union = 13 UMETA(DisplayName = "Northern Union"),
 
 
 	//- "Red" Empire ------------------------------------------------=
@@ -35,20 +37,30 @@ enum class ETPSFactionID : uint8
 	//
 	Peacekeeper = 30,
 	//
-	UnitedNations = 31,
+	UN = 31,
 	//
-	China = 31,
+	TPAC = 32,
 	//
-	Russia = 32,
-	//
-	EuropeanUnion = 33,
+	EU = 33,
 
 
 	//- Independent States ------------------------------------------=
 	//
-	Independent = 40,
+	Appalachia = 40,
+	// First Nations Alliance [FNA]
+	FirstNations = 41,
 	// Monorai / "New Zion" [NZ]
 	Mormon = 42,
+	// Creole Republic
+	Creole = 43,
+	// Lincoln (WA/OR) [LN]
+	Lincoln = 44,
 	// Republic of Texas [TX]
 	Texas = 45,
+	// Pueblo
+	Pueblo = 46,
+	// Orange Counties [OC]
+	OrangeCounty = 47,
+	// Golden Hills [GH]
+	GoldenHills = 48
 };

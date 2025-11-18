@@ -5,7 +5,7 @@
 #include "TPSCharacterRank.generated.h"
 
 UENUM(BlueprintType)
-enum class ETPSCharacterRank : uint8
+enum ETPSCharacterRank : int
 {
     Recruit = 0,
 

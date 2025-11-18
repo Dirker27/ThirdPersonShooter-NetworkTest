@@ -73,6 +73,8 @@ void UTPSCharacterInstance::Die()
 	{
 		SpawnedActor->Die();
 	}
+
+	NotifyDisplayWidgets.Broadcast();
 }
 
 
@@ -81,6 +83,8 @@ void UTPSCharacterInstance::Focus()
 	if (!IsValid(SpawnedActor)) { return; }
 
 	SpawnedActor->IsFocused = true;
+
+	NotifyDisplayWidgets.Broadcast();
 }
 
 void UTPSCharacterInstance::UnFocus()
@@ -88,6 +92,8 @@ void UTPSCharacterInstance::UnFocus()
 	if (!IsValid(SpawnedActor)) { return; }
 
 	SpawnedActor->IsFocused = false;
+
+	NotifyDisplayWidgets.Broadcast();
 }
 
 
