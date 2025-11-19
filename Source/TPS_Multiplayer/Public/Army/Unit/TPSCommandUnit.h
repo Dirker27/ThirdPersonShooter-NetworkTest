@@ -2,22 +2,24 @@
 
 #pragma once
 
-#include "Army/Unit/TPSCommandUnitConfiguration.h"
+#include "TPSUnitIdentity.h"
+#include "Army/Unit/TPSUnitSchema.h"
 #include "Army/Unit/TPSCommandGroup.h"
 #include "Character/TPSCharacterInstance.h"
 
-#include "TPSCommandStructure.generated.h"
+#include "TPSCommandUnit.generated.h"
 
 /**
- * A generic unit of command-able units with a designated leader.
+ * An instance of command-able units with a designated leader.
+ *   ie: "Squad", "Platoon", "Fireteam", etc
  */
 UCLASS()
-class TPS_MULTIPLAYER_API UTPSCommandStructure : public UTPSCommandGroup
+class TPS_MULTIPLAYER_API UTPSCommandUnit : public UTPSCommandGroup
 {
 	GENERATED_BODY()
 
 public:
-	UTPSCommandStructure();
+	UTPSCommandUnit();
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
@@ -26,7 +28,10 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FTPSCommandUnitConfiguration Configuration;
+	FTPSUnitSchemaData Schema;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UTPSUnitIdentity> Identity;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)

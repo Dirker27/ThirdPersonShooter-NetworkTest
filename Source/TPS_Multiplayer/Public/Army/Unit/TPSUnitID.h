@@ -4,7 +4,7 @@
 
 #include "Components/ActorComponent.h"
 
-#include "Army/Unit/TPSHierarchicalCollectionLevel.h"
+#include "Army/Unit/TPSUnitLevel.h"
 #include "Team/TPSTeamID.h"
 
 #include "TPSUnitID.generated.h"
@@ -40,43 +40,43 @@ struct TPS_MULTIPLAYER_API FTPSUnitHierarchy
 	{		
 	}
 
-	static FTPSUnitHierarchy AppendLevelNumber(FTPSUnitHierarchy hierarchy, ETPSHierarchicalLevel level, int number)
+	static FTPSUnitHierarchy AppendLevelNumber(FTPSUnitHierarchy hierarchy, ETPSUnitLevel level, int number)
 	{
 		FTPSUnitHierarchy h = hierarchy;
 		switch (level)
 		{
-		case ETPSHierarchicalLevel::UNIT:
+		case ETPSUnitLevel::UNIT:
 			h.UnitNumber = number;
 			break;
-		case ETPSHierarchicalLevel::FIRE_TEAM:
+		case ETPSUnitLevel::FIRE_TEAM:
 			h.FireteamNumber = number;
 			break;
-		case ETPSHierarchicalLevel::SQUAD:
+		case ETPSUnitLevel::SQUAD:
 			h.SquadNumber = number;
 			break;
-		case ETPSHierarchicalLevel::PLATOON:
+		case ETPSUnitLevel::PLATOON:
 			h.PlatoonNumber = number;
 			break;
-		case ETPSHierarchicalLevel::COMPANY:
+		case ETPSUnitLevel::COMPANY:
 			h.CompanyNumber = number;
 			break;
 		}
 		return h;
 	}
 
-	static int GetNumberForLevel(FTPSUnitHierarchy hierarchy, ETPSHierarchicalLevel level)
+	static int GetNumberForLevel(FTPSUnitHierarchy hierarchy, ETPSUnitLevel level)
 	{
 		switch (level)
 		{
-		case ETPSHierarchicalLevel::UNIT:
+		case ETPSUnitLevel::UNIT:
 			return hierarchy.UnitNumber;
-		case ETPSHierarchicalLevel::FIRE_TEAM:
+		case ETPSUnitLevel::FIRE_TEAM:
 			return hierarchy.FireteamNumber;
-		case ETPSHierarchicalLevel::SQUAD:
+		case ETPSUnitLevel::SQUAD:
 			return hierarchy.SquadNumber;
-		case ETPSHierarchicalLevel::PLATOON:
+		case ETPSUnitLevel::PLATOON:
 			return hierarchy.PlatoonNumber;
-		case ETPSHierarchicalLevel::COMPANY:
+		case ETPSUnitLevel::COMPANY:
 			return hierarchy.CompanyNumber;
 		default:
 			return 0;
@@ -100,7 +100,7 @@ struct TPS_MULTIPLAYER_API FTPSUnitID
 	TEnumAsByte<ETPSTeamID> TeamID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TEnumAsByte<ETPSHierarchicalLevel> UnitLevel;
+	TEnumAsByte<ETPSUnitLevel> UnitLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int UnitNumber;
@@ -110,7 +110,7 @@ struct TPS_MULTIPLAYER_API FTPSUnitID
 
 	/*TPS_MULTIPLAYER_API static inline const FTPSUnitID UnSet = {
 		ETPSTeamID::Independent,
-		ETPSHierarchicalLevel::UNIT,
+		ETPSUnitLevel::UNIT,
 		0
 	};*/
 
@@ -135,7 +135,7 @@ public:
 	}
 
 private:
-	static uint64 _hash(TMap<ETPSHierarchicalLevel, int> hierarchyMap)
+	static uint64 _hash(TMap<ETPSUnitLevel, int> hierarchyMap)
 	{
 		uint64 hash = 0;
 		for (auto lvl : hierarchyMap.Array())

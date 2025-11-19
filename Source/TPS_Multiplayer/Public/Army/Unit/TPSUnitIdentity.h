@@ -4,9 +4,21 @@
 
 #include "CoreMinimal.h"
 
-#include "Army/Unit/TPSUnitID.h"
-
 #include "TPSUnitIdentity.generated.h"
+
+
+USTRUCT(BlueprintType)
+struct FTPSUnitIdentityData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Alias;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLinearColor BannerColor = FLinearColor::Black;
+};
+
 
 /**
  * Characterizes a given unit.
@@ -20,14 +32,5 @@ class UTPSUnitIdentity : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString Alias;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FLinearColor BannerColor = FLinearColor::Black;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTPSUnitIdentifier* FlagshipUnit;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGuid LeadCharacterId;
+	FTPSUnitIdentityData Identity;
 };

@@ -27,10 +27,10 @@ protected:
 //  ATTRIBUTES
 //~ ============================================================= ~//
 public:
-    //- Configuration -----------------------------------=
+    //- Schema -----------------------------------=
     //
     // Offset to apply to ALL mounting targets
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mountable|Schema")
     FTPSMountOffset GlobalMountOffset;
 
     //- TPSGameState ---------------------------------------------=

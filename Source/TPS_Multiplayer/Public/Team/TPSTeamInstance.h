@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 
-#include "TPSTeamConfiguration.h"
+#include "TPSTeamDefinition.h"
 #include "TPSTeamID.h"
+#include "Army/TPSArmy.h"
 
-#include "Army/Unit/TPSCommandStructure.h"
+#include "Army/Unit/TPSCommandUnit.h"
 #include "World/TPSSpawnPool.h"
 
 #include "TPSTeamInstance.generated.h"
@@ -35,7 +36,7 @@ public:
     FTPSTeamConfiguration Configuration;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-    TObjectPtr<UTPSCommandStructure> RootUnit;
+    TArray<TObjectPtr<UTPSArmyInstance>> Armies;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UTPSSpawnPool> SpawnPool;
@@ -70,7 +71,5 @@ class UTeamRosterPreset : public UDataAsset
 
 public:
     UPROPERTY(EditDefaultsOnly)
-    TObjectPtr<UTPSCommandStructure> CommandStructure;
-
-
+    TObjectPtr<UTPSCommandUnit> CommandStructure;
 };

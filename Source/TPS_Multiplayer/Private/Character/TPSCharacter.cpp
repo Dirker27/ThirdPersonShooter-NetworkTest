@@ -304,11 +304,11 @@ FTPSOperatorIdentity ATPSCharacter::GetIdentity()
 		: FTPSOperatorIdentity();
 }
 
-FTPSOperatorConfiguration ATPSCharacter::GetConfiguration()
+FTPSCharacterConfigurationData ATPSCharacter::GetConfiguration()
 {
 	return IsValid(CharacterInstance)
 		? CharacterInstance->Configuration
-		: FTPSOperatorConfiguration();
+		: FTPSCharacterConfigurationData();
 }
 
 bool ATPSCharacter::IsInitialized() const

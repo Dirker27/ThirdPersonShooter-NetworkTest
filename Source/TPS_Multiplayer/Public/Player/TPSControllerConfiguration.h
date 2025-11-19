@@ -6,7 +6,7 @@
 
 #include "TPSControllerConfiguration.generated.h"
 
-// "Controller" Configuration?
+// "Controller" Schema?
 USTRUCT(BlueprintType)
 struct TPS_MULTIPLAYER_API FTPSControllerConfiguration
 {

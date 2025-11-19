@@ -70,7 +70,7 @@ public:
     FString Name;
 
     /////////////////////////////////////////////////////////////////
-    // Configuration
+    // Schema
 
         // Effects to be applied to the owning Pawn's AbilitySystem when equipped (active)
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Equipable|Effects")
@@ -81,7 +81,7 @@ public:
     TArray<TSubclassOf<UGameplayEffect>> PassiveEffects;
 
     // Offset to use when item is mounted to a Pawn. (not armed)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mountable|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mountable|Schema")
     FTPSMountOffset WeaponHolsterOffset = FTPSMountOffset();
 
     /////////////////////////////////////////////////////////////////

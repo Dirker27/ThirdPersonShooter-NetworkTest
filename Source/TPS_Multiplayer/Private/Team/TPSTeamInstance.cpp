@@ -16,8 +16,7 @@ void UTPSTeamInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(ThisClass, TeamID);
-    //DOREPLIFETIME(ThisClass, Configuration);
-    DOREPLIFETIME(ThisClass, RootUnit);
+    DOREPLIFETIME(ThisClass, Armies);
 
     DOREPLIFETIME(ThisClass, ScoredPoints);
     DOREPLIFETIME(ThisClass, Members);

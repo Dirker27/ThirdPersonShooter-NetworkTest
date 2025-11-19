@@ -169,7 +169,7 @@ FString UTPSFunctionLibrary::GetAbbreviationForRank(const ETPSCharacterRank rank
     return TPSCharacterRankAbbreviationString(rank);
 }
 
-FTPSUnitID UTPSFunctionLibrary::MakeChildUnitID(FTPSUnitID parentId, ETPSHierarchicalLevel childLevel, int childNumber)
+FTPSUnitID UTPSFunctionLibrary::MakeChildUnitID(FTPSUnitID parentId, ETPSUnitLevel childLevel, int childNumber)
 {
     FTPSUnitID id = FTPSUnitID();
     id.Hierarchy = FTPSUnitHierarchy::AppendLevelNumber(id.Hierarchy, id.UnitLevel, id.UnitNumber);

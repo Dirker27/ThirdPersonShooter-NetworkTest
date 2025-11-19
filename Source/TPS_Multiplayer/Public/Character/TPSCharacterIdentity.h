@@ -5,7 +5,7 @@
 #include "Character/Types/TPSCharacterBodyType.h"
 #include "Character/Types/TPSCharacterRank.h"
 #include "Army/TPSFactionID.h"
-#include "Army/Unit/TPSSquadRole.h"
+#include "Army/Unit/TPSUnitRole.h"
 #include "Army/Unit/TPSUnitID.h"
 #include "Types/TPSCharacterStance.h"
 
@@ -89,7 +89,7 @@ public:
 
     // Character's "Class" / Role in their Squad
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TEnumAsByte<ETPSSquadRole> SquadRole;
+    TEnumAsByte<ETPSUnitRole> SquadRole;
 };
 
 /**

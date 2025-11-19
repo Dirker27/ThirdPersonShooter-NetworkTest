@@ -2,26 +2,25 @@
 
 #pragma once
 
-#include "TPSSquadRole.generated.h"
+#include "TPSUnitRole.generated.h"
 
 // A Character's "Class" by a different name.
 UENUM(BlueprintType)
-enum ETPSSquadRole : int
+enum ETPSUnitRole : int
 {
-    NONE = 0,
+    Rifleman = 0,
+    AutomaticRifleman = 1,
+    Grenadier = 2,
+    Sharpshooter = 3,
 
-    Leader = 1,
-
-    Rifleman,
-    AutomaticRifleman,
-    Support,
-    Medic,
+    Leader = 10,
+    AssistantLeader = 11,
 
     // Radio, EW Operator, Engineer, etc
     Specialist,
+    Medic,
 
     // MG, Sniper, Mortar, etc
     Gunner,
-    // Loader, Spotter, etc
     AssistantGunner
 };

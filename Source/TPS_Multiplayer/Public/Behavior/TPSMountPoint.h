@@ -11,10 +11,10 @@ struct TPS_MULTIPLAYER_API FTPSMountTarget
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Schema")
     TWeakObjectPtr<USceneComponent> ParentComponent = nullptr;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Schema")
     FName SocketName = FName();
 };
 
@@ -23,10 +23,10 @@ struct TPS_MULTIPLAYER_API FTPSMountOffset
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Schema")
     FVector RelativeLocation = FVector::Zero();
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Configuration")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MountPoint|Schema")
     FRotator RelativeRotation = FRotator::ZeroRotator;
 
     /*TPS_MULTIPLAYER_API static inline const FTPSMountOffset Zero = {
@@ -46,13 +46,13 @@ public:
     void BindToParentSocket(USceneComponent* InParent, FName InSocketName = NAME_None);
 
 //~ ============================================================= ~//
-//  Configuration
+//  Schema
 //~ ============================================================= ~//
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MountPoint|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MountPoint|Schema")
     FTPSMountTarget Target;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MountPoint|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MountPoint|Schema")
     FTPSMountOffset Offset = FTPSMountOffset();
 
 //~ ============================================================= ~//

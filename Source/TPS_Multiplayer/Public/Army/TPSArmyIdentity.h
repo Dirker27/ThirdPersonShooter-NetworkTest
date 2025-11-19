@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 
 #include "Army/Unit/TPSUnitID.h"
+#include "Engine/DataAsset.h"
+#include "Unit/TPSUnitID.h"
 
 #include "TPSArmyIdentity.generated.h"
 

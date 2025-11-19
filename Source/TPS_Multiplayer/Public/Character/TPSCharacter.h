@@ -119,22 +119,22 @@ public:
 	FTPSOperatorIdentity GetIdentity();
 
 	//////////////////////////////////////////////////////
-	// Configuration
+	// Schema
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FTPSOperatorConfiguration GetConfiguration();
+	FTPSCharacterConfigurationData GetConfiguration();
 
 	// Can Be Possessed by a Player
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPSCharacter|Configuration")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPSCharacter|Schema")
 	bool CanBePossessedByPlayer = false;
 
 	// Can Death be triggered by loss of Health?
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Schema")
 	bool CanDie = false;
 
-	// Character Attributes Configuration
+	// Character Attributes Schema
 	//   Can be overridden by PlayerState on Possession.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Configuration", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Schema", Replicated)
 	TObjectPtr<UTPSCharacterConfiguration> Configuration;
 
 
@@ -603,7 +603,7 @@ public:
 
 public:
 	// Use Actor's Eyes at Mesh Location for detection and docking sweeps.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Schema")
 	FName EyeSocketName;
 	virtual void GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const override;
 

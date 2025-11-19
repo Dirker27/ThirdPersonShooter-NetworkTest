@@ -2,6 +2,7 @@
 
 #include "Team/TPSTeamInstanceFactory.h"
 
+#include "Character/TPSCharacterInstanceFactory.h"
 #include "Game/TPSGameState.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -48,56 +49,51 @@ void UTPSTeamInstanceFactory::CreateTeam(const ETPSTeamID teamId)
 	state->AddReplicatedSubObject(team);
 }
 
-void UTPSTeamInstanceFactory::ConfigureTeam(const ETPSTeamID teamId, FTPSTeamConfiguration configuration)
+
+void UTPSTeamInstanceFactory::ConfigureTeam(const ETPSTeamID teamId, FTPSTeamDefinitionData definition)
 {
 	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
 	if (UTPSTeamInstance* team = state->GetTeam(teamId))
 	{
-		team->Configuration = configuration;
+		team->Configuration = definition.Configuration;
 
-		UTPSCommandStructure* unit = NewObject<UTPSCommandStructure>(state, UTPSCommandStructure::StaticClass());
-		unit->UnitID.TeamID = teamId;
-		unit->UnitID.UnitNumber = 1;
-		_ConfigureUnit(unit, configuration, configuration.HighestSupportedCommandLevel);
+		for (auto def : definition.Armies)
+		{
+			UTPSArmyInstance* army = NewObject<UTPSArmyInstance>(
+				state, 
+				UTPSArmyInstance::StaticClass(),
+				FName(FString("ARMY-").Append(TPSTeamIdToString(teamId))));
 
-		team->RootUnit = unit;
+			UTPSCommandUnit* unit = NewObject<UTPSCommandUnit>(state, UTPSCommandUnit::StaticClass());
+			unit->UnitID.TeamID = teamId;
+			unit->UnitID.UnitNumber = 1;
+			_ConfigureUnit(unit, def->Definition.RootUnitSchema->Schema);
+
+			army->RootUnit = unit;
+			team->Armies.Add(army);
+			state->Armies.Add(army);
+		}
 	}
 }
 
 
 // TODO: Migrate to UnitFactory
-void UTPSTeamInstanceFactory::_ConfigureUnit(UTPSCommandStructure* node, FTPSTeamConfiguration configuration,
-	ETPSHierarchicalLevel level)
+void UTPSTeamInstanceFactory::_ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSchemaData schema)
 {
+	if (!IsValid(node)) { return; }
+
+	UE_LOG(LogTemp, Log, TEXT("Configuring Unit[%s]..."), *UTPSFunctionLibrary::GetNameForUnitID(node->UnitID));
+
 	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
 
-	node->UnitID.UnitLevel = level;
-	//node->UnitID.UnitNumber = unitNumber;
+	node->UnitID.UnitLevel = schema.Level;
+	node->Schema = schema;
 
-	int memberCount = (configuration.MemberCapacityMap.Find(level))
-		? *configuration.MemberCapacityMap.Find(level)
-		: 0;
-	int subUnitCount = (configuration.SubUnitCapacityMap.Find(level))
-		? *configuration.SubUnitCapacityMap.Find(level)
-		: 0;
-	node->Configuration.MaxNumMembers = memberCount;
-	node->Configuration.MaxNumSubCollections = subUnitCount;
-	node->Configuration.MemberLoadoutMap = configuration.MemberLoadoutMap;
-
-
-	if (level > ETPSHierarchicalLevel::FIRE_TEAM) 
+	for (auto subUnitSchema : schema.SubUnitDefinitions)
 	{
-		for (int i = 0; i < subUnitCount; i++)
-		{
-			UTPSCommandStructure* subUnit = NewObject<UTPSCommandStructure>(state, UTPSCommandStructure::StaticClass());
-			_ConfigureUnit(subUnit, configuration, _TPSLevel_Down(level));
-			node->AddSubCollection(subUnit);
-		}
-	}
-
-	if (level == ETPSHierarchicalLevel::SQUAD)
-	{
-		node->Alias = GetAliasForUnitNumber(node->UnitID.UnitNumber);
+		UTPSCommandUnit* subUnit = NewObject<UTPSCommandUnit>(state, UTPSCommandUnit::StaticClass());
+		_ConfigureUnit(subUnit, subUnitSchema->Schema);
+		node->AddSubCollection(subUnit);
 	}
 
 	// Index to TPSGameState
@@ -106,69 +102,25 @@ void UTPSTeamInstanceFactory::_ConfigureUnit(UTPSCommandStructure* node, FTPSTea
 }
 
 
-
-// TODO: Derive unit role/rank from TeamConfig
-void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandStructure* node)
+void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandUnit* node)
 {
 	if (!IsValid(node)) { return; }
 
-	// Instantiate and map CharacterInstances -> Unit/Team
-	for (int i = 0; i < node->Configuration.MaxNumMembers; i++)
+	UE_LOG(LogTemp, Log, TEXT("Populating Unit[%s]..."), *UTPSFunctionLibrary::GetNameForUnitID(node->UnitID));
+	for (auto roleDefinition : node->Schema.MemberDefinitions)
 	{
-		//- Instantiate CharacterInstances -----------------------=
-		//
-		// TODO: [PC-173] Construct CharacterInstances from CharacterInstanceFactory (supplied by GameMode/TeamConfiguration)
-		//
+		// Instantiate
 		UTPSCharacterInstance* instance = _NewCharacter();
+
+		// Configure (via CharacterFactory)
+		UTPSCharacterInstanceFactory::ConfigureCharacterInstanceForUnitAndRole(instance,
+			node->UnitID, roleDefinition);
+
+		// Assign Loadout
+		instance->Loadout = roleDefinition.Loadout;
+
+		// Store
 		node->AddMember(instance);
-		//
-		instance->Identity.Guid = FGuid::NewGuid();
-		instance->Identity.FirstName = "Karl";
-		instance->Identity.Callsign = "Callsign";
-		instance->Identity.LastName = UTPSFunctionLibrary::GetNameForUnitID(
-			instance->Identity.UnitID);
-		instance->Identity.CharacterBodyType = 
-			(FMath::RandRange(0, 1) > 0)
-				? ETPSCharacterBodyType::Male
-				: ETPSCharacterBodyType::Female;
-
-
-		//- Assign Squad Role from Schema -----------------------=
-		//
-		// TODO: [PC-174] Derive this from UnitSchema in FTPSCommandUnitConfiguration
-		//
-		instance->Identity.SquadRole = ETPSSquadRole::Rifleman;
-		if (i == 2) { instance->Identity.SquadRole = ETPSSquadRole::AutomaticRifleman; }
-		//
-		instance->Identity.Rank = ETPSCharacterRank::Private;
-		if (i == 0)
-		{
-			instance->Identity.SquadRole = ETPSSquadRole::Leader;
-
-			switch (node->UnitID.UnitLevel) {
-			case ETPSHierarchicalLevel::FIRE_TEAM:
-				instance->Identity.Rank = ETPSCharacterRank::Corporal;
-				break;
-			case ETPSHierarchicalLevel::SQUAD:
-				instance->Identity.Rank = ETPSCharacterRank::Sergeant;
-				break;
-			case ETPSHierarchicalLevel::PLATOON:
-				instance->Identity.Rank = ETPSCharacterRank::Lieutenant;
-				break;
-			case ETPSHierarchicalLevel::COMPANY:
-				instance->Identity.Rank = ETPSCharacterRank::Captain;
-				break;
-			}
-			node->SetLeader(instance);
-		}
-
-		// Assign Loadout based on SquadRole
-		if (auto l = node->Configuration.MemberLoadoutMap
-				.Find(instance->Identity.SquadRole))
-		{
-			instance->Loadout = *l;
-		}
-
 		ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
 		if (auto team = state->GetTeam(node->UnitID.TeamID))
 		{
@@ -176,12 +128,11 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandStructure* node)
 			state->Characters.Add(instance);
 			state->AddReplicatedSubObject(instance);
 		}
-		
 	}
 
 	for (auto subUnit : node->GetAllSubCollections())
 	{
-		_PopulateUnit(Cast<UTPSCommandStructure>(subUnit));
+		_PopulateUnit(Cast<UTPSCommandUnit>(subUnit));
 	}
 }
 void UTPSTeamInstanceFactory::PopulateTeam(ETPSTeamID teamId, TArray<UTPSCharacterInstance*> roster)
@@ -194,7 +145,10 @@ void UTPSTeamInstanceFactory::PopulateTeam(ETPSTeamID teamId, TArray<UTPSCharact
 	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
 	if (auto team = state->GetTeam(teamId))
 	{
-		_PopulateUnit(team->RootUnit);
+		for (auto army : team->Armies)
+		{
+			_PopulateUnit(army->RootUnit);
+		}
 	}
 }
 
@@ -220,12 +174,12 @@ void UTPSTeamInstanceFactory::AssignCharacterToTeam(ETPSTeamID team, UTPSCharact
 void UTPSTeamInstanceFactory::AssignCharacterToTeamUnit(FTPSUnitID unitId, UTPSCharacterInstance* character)
 {
 	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
-	if (UTPSCommandStructure* existingUnit = state->GetUnit(character->Identity.UnitID))
+	if (UTPSCommandUnit* existingUnit = state->GetUnit(character->Identity.UnitID))
 	{
 		existingUnit->RemoveMember(character->Identity.UnitID.UnitNumber);
 	}
 
-	if (UTPSCommandStructure* unit = state->GetUnit(unitId))
+	if (UTPSCommandUnit* unit = state->GetUnit(unitId))
 	{
 		unit->AddMember(character);
 	}
@@ -233,10 +187,10 @@ void UTPSTeamInstanceFactory::AssignCharacterToTeamUnit(FTPSUnitID unitId, UTPSC
 
 
 
-// TODO: Generate default characters from a CharacterFactory component
 UTPSCharacterInstance* UTPSTeamInstanceFactory::_NewCharacter()
 {
 	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
 	UTPSCharacterInstance* character = NewObject<UTPSCharacterInstance>(state, UTPSCharacterInstance::StaticClass());
+
 	return character;
 }

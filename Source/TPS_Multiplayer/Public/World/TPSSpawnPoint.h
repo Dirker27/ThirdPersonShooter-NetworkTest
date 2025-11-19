@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
 
-#include "Army/Unit/TPSSquadRole.h"
+#include "Army/Unit/TPSUnitRole.h"
 #include "Army/Unit/TPSUnitID.h"
 
 #include "TPSSpawnPoint.generated.h"
@@ -29,7 +29,7 @@ public:
 
     // Preferred Squad Role to spawn at this 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TEnumAsByte<ETPSSquadRole> PreferredSquadRoleToSpawn;
+    TEnumAsByte<ETPSUnitRole> PreferredSquadRoleToSpawn;
 
 public:
     UFUNCTION(BlueprintCallable)

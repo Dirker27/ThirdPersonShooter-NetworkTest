@@ -54,7 +54,7 @@ public:
     FTPSOperatorIdentity Identity;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-    FTPSOperatorConfiguration Configuration;
+    FTPSCharacterConfigurationData Configuration;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
     FTPSOperatorRecord Record;

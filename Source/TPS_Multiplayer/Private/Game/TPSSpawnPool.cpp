@@ -29,7 +29,7 @@ ATPSSpawnPoint* UTPSSpawnPool::FindFirstAvailableSpawnPoint()
 	return nullptr;
 }
 
-ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForSquadRole(const ETPSSquadRole role)
+ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForSquadRole(const ETPSUnitRole role)
 {
 	for (auto sp : SpawnPoints)
 	{
@@ -42,7 +42,7 @@ ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForSquadRole(const ETPSSquadRol
 }
 
 
-ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForUnitAndSquadRole(const FTPSUnitID unitId, const ETPSSquadRole role)
+ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForUnitAndSquadRole(const FTPSUnitID unitId, const ETPSUnitRole role)
 {
 	// Exact fit by Unit ID - return immediately
 	int unitHash = FTPSUnitID::HashUnitIdentifier(unitId);
@@ -55,7 +55,7 @@ ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForUnitAndSquadRole(const FTPSU
 	}
 
 	ATPSSpawnPoint* bestSpawn = FindFirstAvailableSpawnPoint();
-	ETPSHierarchicalLevel bestLevel = ETPSHierarchicalLevel::ROOT;
+	ETPSUnitLevel bestLevel = ETPSUnitLevel::ROOT;
 
 	for (auto sp : SpawnPoints)
 	{

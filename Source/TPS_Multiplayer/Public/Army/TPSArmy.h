@@ -3,50 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TPSArmyID.h"
 
-#include "Army/Unit/TPSCommandStructure.h"
+#include "Army/Unit/TPSCommandUnit.h"
 
 #include "TPSArmy.generated.h"
-
-/**
- * Describes the hierarchy and composition of a given Team.
- *
- * Defines how many Squads-per-Platoon, Units-per-Fireteam, etc along with
- *   appropriate loadouts for each prospective Squad member.
- */
-USTRUCT(BlueprintType)
-struct FTPSArmySchema
-{
-    GENERATED_BODY()
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TEnumAsByte<ETPSHierarchicalLevel> HighestSupportedCommandLevel = ETPSHierarchicalLevel::PLATOON;
-
-    // Defines number of Members directly assigned to each level
-    //   ie: Leader units and "HeadQuarters" Squad members
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TMap<TEnumAsByte<ETPSHierarchicalLevel>, int> MemberCapacityMap;
-
-    // Defines Squads-per-Platoon, Units-per-Fireteam, etc
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TMap<TEnumAsByte<ETPSHierarchicalLevel>, int> SubUnitCapacityMap;
-
-    // Defines what Loadout each SquadRole should spawn with.
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TMap<TEnumAsByte<ETPSSquadRole>, UTPSEquipmentLoadout*> MemberLoadoutMap;
-};
-
-UCLASS(BlueprintType)
-class UTPSArmyConfigurationData : public UDataAsset
-{
-    GENERATED_BODY()
-
-public:
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    FTPSArmySchema Schema;
-};
-
-
 
 
 UDELEGATE(BlueprintAuthorityOnly)
@@ -75,9 +36,9 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated)
     TEnumAsByte<ETPSTeamID> TeamID;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FTPSArmySchema Configuration;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated)
+    FTPSArmyID ID;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-    TObjectPtr<UTPSCommandStructure> RootUnit;
+    TObjectPtr<UTPSCommandUnit> RootUnit;
 };

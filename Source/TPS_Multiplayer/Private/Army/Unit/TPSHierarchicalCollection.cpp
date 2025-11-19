@@ -100,12 +100,12 @@ bool UTPSHierarchicalCollection::CanAddSubCollection(const UTPSHierarchicalColle
 	}
 
 
-	if (UnitID.UnitLevel == ETPSHierarchicalLevel::UNIT)
+	if (UnitID.UnitLevel == ETPSUnitLevel::UNIT)
 	{
 		return nullptr;
 	}
 
-	ETPSHierarchicalLevel targetChildLvl = LevelDown(UnitID.UnitLevel);
+	ETPSUnitLevel targetChildLvl = LevelDown(UnitID.UnitLevel);
 	if (auto targetChildUnitNumber = id.Hierarchy.Find(targetChildLvl))
 	{
 		if (*targetChildUnitNumber >= SubCollections.Num()) { return nullptr; }
@@ -181,12 +181,12 @@ void UTPSHierarchicalCollection::UpdateUnitIdForSubCollection(UTPSHierarchicalCo
 }
 
 
-ETPSHierarchicalLevel UTPSHierarchicalCollection::LevelDown(ETPSHierarchicalLevel level)
+ETPSUnitLevel UTPSHierarchicalCollection::LevelDown(ETPSUnitLevel level)
 {
 	return _TPSLevel_Down(level);
 }
 
-ETPSHierarchicalLevel UTPSHierarchicalCollection::LevelUp(ETPSHierarchicalLevel level)
+ETPSUnitLevel UTPSHierarchicalCollection::LevelUp(ETPSUnitLevel level)
 {
 	return _TPSLevel_Up(level);
 }

@@ -74,14 +74,14 @@ public:
 	bool IsDebugEnabled = false;
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPS|Configuration")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPS|Schema")
 	TSubclassOf<ATPSCharacter> PlayerCharacterTemplate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|Configuration")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|Schema")
 	TSubclassOf<ATPSCharacter> BotTemplate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPS|Configuration")
-	TMap<TEnumAsByte<ETPSTeamID>, TObjectPtr<UTPSTeamConfigurationData>> TeamConfigurationMap;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPS|Schema")
+	TMap<TEnumAsByte<ETPSTeamID>, TObjectPtr<UTPSTeamDefinition>> TeamDefinitionMap;
 
 //~ ============================================================= ~//
 //  OPERATIONS
@@ -110,7 +110,7 @@ public:
 
 
 
-	// Instantiates Teams in GameState with configurations defined in TeamConfigurationMap
+	// Instantiates Teams in GameState with configurations defined in TeamDefinitionMap
 	UFUNCTION(BlueprintCallable)
 	void InitializeTeams();
 
@@ -135,7 +135,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SpawnUnit(FTPSUnitID unitId);
 private:
-	void _SpawnUnit(UTPSCommandStructure* unit, UTPSSpawnPool* spawnPool);
+	void _SpawnUnit(UTPSCommandUnit* unit, UTPSSpawnPool* spawnPool);
 
 
 	////////////////////////////////////////////////////////

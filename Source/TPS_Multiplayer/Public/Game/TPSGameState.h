@@ -9,7 +9,7 @@
 
 #include "Player/TPSPlayerState.h"
 #include "Log/TPSCombatLog.h"
-#include "Army/Unit/TPSCommandStructure.h"
+#include "Army/Unit/TPSCommandUnit.h"
 #include "Team/TPSTeamInstance.h"
 #include "Types/TPSBroadcastMessage.h"
 
@@ -107,9 +107,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	TArray<TObjectPtr<UTPSTeamInstance>> Teams;
 
+	// All Army instances instantiated in the World
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
+	TArray<TObjectPtr<UTPSArmyInstance>> Armies;
+
 	// All TeamUnits instantiated in the World (all teams)
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
-	TArray<TObjectPtr<UTPSCommandStructure>> TeamUnits;
+	TArray<TObjectPtr<UTPSCommandUnit>> TeamUnits;
 
 	// All CharacterInstances (not actors) *ever* instantiated in the World
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
@@ -127,13 +131,17 @@ protected:
 	TMap<TEnumAsByte<ETPSTeamID>, TObjectPtr<UTPSTeamInstance>> TeamsById;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TMap<int, TObjectPtr<UTPSCommandStructure>> TeamUnitsById;
+	TMap<int, TObjectPtr<UTPSArmyInstance>> ArmiesById;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TMap<int, TObjectPtr<UTPSCommandUnit>> TeamUnitsById;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TMap<FGuid, TObjectPtr<UTPSCharacterInstance>> CharactersById;
 
 private:
 	void IndexTeams();
+	void IndexArmies();
 	void IndexTeamUnits();
 	void IndexCharacters();
 
@@ -168,12 +176,16 @@ public:
 	////////////////////////////////////////////////////////
 	// Team Sub-Unit CRUD
 
+	// Find a Command Unit that matches the provided UnitID
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSArmyInstance* GetArmy(const FTPSArmyID armyId);
+
 	/*UFUNCTION(BlueprintCallable)
 	void CreateTeamUnit(const FTPSUnitID unitId, const FTPSCommandUnitConfiguration unitConfig);*/
 
 	// Find a Command Unit that matches the provided UnitID
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UTPSCommandStructure* GetUnit(const FTPSUnitID unitId);
+	UTPSCommandUnit* GetUnit(const FTPSUnitID unitId);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSCharacterInstance* GetUnitLeader(const FTPSUnitID unitId);

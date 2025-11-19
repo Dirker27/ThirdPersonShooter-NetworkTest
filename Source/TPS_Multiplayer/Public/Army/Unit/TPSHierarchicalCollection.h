@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "TPSUnitID.h"
-#include "Army/Unit/TPSHierarchicalCollectionLevel.h"
+#include "Army/Unit/TPSUnitLevel.h"
 #include "Character/TPSCharacterInstance.h"
 
 #include "TPSHierarchicalCollection.generated.h"
@@ -88,10 +88,10 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static ETPSHierarchicalLevel LevelDown(ETPSHierarchicalLevel level);
+	static ETPSUnitLevel LevelDown(ETPSUnitLevel level);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static ETPSHierarchicalLevel LevelUp(ETPSHierarchicalLevel level);
+	static ETPSUnitLevel LevelUp(ETPSUnitLevel level);
 
 };
 

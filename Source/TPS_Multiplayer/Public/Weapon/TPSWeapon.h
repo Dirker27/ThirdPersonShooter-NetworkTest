@@ -38,15 +38,15 @@ protected:
 //~ ======================================================================== ~//
 public:
     // UI Reticle
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Schema")
     TObjectPtr<UTPSWeaponReticle> Reticle;
 
     // Mount offset for WeaponHand
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mountable|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mountable|Schema")
     FTPSMountOffset PrimaryWeaponHandOffset = FTPSMountOffset();
 
     // IK Target for SecondaryHand
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Schema")
     TObjectPtr<UTPSMountPoint> SecondaryWeaponHandMountPoint;
 
 //~ ======================================================================= ~//
@@ -61,14 +61,14 @@ public:
     TEnumAsByte<ETPSWeaponType> Type;
 
     //////////////////////////////////////////////////////
-    // Configuration
+    // Schema
 
     // Effects to be applied to the owning Pawn's AbilitySystem when equipped (active)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipable|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipable|Schema")
     TEnumAsByte<ETPSWeaponSlot> WeaponSlot;
 
     // Weapon Attributes (damage, spread, cycle rate, etc)
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Schema")
     TObjectPtr<UTPSWeaponConfiguration> Configuration;
 
     //////////////////////////////////////////////////////

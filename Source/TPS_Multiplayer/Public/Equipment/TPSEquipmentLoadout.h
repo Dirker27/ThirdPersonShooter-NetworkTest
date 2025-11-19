@@ -15,7 +15,7 @@
  * State object for a character's weapons, equipment, and gear.
  */
 USTRUCT(BlueprintType)
-struct TPS_MULTIPLAYER_API FTPSOperatorLoadout
+struct TPS_MULTIPLAYER_API FTPSEquipmentLoadoutData
 {
     GENERATED_BODY()
 
@@ -38,7 +38,7 @@ class TPS_MULTIPLAYER_API UTPSEquipmentLoadout : public UDataAsset
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FTPSOperatorLoadout Loadout;
+    FTPSEquipmentLoadoutData Loadout;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TMap<TEnumAsByte<ETPSWeaponSlot>, TSubclassOf<ATPSWeapon>> WeaponsBySlot;

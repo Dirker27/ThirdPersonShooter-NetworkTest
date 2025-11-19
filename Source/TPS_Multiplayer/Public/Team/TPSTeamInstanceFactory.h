@@ -34,8 +34,8 @@ private:
 //~ ==================================================================== ~//
 public:
 
-    static UTPSTeamInstance* NewTeamInstance(const ETPSTeamID teamId, const FTPSTeamConfiguration teamConfig, AActor* owner);
-    static UTPSCommandStructure* NewTeamUnitInstance(const FTPSUnitID teamId, const FTPSCommandUnitConfiguration unitConfig, AActor* owner);
+    static UTPSTeamInstance* NewTeamInstance(const ETPSTeamID teamId, const FTPSTeamDefinitionData teamConfig, AActor* owner);
+    static UTPSCommandUnit* NewTeamUnitInstance(const FTPSUnitID teamId, const FTPSUnitSchemaData unitConfig, AActor* owner);
 
 
     //~ Team CRUD ~//
@@ -44,7 +44,7 @@ public:
     void CreateTeam(const ETPSTeamID teamId);
 
     UFUNCTION(BlueprintCallable)
-    void ConfigureTeam(const ETPSTeamID teamId, const FTPSTeamConfiguration configuration);
+    void ConfigureTeam(const ETPSTeamID teamId, const FTPSTeamDefinitionData definition);
 
     UFUNCTION(BlueprintCallable)
     void PopulateTeam(const ETPSTeamID teamId, TArray<UTPSCharacterInstance*> roster);
@@ -64,8 +64,7 @@ public:
     void ActivateCharacter(UTPSCharacterInstance* instance);
 
 private:
-    void _ConfigureUnit(UTPSCommandStructure* node, FTPSTeamConfiguration configuration,
-        ETPSHierarchicalLevel level);
-    void _PopulateUnit(UTPSCommandStructure* node);
+    void _ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSchemaData schema);
+    void _PopulateUnit(UTPSCommandUnit* node);
     UTPSCharacterInstance* _NewCharacter();
 };

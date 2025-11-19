@@ -7,9 +7,10 @@
 #include "TPSCharacterInstanceFactory.generated.h"
 
 /**
- * GameMode worker sub-component to manage Team compositions and schema.
+ * GameMode worker sub-component to create new Character Instances, Identities, and Actors.
  *
- * TODO: Rename to "TeamFactory"/"TeamWorker"?
+ * TODO: Derive names and similar info from Faction-appropriate name pools.
+ *   - https://toastercatstudios.atlassian.net/browse/PC-225
  */
 UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSCharacterInstanceFactory : public UActorComponent
@@ -24,5 +25,6 @@ protected:
     TSubclassOf<UTPSCharacterConfiguration> DefaultCharacterTemplate;
 
 public:
-    static UTPSCharacterInstance* NewCharacterInstance();
+    static UTPSCharacterInstance* ConfigureCharacterInstanceForUnitAndRole(UTPSCharacterInstance* instance, FTPSUnitID unit, FTPSUnitRoleDefinitionData roleDefinition);
 };
+

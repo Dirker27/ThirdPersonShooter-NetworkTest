@@ -48,26 +48,26 @@ public:
 //~ ======================================================================== ~//
 protected:
     //////////////////////////////////////////////////////
-    // Target Mesh Configuration
+    // Target Mesh Schema
 
     // Parent Mesh - Bound on Startup
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Schema")
     TObjectPtr<USkeletalMeshComponent> TargetMesh;
 
     // Owner's AbilitySystem (integrates to equipment w/ owner GAS) - Bound on Startup
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Schema")
     TObjectPtr<UAbilitySystemComponent> OwnerAsc;
 
     // HarnessSlot -> Mesh SocketName (MountPoint setup only)
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Configuration")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EquipmentManager|Schema")
     TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, FName> HarnessSocketMap;
 
     // EquipmentSlot -> HarnessSlot (when holstered)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Schema")
     TMap<TEnumAsByte<ETPSWeaponSlot>, TEnumAsByte<ETPSEquipmentHarnessSlot>> EquipmentHarnessMap;
 
     // EquipmentSlot -> HarnessSlot (when holstered)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Schema")
     TMap<TEnumAsByte<ETPSGearSlot>, TEnumAsByte<ETPSEquipmentHarnessSlot>> GearHarnessMap;
 
 //~ ======================================================================== ~//
@@ -75,7 +75,7 @@ protected:
 //~ ======================================================================== ~//
 protected:
     // HarnessSlot -> MountPoint
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Configuration")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentManager|Schema")
     TMap<TEnumAsByte<ETPSEquipmentHarnessSlot>, UTPSMountPoint*> HarnessMountPointMap;
 
     //////////////////////////////////////////////////////
@@ -112,7 +112,7 @@ protected:
 
 public:
     //////////////////////////////////////////////////////
-    // Target Mesh Configuration
+    // Target Mesh Schema
 
     // Equip the current ActiveWeaponSlot to the armed hand.
     //   If no equipment is currently active, pick the first available slot.

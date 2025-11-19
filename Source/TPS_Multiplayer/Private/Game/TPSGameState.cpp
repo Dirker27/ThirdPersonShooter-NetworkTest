@@ -116,6 +116,19 @@ void ATPSGameState::IndexTeams()
     }
 }
 
+static int _a = 0;
+void ATPSGameState::IndexArmies()
+{
+    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexArmies()..."));
+
+    ArmiesById.Empty();
+
+    for (auto army : Armies)
+    {
+        ArmiesById.Add(_a++, army);
+    }
+}
+
 void ATPSGameState::IndexTeamUnits()
 {
     UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexTeamUnits()..."));
@@ -209,15 +222,28 @@ int ATPSGameState::GetTotalTeamMemberCount(const ETPSTeamID teamId)
 //  UNIT Reads
 //~ ==================================================================== ~//
 
+UTPSArmyInstance* ATPSGameState::GetArmy(const FTPSArmyID armyId)
+{
+    for (auto army : Armies)
+    {
+        if (armyId.ID == army->ID.ID)
+        {
+            return army;
+        }
+    }
+    return nullptr;
+}
+
+
 /*void ATPSGameState::CreateTeamUnit(const FTPSUnitID unitId, const FTPSCommandUnitConfiguration unitConfig)
 {
-    UTPSCommandStructure* instance = UTPSTeamInstanceFactory::NewTeamUnitInstance(unitId, unitConfig, this);
+    UTPSCommandUnit* instance = UTPSTeamInstanceFactory::NewTeamUnitInstance(unitId, unitConfig, this);
 
     TeamUnits.Add(instance);
     AddReplicatedSubObject(instance);
 }*/
 
-UTPSCommandStructure* ATPSGameState::GetUnit(const FTPSUnitID unitId)
+UTPSCommandUnit* ATPSGameState::GetUnit(const FTPSUnitID unitId)
 {
     // lazy JIT index
     if (TeamUnitsById.IsEmpty())

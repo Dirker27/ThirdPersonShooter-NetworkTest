@@ -102,7 +102,9 @@ void ATPSGameMode::SpawnTeam(ETPSTeamID teamId)
 {
 	if (UTPSTeamInstance* t = State()->GetTeam(teamId))
 	{
-		_SpawnUnit(t->RootUnit, t->SpawnPool);
+		for (auto army : t->Armies) {
+			_SpawnUnit(army->RootUnit, t->SpawnPool);
+		}
 	}
 }
 
@@ -111,13 +113,13 @@ void ATPSGameMode::SpawnUnit(FTPSUnitID unitId)
 	ATPSGameState* state = State();
 
 	UTPSTeamInstance* team = state->GetTeam(unitId.TeamID);
-	if (UTPSCommandStructure* unit = state->GetUnit(unitId))
+	if (UTPSCommandUnit* unit = state->GetUnit(unitId))
 	{
 		_SpawnUnit(unit, team->SpawnPool);
 	}
 }
 
-void ATPSGameMode::_SpawnUnit(UTPSCommandStructure* unit, UTPSSpawnPool* spawnPool)
+void ATPSGameMode::_SpawnUnit(UTPSCommandUnit* unit, UTPSSpawnPool* spawnPool)
 {
 	for (auto instance : unit->GetAllMembers())
 	{
@@ -132,7 +134,7 @@ void ATPSGameMode::_SpawnUnit(UTPSCommandStructure* unit, UTPSSpawnPool* spawnPo
 
 	for (auto subUnit : unit->GetAllSubCollections())
 	{
-		_SpawnUnit(Cast<UTPSCommandStructure>(subUnit), spawnPool);
+		_SpawnUnit(Cast<UTPSCommandUnit>(subUnit), spawnPool);
 	}
 }
 
@@ -140,10 +142,10 @@ void ATPSGameMode::_SpawnUnit(UTPSCommandStructure* unit, UTPSSpawnPool* spawnPo
 
 void ATPSGameMode::InitializeTeams()
 {
-	for (auto teamConfig : TeamConfigurationMap)
+	for (auto teamConfig : TeamDefinitionMap)
 	{
 		TeamInstanceFactory->CreateTeam(teamConfig.Key);
-		TeamInstanceFactory->ConfigureTeam(teamConfig.Key, teamConfig.Value->Configuration);
+		TeamInstanceFactory->ConfigureTeam(teamConfig.Key, teamConfig.Value->Definition);
 	}
 }
 

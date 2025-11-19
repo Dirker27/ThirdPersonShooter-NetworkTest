@@ -12,7 +12,7 @@
  * Detailed configuration options for an operator / character.
  */
 USTRUCT(BlueprintType)
-struct TPS_MULTIPLAYER_API FTPSOperatorConfiguration
+struct TPS_MULTIPLAYER_API FTPSCharacterConfigurationData
 {
     GENERATED_BODY()
 
@@ -39,7 +39,7 @@ protected:
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FTPSOperatorConfiguration Configuration;
+    FTPSCharacterConfigurationData Configuration;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     ETPSCharacterBodyType BodyType;
