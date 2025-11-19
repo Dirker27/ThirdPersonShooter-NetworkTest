@@ -67,11 +67,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool CanAddSubCollection(const UTPSHierarchicalCollection* subCollection) const;
 
-
-
-	//UFUNCTION(BlueprintCallable, BlueprintPure)
-	//UTPSHierarchicalCollection* GetSubCollection(FTPSUnitID id);
-
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	TArray<UTPSHierarchicalCollection*> GetAllSubCollections();
 

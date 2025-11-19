@@ -64,10 +64,10 @@ bool UTPSHierarchicalCollection::CanAddMember(const UTPSCharacterInstance* membe
 	}
 
 	return true;
-	//return !Members.Contains(member);
 }
 
 // TODO: Guard against cyclical hierarchies
+// - [PC-235]: https://toastercatstudios.atlassian.net/browse/PC-235
 bool UTPSHierarchicalCollection::CanAddSubCollection(const UTPSHierarchicalCollection* subCollection) const
 {
 	if (!IsValid(subCollection))
@@ -81,51 +81,10 @@ bool UTPSHierarchicalCollection::CanAddSubCollection(const UTPSHierarchicalColle
 	}
 
 	return true;
-	//return !SubCollections.Contains(subCollection);
 }
-
-
-/*UTPSHierarchicalCollection* UTPSHierarchicalCollection::GetSubCollection(FTPSUnitID id)
-{
-	if (id.UnitLevel > UnitID.UnitLevel)
-	{
-		return nullptr;
-	}
-
-	if (id.UnitLevel == UnitID.UnitLevel)
-	{
-		return id.UnitNumber == UnitID.UnitNumber
-			? this
-			: nullptr;
-	}
-
-
-	if (UnitID.UnitLevel == ETPSUnitLevel::UNIT)
-	{
-		return nullptr;
-	}
-
-	ETPSUnitLevel targetChildLvl = LevelDown(UnitID.UnitLevel);
-	if (auto targetChildUnitNumber = id.Hierarchy.Find(targetChildLvl))
-	{
-		if (*targetChildUnitNumber >= SubCollections.Num()) { return nullptr; }
-		if (auto childUnit = SubCollections[*targetChildUnitNumber])
-		{
-			return childUnit->GetSubCollection(id);
-		}
-	}
-
-	return nullptr;
-}*/
 
 TArray<UTPSHierarchicalCollection*> UTPSHierarchicalCollection::GetAllSubCollections()
 {
-	/*TArray<UTPSHierarchicalCollection*> children;
-	for (auto child : SubCollections)
-	{
-		children.Add(child.Value);
-	}
-	return children;*/
 	return SubCollections;
 }
 
@@ -140,12 +99,6 @@ UTPSCharacterInstance* UTPSHierarchicalCollection::GetMember(int targetIdNumber)
 
 TArray<UTPSCharacterInstance*> UTPSHierarchicalCollection::GetAllMembers()
 {
-	/*TArray<UTPSCharacterInstance*> children;
-	for (auto child : Members)
-	{
-		children.Add(child.Value);
-	}
-	return children;*/
 	return Members;
 }
 
