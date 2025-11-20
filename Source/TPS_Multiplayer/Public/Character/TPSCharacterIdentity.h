@@ -2,11 +2,10 @@
 
 #pragma once
 
+#include "Army/Unit/TPSUnitRole.h"
 #include "Character/Types/TPSCharacterBodyType.h"
 #include "Character/Types/TPSCharacterRank.h"
-#include "Army/TPSFactionID.h"
-#include "Army/Unit/TPSUnitRole.h"
-#include "Army/Unit/TPSUnitID.h"
+#include "Faction/TPSFactionID.h"
 #include "Types/TPSCharacterStance.h"
 
 #include "TPSCharacterIdentity.generated.h"
@@ -26,13 +25,6 @@ struct TPS_MULTIPLAYER_API FTPSOperatorIdentity
 //  ATTRIBUTES
 //~ ==================================================================== ~//
 public:
-
-    // Unique ID - independent of UnitID.
-    //   Used for lookup and management operations from GameMode / GameState.
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FGuid Guid;
-
-
 
     ////////////////////////////////////////////////////////
     // Name
@@ -82,18 +74,13 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TEnumAsByte<ETPSFactionID> FactionID;
 
-    // Unit UnitID -> Squad/Team Hierarchy
-    //   Can be zero-d out if no assignment is active.
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FTPSUnitID UnitID;
-
     // Character's "Class" / Role in their Squad
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TEnumAsByte<ETPSUnitRole> SquadRole;
 };
 
 /**
- * ID Card Pointer
+ * ArmyID Card Pointer
  */
 UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSCharacterIdentity : public UObject

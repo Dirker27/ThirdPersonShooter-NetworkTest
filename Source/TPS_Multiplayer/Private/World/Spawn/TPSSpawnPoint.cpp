@@ -1,6 +1,6 @@
 // (C) ToasterCat Studios 2025
 
-#include "World/TPSSpawnPoint.h"
+#include "World/Spawn/TPSSpawnPoint.h"
 
 #include "Character/TPSCharacter.h"
 

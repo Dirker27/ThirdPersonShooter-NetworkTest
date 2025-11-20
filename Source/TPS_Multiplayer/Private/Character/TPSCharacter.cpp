@@ -205,7 +205,7 @@ void ATPSCharacter::Tick(float deltaTime)
 		if (IsDeathConditionMet() && !HasDeathTriggered)
 		{
 			ATPSGameMode* gameMode = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this));
-			if (IsValid(CharacterInstance)) { gameMode->KillCharacter(CharacterInstance->Identity.Guid); }
+			if (IsValid(CharacterInstance)) { gameMode->KillCharacter(CharacterInstance->CharacterID); }
 			Die();
 		}
 	}
@@ -297,19 +297,34 @@ void ATPSCharacter::SyncComponentsFromState()
 //  SYNTHETIC GETTERS
 //~ ============================================================= ~//
 
-FTPSOperatorIdentity ATPSCharacter::GetIdentity()
+FTPSCharacterID ATPSCharacter::GetCharacterID() const
+{
+	return IsValid(CharacterInstance)
+		? CharacterInstance->CharacterID
+		: FTPSCharacterID();
+}
+
+FTPSOperatorIdentity ATPSCharacter::GetIdentity() const
 {
 	return IsValid(CharacterInstance)
 		? CharacterInstance->Identity
 		: FTPSOperatorIdentity();
 }
 
-FTPSCharacterConfigurationData ATPSCharacter::GetConfiguration()
+FTPSCharacterConfigurationData ATPSCharacter::GetConfiguration() const
 {
 	return IsValid(CharacterInstance)
 		? CharacterInstance->Configuration
 		: FTPSCharacterConfigurationData();
 }
+
+ETPSTeamID ATPSCharacter::GetAssignedTeamID() const
+{
+	return IsValid(CharacterInstance)
+		? CharacterInstance->GetAssignedTeamID()
+		: ETPSTeamID::UNAFFILIATED;
+}
+
 
 bool ATPSCharacter::IsInitialized() const
 {

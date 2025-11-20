@@ -14,7 +14,19 @@ struct TPS_MULTIPLAYER_API FTPSArmyID
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGuid ID;
+	FGuid Guid;
+
+
+public:
+	bool operator == (const FTPSArmyID other) const
+	{
+		return Guid == other.Guid;
+	}
+
+	friend uint32 GetTypeHash(const FTPSArmyID& id)
+	{
+		return uint32(CityHash64((char*)&id.Guid, sizeof(FGuid)));
+	}
 };
 
 
@@ -25,5 +37,5 @@ class UTPSArmyIdentifier : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FTPSArmyID ID;
+	FTPSArmyID ArmyID;
 };

@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 
+#include "TPSUnitHierarchy.h"
 #include "TPSUnitID.h"
-#include "Army/Unit/TPSUnitLevel.h"
+#include "TPSUnitLevel.h"
+
 #include "Character/TPSCharacterInstance.h"
 
 #include "TPSHierarchicalCollection.generated.h"
@@ -26,16 +28,24 @@ class TPS_MULTIPLAYER_API UTPSHierarchicalCollection : public UObject
 public:
 	UTPSHierarchicalCollection();
 
-
-	// Broadcast Delegate - Team/Character/Player Roster Updated
-	UPROPERTY(BlueprintAssignable)
-	FUnitUpdate UnitUpdate;
-
 	// Composite UnitID - unique to the active trie (but not globally)
 	//
 	// Level + UnitID == "Squad 2"
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTPSUnitID UnitID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTPSUnitHierarchy Hierarchy;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<ETPSUnitLevel> UnitLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int UnitNumber;
+
+	// Broadcast Delegate - Team/Character/Player Roster Updated
+	UPROPERTY(BlueprintAssignable)
+	FUnitUpdate UnitUpdate;
 
 protected:
 	// TODO: Make Generic/Template
@@ -75,11 +85,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	TArray<UTPSCharacterInstance*> GetAllMembers();
-
-
-protected:
-	void UpdateUnitIdForMember(UTPSCharacterInstance* member, int id);
-	void UpdateUnitIdForSubCollection(UTPSHierarchicalCollection* subCollection, int id);
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)

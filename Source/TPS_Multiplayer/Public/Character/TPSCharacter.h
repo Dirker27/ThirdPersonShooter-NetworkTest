@@ -9,6 +9,7 @@
 #include "AbilitySystemComponent.h"
 
 #include "TPSCharacterConfiguration.h"
+#include "TPSCharacterID.h"
 #include "TPSCharacterIdentity.h"
 #include "TPSCharacterInventory.h"
 
@@ -20,6 +21,7 @@
 #include "GAS/Attributes/CharacterHealthAttributeSet.h"
 #include "GAS/Attributes/StandardAttributeSet.h"
 #include "GAS/Attributes/WeaponAttributeSet.h"
+#include "Team/TPSTeamID.h"
 #include "Weapon/TPSWeapon.h"
 
 #include "TPSCharacter.generated.h"
@@ -28,7 +30,7 @@ class UTPSCharacterInstance;
 
 
 UDELEGATE(BlueprintAuthorityOnly)
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUpdateCharacterAttributeDisplay);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterAttributeUpdate);
 
 /**
  * Defines an arbitrary Character in our game's universe.
@@ -63,7 +65,7 @@ public:
 
 	// Broadcast Delegate
 	UPROPERTY(BlueprintAssignable)
-	FUpdateCharacterAttributeDisplay NotifyDisplayWidgets;
+	FCharacterAttributeUpdate NotifyDisplayWidgets;
 private:
 	// Trigger a broadcast to all listening display widgets to perform an Update cycle.
 	//   Should set to 'true' whenever states or attributes are changed.
@@ -116,26 +118,34 @@ public:
 	// Identity
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FTPSOperatorIdentity GetIdentity();
-
-	//////////////////////////////////////////////////////
-	// Schema
+	FTPSCharacterID GetCharacterID() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FTPSCharacterConfigurationData GetConfiguration();
+	FTPSOperatorIdentity GetIdentity() const;
+
+	//////////////////////////////////////////////////////
+	// Configuration
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FTPSCharacterConfigurationData GetConfiguration() const;
 
 	// Can Be Possessed by a Player
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPSCharacter|Schema")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPSCharacter|Configuration")
 	bool CanBePossessedByPlayer = false;
 
 	// Can Death be triggered by loss of Health?
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Schema")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration")
 	bool CanDie = false;
 
-	// Character Attributes Schema
+	// Character Attributes Configuration
 	//   Can be overridden by PlayerState on Possession.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Schema", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Configuration", Replicated)
 	TObjectPtr<UTPSCharacterConfiguration> Configuration;
+
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ETPSTeamID GetAssignedTeamID() const;
+
 
 
 	//////////////////////////////////////////////////////
@@ -165,12 +175,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector2D GetCurrentAccuracyTolerance() const;
 
-
-	//////////////////////////////////////////////////////
-	// Persistent State
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State", Replicated)
-	//TObjectPtr<UTPSCharacterRecord> Record;
 
 
 	//////////////////////////////////////////////////////

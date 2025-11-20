@@ -20,7 +20,7 @@ enum ETPSFactionID : int
 {
 	Unaffiliated = 0 UMETA(DisplayName = "Unaffiliated"),
 
-	//- "Blue" Alliance ---------------------------------------------=
+	//- "BLUE_TEAM" Alliance ---------------------------------------------=
 	//
 	Alliance = 10,
 	// Cascadian Coastal Republic [CCR]
@@ -32,7 +32,7 @@ enum ETPSFactionID : int
 	Union = 13 UMETA(DisplayName = "Northern Union"),
 
 
-	//- "Red" Empire ------------------------------------------------=
+	//- "RED_TEAM" Empire ------------------------------------------------=
 	//
 	Empire = 20,
 	// American (Con)Federation [AF]
@@ -50,7 +50,7 @@ enum ETPSFactionID : int
 	EU = 33,
 
 
-	//- Independent States ------------------------------------------=
+	//- UNAFFILIATED States ------------------------------------------=
 	//
 	Appalachia = 40,
 	// First Nations Alliance [FNA]

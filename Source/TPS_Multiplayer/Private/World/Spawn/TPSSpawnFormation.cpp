@@ -1,6 +1,6 @@
 // (C) ToasterCat Studios 2025
 
-#include "Game/TPSSpawnFormation.h"
+#include "World/Spawn/TPSSpawnFormation.h"
 
 ATPSSpawnFormation::ATPSSpawnFormation()
 {

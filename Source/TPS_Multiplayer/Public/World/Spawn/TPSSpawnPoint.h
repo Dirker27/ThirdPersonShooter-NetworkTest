@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Army/Unit/TPSCommandUnit.h"
+#include "Army/Unit/TPSUnitHierarchy.h"
 #include "Components/BoxComponent.h"
 
 #include "Army/Unit/TPSUnitRole.h"
-#include "Army/Unit/TPSUnitID.h"
+#include "Team/TPSTeamID.h"
 
 #include "TPSSpawnPoint.generated.h"
 
@@ -23,9 +25,16 @@ protected:
     TObjectPtr<UBoxComponent> Collider;
 
 public:
-    // Squads in a Team that can use this Spawn Point
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FTPSUnitID AssignedUnit;
+    TEnumAsByte<ETPSTeamID> AssignedTeamID;
+
+    // Filters Squads/Fireteams that can use this Spawn Point
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FTPSUnitHierarchy UnitHierarchyFilter;
+
+    // Will override all other selection filters if set.
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TWeakObjectPtr<UTPSCommandUnit> AssignedUnit;
 
     // Preferred Squad Role to spawn at this 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)

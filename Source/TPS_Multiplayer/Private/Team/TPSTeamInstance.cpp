@@ -2,7 +2,7 @@
 
 #include "Team/TPSTeamInstance.h"
 
-#include "World/TPSSpawnPool.h"
+#include "World/Spawn/TPSSpawnPool.h"
 #include "Net/UnrealNetwork.h"
 
 UTPSTeamInstance::UTPSTeamInstance()
@@ -19,8 +19,6 @@ void UTPSTeamInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     DOREPLIFETIME(ThisClass, Armies);
 
     DOREPLIFETIME(ThisClass, ScoredPoints);
-    DOREPLIFETIME(ThisClass, Members);
-    DOREPLIFETIME(ThisClass, ActiveMembers);
     DOREPLIFETIME(ThisClass, ActivePlayers);
 }
 

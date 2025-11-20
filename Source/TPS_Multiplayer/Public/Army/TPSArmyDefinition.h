@@ -25,7 +25,7 @@ struct TPS_MULTIPLAYER_API FTPSArmyDefinitionData
     TObjectPtr<UTPSArmyIdentity> Identity;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TObjectPtr<UTPSArmyIdentifier> ID;
+    FTPSArmyID ArmyID;
 };
 
 UCLASS()

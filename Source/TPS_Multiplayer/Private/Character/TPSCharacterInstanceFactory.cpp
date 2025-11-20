@@ -536,16 +536,38 @@ UTPSCharacterInstanceFactory::UTPSCharacterInstanceFactory()
 	
 }
 
-UTPSCharacterInstance* UTPSCharacterInstanceFactory::ConfigureCharacterInstanceForUnitAndRole(UTPSCharacterInstance* instance, FTPSUnitID unit, FTPSUnitRoleDefinitionData roleDefinition)
-{
-	instance->Identity.UnitID = unit;
 
-	// Coin flip for gender
+
+UTPSCharacterInstance* UTPSCharacterInstanceFactory::ConfigureCharacterInstanceForUnitAndRole(UTPSCharacterInstance* instance, UTPSCommandUnit* unit, FTPSUnitRoleDefinitionData roleDefinition)
+{
+	// Bind Instance to Unit/Role
+	instance->Identity.SquadRole = roleDefinition.Role;
+	instance->Identity.Rank = roleDefinition.Rank;
+
+	// TODO: Get Configuration from Blueprint
+	//
+	// instance->Configuration = ...
+	instance->Configuration.BaseAccuracyTolerance = FMath::FRandRange(0.f, 5.f);
+
+	//~ INSTANTIATE CHARACTER IDENTITY ----------------------=
+	//
+	// TODO: Migrate to Remote Generation
+	//
+	instance->CharacterID.Guid = FGuid::NewGuid();
+
+	// Assign to Command Hierarchy
+	instance->AssignedTeam = unit->AssignedTeam.Get();
+	instance->AssignedArmy = unit->AssignedArmy.Get();
+	instance->AssignedUnit = unit;
+
+	// Coin flip for gender - 50%
 	bool isMale = FMath::RandRange(0, 1) > 0;
 	if (isMale) {
+		instance->Configuration.BodyType = ETPSCharacterBodyType::Male;
 		instance->Identity.CharacterBodyType = ETPSCharacterBodyType::Male;
 		instance->Identity.FirstName = _randNameInList(_FirstNames_Male);
 	} else {
+		instance->Configuration.BodyType = ETPSCharacterBodyType::Female;
 		instance->Identity.CharacterBodyType = ETPSCharacterBodyType::Female;
 		instance->Identity.FirstName = _randNameInList(_FirstNames_Female);
 	}
@@ -553,8 +575,14 @@ UTPSCharacterInstance* UTPSCharacterInstanceFactory::ConfigureCharacterInstanceF
 	instance->Identity.Callsign = _randNameInList(_Callsigns);
 
 
-	instance->Identity.SquadRole = roleDefinition.Role;
-	instance->Identity.Rank = roleDefinition.Rank;
+	// Coin flip for Left/Right-Handed - 80%
+	bool isRighty = FMath::RandRange(0, 10) > 8;
+	if (isRighty) {
+		instance->Identity.PreferredStance = RightHanded;
+	}
+	else {
+		instance->Identity.PreferredStance = LeftHanded;
+	}
 
 	return instance;
 }

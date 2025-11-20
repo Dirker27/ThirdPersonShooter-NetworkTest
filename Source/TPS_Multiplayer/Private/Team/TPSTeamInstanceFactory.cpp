@@ -62,18 +62,38 @@ void UTPSTeamInstanceFactory::ConfigureTeam(const ETPSTeamID teamId, FTPSTeamDef
 			UTPSArmyInstance* army = NewObject<UTPSArmyInstance>(
 				state, 
 				UTPSArmyInstance::StaticClass(),
-				FName(FString("ARMY-").Append(TPSTeamIdToString(teamId))));
+				FName(FString("ARMY-").Append(def->Definition.ArmyID.Guid.ToString())));
+			army->AssignTeam(team->TeamID);
+			_ConfigureArmy(army, def->Definition);
 
-			UTPSCommandUnit* unit = NewObject<UTPSCommandUnit>(state, UTPSCommandUnit::StaticClass());
-			unit->UnitID.TeamID = teamId;
-			unit->UnitID.UnitNumber = 1;
-			_ConfigureUnit(unit, def->Definition.RootUnitSchema->Schema);
+			if (IsValid(def->Definition.RootUnitSchema))
+			{
+				UTPSCommandUnit* unit = NewObject<UTPSCommandUnit>(state, UTPSCommandUnit::StaticClass());
+				unit->AssignedArmy = army;
+				unit->AssignedTeam = team;
+				unit->UnitNumber = 1;
 
-			army->RootUnit = unit;
+				_ConfigureUnit(unit, def->Definition.RootUnitSchema->Schema);
+				army->AssignRootUnit(unit);
+			}
+
 			team->Armies.Add(army);
-			state->Armies.Add(army);
 		}
 	}
+}
+
+// TODO: Migrate to ArmyFactory
+void UTPSTeamInstanceFactory::_ConfigureArmy(UTPSArmyInstance* army, FTPSArmyDefinitionData data)
+{
+	if (!IsValid(army)) { return; }
+	UE_LOG(LogTemp, Log, TEXT("Configuring Army[%s]..."), *army->ArmyID.Guid.ToString());
+
+	army->ArmyID = data.ArmyID;
+	army->Identity = data.Identity;
+
+	// Index to TPSGameState
+	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
+	state->Armies.Add(army);
 }
 
 
@@ -81,17 +101,20 @@ void UTPSTeamInstanceFactory::ConfigureTeam(const ETPSTeamID teamId, FTPSTeamDef
 void UTPSTeamInstanceFactory::_ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSchemaData schema)
 {
 	if (!IsValid(node)) { return; }
-
 	UE_LOG(LogTemp, Log, TEXT("Configuring Unit[%s]..."), *UTPSFunctionLibrary::GetNameForUnitID(node->UnitID));
 
 	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
 
-	node->UnitID.UnitLevel = schema.Level;
+	node->UnitLevel = schema.Level;
 	node->Schema = schema;
 
+	int unitNum = 1;
 	for (auto subUnitSchema : schema.SubUnitDefinitions)
 	{
 		UTPSCommandUnit* subUnit = NewObject<UTPSCommandUnit>(state, UTPSCommandUnit::StaticClass());
+		subUnit->UnitNumber = unitNum++;
+		subUnit->AssignedTeam = node->AssignedTeam;
+		subUnit->AssignedArmy = node->AssignedArmy;
 		_ConfigureUnit(subUnit, subUnitSchema->Schema);
 		node->AddSubCollection(subUnit);
 	}
@@ -105,8 +128,8 @@ void UTPSTeamInstanceFactory::_ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSche
 void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandUnit* node)
 {
 	if (!IsValid(node)) { return; }
-
 	UE_LOG(LogTemp, Log, TEXT("Populating Unit[%s]..."), *UTPSFunctionLibrary::GetNameForUnitID(node->UnitID));
+
 	for (auto roleDefinition : node->Schema.MemberDefinitions)
 	{
 		// Instantiate
@@ -114,20 +137,22 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandUnit* node)
 
 		// Configure (via CharacterFactory)
 		UTPSCharacterInstanceFactory::ConfigureCharacterInstanceForUnitAndRole(instance,
-			node->UnitID, roleDefinition);
+			node, roleDefinition);
+		UE_LOG(LogTemp, Log, TEXT("Instantiated/Loaded Character[%s]..."), *instance->CharacterID.Guid.ToString());
 
 		// Assign Loadout
 		instance->Loadout = roleDefinition.Loadout;
 
 		// Store
 		node->AddMember(instance);
-		ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
-		if (auto team = state->GetTeam(node->UnitID.TeamID))
+		if (IsValid(node->AssignedArmy.Get()))
 		{
-			team->Members.Add(instance);
-			state->Characters.Add(instance);
-			state->AddReplicatedSubObject(instance);
+			node->AssignedArmy->AddMember(instance);
 		}
+
+		ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
+		state->Characters.Add(instance);
+		state->AddReplicatedSubObject(instance);
 	}
 
 	for (auto subUnit : node->GetAllSubCollections())
@@ -147,20 +172,8 @@ void UTPSTeamInstanceFactory::PopulateTeam(ETPSTeamID teamId, TArray<UTPSCharact
 	{
 		for (auto army : team->Armies)
 		{
-			_PopulateUnit(army->RootUnit);
+			_PopulateUnit(army->GetRootUnit());
 		}
-	}
-}
-
-void UTPSTeamInstanceFactory::ActivateCharacter(UTPSCharacterInstance* instance)
-{
-	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
-	if (UTPSTeamInstance* team = state->GetTeam(instance->Identity.UnitID.TeamID))
-	{
-		team->ActiveMembers.Add(instance);
-		/*team->ActiveMembers.Add(
-			FTPSUnitID::HashUnitIdentifier(instance->Identity->UnitID),
-			instance);*/
 	}
 }
 
@@ -174,11 +187,6 @@ void UTPSTeamInstanceFactory::AssignCharacterToTeam(ETPSTeamID team, UTPSCharact
 void UTPSTeamInstanceFactory::AssignCharacterToTeamUnit(FTPSUnitID unitId, UTPSCharacterInstance* character)
 {
 	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
-	if (UTPSCommandUnit* existingUnit = state->GetUnit(character->Identity.UnitID))
-	{
-		existingUnit->RemoveMember(character->Identity.UnitID.UnitNumber);
-	}
-
 	if (UTPSCommandUnit* unit = state->GetUnit(unitId))
 	{
 		unit->AddMember(character);

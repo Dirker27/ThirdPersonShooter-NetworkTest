@@ -131,13 +131,13 @@ protected:
 	TMap<TEnumAsByte<ETPSTeamID>, TObjectPtr<UTPSTeamInstance>> TeamsById;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TMap<int, TObjectPtr<UTPSArmyInstance>> ArmiesById;
+	TMap<FTPSArmyID, TObjectPtr<UTPSArmyInstance>> ArmiesById;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TMap<int, TObjectPtr<UTPSCommandUnit>> TeamUnitsById;
+	TMap<FTPSUnitID, TObjectPtr<UTPSCommandUnit>> TeamUnitsById;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TMap<FGuid, TObjectPtr<UTPSCharacterInstance>> CharactersById;
+	TMap<FTPSCharacterID, TObjectPtr<UTPSCharacterInstance>> CharactersById;
 
 private:
 	void IndexTeams();
@@ -149,26 +149,23 @@ public:
 	////////////////////////////////////////////////////////
 	// Team CRUD
 
-	/*UFUNCTION(BlueprintCallable)
-	void CreateTeam(const ETPSTeamID teamId, const FTPSTeamConfiguration teamConfig);*/
-
 	// Retrieve a Team Instance that matches the provided TeamID
 	//   Will be NULL if Team Instance was not created in the current match.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSTeamInstance* GetTeam(const ETPSTeamID teamId);
 
 	// Retrieve the number of Active (alive) members on a given team.
-	//   Returns ZERO if Team Instance does not exist for provided ID.
+	//   Returns ZERO if Team Instance does not exist for provided ArmyID.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetActiveTeamMemberCount(const ETPSTeamID teamId);
 
 	// Retrieves the Total number of team members, alive or dead.
-	//   Returns ZERO if Team Instance does not exist for provided ID.
+	//   Returns ZERO if Team Instance does not exist for provided ArmyID.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetTotalTeamMemberCount(const ETPSTeamID teamId);
 
 	// Retrieves the current score for a given team.
-	//   Returns ZERO if Team Instance does not exist for provided ID.
+	//   Returns ZERO if Team Instance does not exist for provided ArmyID.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetTeamScore(const ETPSTeamID teamId);
 
@@ -179,9 +176,6 @@ public:
 	// Find a Command Unit that matches the provided UnitID
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSArmyInstance* GetArmy(const FTPSArmyID armyId);
-
-	/*UFUNCTION(BlueprintCallable)
-	void CreateTeamUnit(const FTPSUnitID unitId, const FTPSCommandUnitConfiguration unitConfig);*/
 
 	// Find a Command Unit that matches the provided UnitID
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -194,11 +188,8 @@ public:
 	////////////////////////////////////////////////////////
 	// Character CRUD
 
-	//UFUNCTION(BlueprintCallable)
-	//void CreateCharacter(const ETPSTeamID teamId);
-
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UTPSCharacterInstance* GetCharacter(const FGuid characterId);
+	UTPSCharacterInstance* GetCharacter(const FTPSCharacterID characterId);
 
 
 

@@ -39,7 +39,7 @@ protected:
 public:
 
 	////////////////////////////////////////////////////////
-	// TPSGameState
+	// State
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
 	TObjectPtr<ATPSCharacter> PossessedCharacter;

@@ -25,6 +25,6 @@ protected:
     TSubclassOf<UTPSCharacterConfiguration> DefaultCharacterTemplate;
 
 public:
-    static UTPSCharacterInstance* ConfigureCharacterInstanceForUnitAndRole(UTPSCharacterInstance* instance, FTPSUnitID unit, FTPSUnitRoleDefinitionData roleDefinition);
+    static UTPSCharacterInstance* ConfigureCharacterInstanceForUnitAndRole(UTPSCharacterInstance* instance, UTPSCommandUnit* unit, FTPSUnitRoleDefinitionData roleDefinition);
 };
 

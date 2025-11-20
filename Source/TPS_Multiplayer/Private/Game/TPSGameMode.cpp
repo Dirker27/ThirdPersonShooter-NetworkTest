@@ -7,7 +7,7 @@
 #include "Game/TPSGameState.h"
 #include "Team/TPSTeamInstanceFactory.h"
 #include "Types/TPSReport.h"
-#include "World/TPSSpawnPoint.h"
+#include "World/Spawn/TPSSpawnPoint.h"
 #include "World/TPSWorldManager.h"
 
 //~ ====================================================================== ~//
@@ -89,9 +89,23 @@ void ATPSGameMode::IndexSpawnPoints()
 	{
 		if (ATPSSpawnPoint* spawn = Cast<ATPSSpawnPoint>(sp))
 		{
-			if (UTPSTeamInstance* t = state->GetTeam(spawn->AssignedUnit.TeamID))
+			if (UTPSTeamInstance* t = state->GetTeam(spawn->AssignedTeamID))
 			{
 				t->SpawnPool->AddSpawnPointToPool(spawn);
+			}
+		}
+	}
+
+	// ALL SpawnFormations -> TEAM
+	TArray<AActor*> spawnFormations;
+	UGameplayStatics::GetAllActorsOfClass(this, ATPSSpawnFormation::StaticClass(), spawnFormations);
+	for (auto sp : spawnPoints)
+	{
+		if (ATPSSpawnFormation* formation = Cast<ATPSSpawnFormation>(sp))
+		{
+			if (UTPSTeamInstance* t = state->GetTeam(formation->AssignedTeamID))
+			{
+				t->SpawnPool->AddSpawnFormationToPool(formation);
 			}
 		}
 	}
@@ -103,7 +117,7 @@ void ATPSGameMode::SpawnTeam(ETPSTeamID teamId)
 	if (UTPSTeamInstance* t = State()->GetTeam(teamId))
 	{
 		for (auto army : t->Armies) {
-			_SpawnUnit(army->RootUnit, t->SpawnPool);
+			_SpawnUnit(army->GetRootUnit(), t->SpawnPool);
 		}
 	}
 }
@@ -112,10 +126,11 @@ void ATPSGameMode::SpawnUnit(FTPSUnitID unitId)
 {
 	ATPSGameState* state = State();
 
-	UTPSTeamInstance* team = state->GetTeam(unitId.TeamID);
 	if (UTPSCommandUnit* unit = state->GetUnit(unitId))
 	{
-		_SpawnUnit(unit, team->SpawnPool);
+		if (auto team = unit->AssignedTeam.Get()) {
+			_SpawnUnit(unit, team->SpawnPool);
+		}
 	}
 }
 
@@ -124,12 +139,10 @@ void ATPSGameMode::_SpawnUnit(UTPSCommandUnit* unit, UTPSSpawnPool* spawnPool)
 	for (auto instance : unit->GetAllMembers())
 	{
 		AActor* spawn = spawnPool->FindBestSpawnPointForUnitAndSquadRole(
-			instance->Identity.UnitID,
+			instance->AssignedUnit,
 			instance->Identity.SquadRole);
 
 		instance->SpawnActor(PlayerCharacterTemplate, spawn);
-
-		TeamInstanceFactory->ActivateCharacter(instance);
 	}
 
 	for (auto subUnit : unit->GetAllSubCollections())
@@ -169,9 +182,9 @@ void ATPSGameMode::SpawnTeams()
 }
 
 
-void ATPSGameMode::KillCharacter_Implementation(const FGuid characterId)
+void ATPSGameMode::KillCharacter_Implementation(const FTPSCharacterID characterId)
 {
-	UE_LOG(LogTemp, Log, TEXT("RECEIVED REQUEST::KillCharacter([%s])..."), *characterId.ToString());
+	UE_LOG(LogTemp, Log, TEXT("RECEIVED REQUEST::KillCharacter([%s])..."), *characterId.Guid.ToString());
 	ATPSGameState* state = GetGameState<ATPSGameState>();
 
 	if (auto character = state->GetCharacter(characterId))
@@ -236,7 +249,7 @@ AActor* ATPSGameMode::FindSpawnPointForCharacter(UTPSCharacterInstance* instance
 		return nullptr;
 	}
 
-	if (UTPSTeamInstance* team = State()->GetTeam(instance->Identity.UnitID.TeamID))
+	if (UTPSTeamInstance* team = instance->AssignedTeam.Get())
 	{
 		return team->SpawnPool->FindBestSpawnPointForSquadRole(instance->Identity.SquadRole);
 	}

@@ -116,7 +116,6 @@ void ATPSGameState::IndexTeams()
     }
 }
 
-static int _a = 0;
 void ATPSGameState::IndexArmies()
 {
     UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexArmies()..."));
@@ -125,7 +124,7 @@ void ATPSGameState::IndexArmies()
 
     for (auto army : Armies)
     {
-        ArmiesById.Add(_a++, army);
+        ArmiesById.Add(army->ArmyID, army);
     }
 }
 
@@ -137,7 +136,7 @@ void ATPSGameState::IndexTeamUnits()
 
     for (auto unit : TeamUnits)
     {
-        TeamUnitsById.Add(FTPSUnitID::HashUnitIdentifier(unit->UnitID), unit);
+        TeamUnitsById.Add(unit->UnitID, unit);
     }
 }
 
@@ -149,7 +148,8 @@ void ATPSGameState::IndexCharacters()
 
     for (auto character : Characters)
     {
-        CharactersById.Add(character->Identity.Guid, character);
+        // TODO: Use FTPSCharacterId
+        CharactersById.Add(character->CharacterID, character);
     }
 }
 
@@ -158,14 +158,6 @@ void ATPSGameState::IndexCharacters()
 //~ ==================================================================== ~//
 //  TEAM Reads
 //~ ==================================================================== ~//
-
-/*void ATPSGameState::CreateTeam(const ETPSTeamID teamId, const FTPSTeamConfiguration teamConfig)
-{
-    UTPSTeamInstance* instance = UTPSTeamInstanceFactory::NewTeamInstance(teamId, teamConfig, this);
-
-    Teams.Add(instance);
-    AddReplicatedSubObject(instance);
-}*/
 
 UTPSTeamInstance* ATPSGameState::GetTeam(const ETPSTeamID teamId)
 {
@@ -195,7 +187,7 @@ UTPSTeamInstance* ATPSGameState::GetTeam(const ETPSTeamID teamId)
 int ATPSGameState::GetActiveTeamMemberCount(const ETPSTeamID teamId)
 {
     int count = 0;
-    if (auto team = GetTeam(teamId))
+    /*if (auto team = GetTeam(teamId))
     {
         for (auto member : team->ActiveMembers)
         {
@@ -204,16 +196,16 @@ int ATPSGameState::GetActiveTeamMemberCount(const ETPSTeamID teamId)
                 count++;
             }
         }
-    }
+    }*/
     return count;
 }
 
 int ATPSGameState::GetTotalTeamMemberCount(const ETPSTeamID teamId)
 {
-    if (auto team = GetTeam(teamId))
+    /*if (auto team = GetTeam(teamId))
     {
         return team->Members.Num();
-    }
+    }*/
     return 0;
 }
 
@@ -226,7 +218,7 @@ UTPSArmyInstance* ATPSGameState::GetArmy(const FTPSArmyID armyId)
 {
     for (auto army : Armies)
     {
-        if (armyId.ID == army->ID.ID)
+        if (armyId.Guid == army->ArmyID.Guid)
         {
             return army;
         }
@@ -234,14 +226,6 @@ UTPSArmyInstance* ATPSGameState::GetArmy(const FTPSArmyID armyId)
     return nullptr;
 }
 
-
-/*void ATPSGameState::CreateTeamUnit(const FTPSUnitID unitId, const FTPSCommandUnitConfiguration unitConfig)
-{
-    UTPSCommandUnit* instance = UTPSTeamInstanceFactory::NewTeamUnitInstance(unitId, unitConfig, this);
-
-    TeamUnits.Add(instance);
-    AddReplicatedSubObject(instance);
-}*/
 
 UTPSCommandUnit* ATPSGameState::GetUnit(const FTPSUnitID unitId)
 {
@@ -252,8 +236,7 @@ UTPSCommandUnit* ATPSGameState::GetUnit(const FTPSUnitID unitId)
     }
 
     // perform quick fetch (use indexes)
-    int indexHash = FTPSUnitID::HashUnitIdentifier(unitId);
-    if (auto unit = TeamUnitsById.Find(indexHash))
+    if (auto unit = TeamUnitsById.Find(unitId))
     {
         return *unit;
     }
@@ -284,7 +267,7 @@ UTPSCharacterInstance* ATPSGameState::GetUnitLeader(const FTPSUnitID unitId)
 //~ ==================================================================== ~//
 
 
-UTPSCharacterInstance* ATPSGameState::GetCharacter(const FGuid characterId)
+UTPSCharacterInstance* ATPSGameState::GetCharacter(const FTPSCharacterID characterId)
 {
     // lazy JIT index
     if (CharactersById.IsEmpty())
@@ -301,7 +284,7 @@ UTPSCharacterInstance* ATPSGameState::GetCharacter(const FGuid characterId)
     // perform slow fetch (fallback)
     for (auto character : Characters)
     {
-        if (character->Identity.Guid == characterId)
+        if (character->CharacterID == characterId)
         {
             return character;
         }

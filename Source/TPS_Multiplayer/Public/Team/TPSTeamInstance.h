@@ -6,10 +6,9 @@
 
 #include "TPSTeamDefinition.h"
 #include "TPSTeamID.h"
-#include "Army/TPSArmy.h"
 
-#include "Army/Unit/TPSCommandUnit.h"
-#include "World/TPSSpawnPool.h"
+#include "Army/TPSArmy.h"
+#include "World/Spawn/TPSSpawnPool.h"
 
 #include "TPSTeamInstance.generated.h"
 
@@ -20,6 +19,10 @@ class TPS_MULTIPLAYER_API UTPSTeamInstance : public UObject
 
 public:
     UTPSTeamInstance();
+
+    // Broadcast Delegate - Team/Character/Player Roster Updated
+    UPROPERTY(BlueprintAssignable)
+    FArmyUpdate ArmyUpdate;
 
 protected:
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -33,10 +36,7 @@ public:
     TEnumAsByte<ETPSTeamID> TeamID;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FTPSTeamConfiguration Configuration;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-    TArray<TObjectPtr<UTPSArmyInstance>> Armies;
+    FTPSTeamConfig Configuration;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UTPSSpawnPool> SpawnPool;
@@ -49,27 +49,10 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
     int ScoredPoints;
 
-    // All characters that have *ever* been a part of this team
-    //   (incl. deceased and never-spawned)
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
-    TArray<TObjectPtr<UTPSCharacterInstance>> Members;
-
-    // All *active* (alive) characters that are a part of this team.
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
-    TArray<TObjectPtr<UTPSCharacterInstance>> ActiveMembers;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    TArray<TObjectPtr<UTPSArmyInstance>> Armies;
 
     // All *active* (connected) players that are a part of this team.
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
     TArray<TObjectPtr<UTPSCharacterInstance>> ActivePlayers;
-};
-
-
-UCLASS()
-class UTeamRosterPreset : public UDataAsset
-{
-    GENERATED_BODY()
-
-public:
-    UPROPERTY(EditDefaultsOnly)
-    TObjectPtr<UTPSCommandUnit> CommandStructure;
 };

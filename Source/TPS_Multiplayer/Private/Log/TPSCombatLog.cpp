@@ -29,10 +29,10 @@ void UTPSLogEntry::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& O
 FString UTPSEliminationEvent::ToString()
 {
 	FString killerName = Elimination.KillerCharacter
-		? Elimination.KillerCharacter->Identity.Guid.ToString()
+		? Elimination.KillerCharacter->CharacterID.Guid.ToString()
 		: "#UNKNOWN#";
 	FString victimName = Elimination.VictimCharacter
-		? Elimination.VictimCharacter->Identity.Guid.ToString()
+		? Elimination.VictimCharacter->CharacterID.Guid.ToString()
 		: "#UNKNOWN#";
 	return FString::Printf(TEXT("[%s]:|Character[%s] KILLED Character[%s] with [%s]|"),
 		*Super::ToString(),

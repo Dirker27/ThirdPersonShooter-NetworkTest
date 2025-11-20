@@ -11,7 +11,7 @@
  * Describes the behaviors of a team.
  */
 USTRUCT(BlueprintType)
-struct FTPSTeamConfiguration
+struct FTPSTeamConfig
 {
 	GENERATED_BODY()
 
@@ -38,7 +38,7 @@ struct FTPSTeamDefinitionData
 	TArray<TObjectPtr<UTPSArmyDefinition>> Armies;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FTPSTeamConfiguration Configuration;
+	FTPSTeamConfig Configuration;
 };
 
 

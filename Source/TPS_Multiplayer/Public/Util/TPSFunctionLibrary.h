@@ -3,10 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Army/Unit/TPSUnitHierarchy.h"
+
 #include "Kismet/BlueprintFunctionLibrary.h"
 
+#include "Army/Unit/TPSUnitLevel.h"
 #include "Character/TPSCharacter.h"
 #include "Character/TPSCharacterInstance.h"
+#include "Team/TPSTeamID.h"
 
 #include "TPSFunctionLibrary.generated.h"
 
@@ -55,6 +59,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static FString GetNameForUnitID(const FTPSUnitID unitID);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FString GetNameForUnitHierarchy(const FTPSUnitHierarchy hierarchy);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static int64 GetHashForUnitID(const FTPSUnitID unitId);

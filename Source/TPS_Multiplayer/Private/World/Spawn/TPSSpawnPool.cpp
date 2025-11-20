@@ -1,6 +1,8 @@
 // (C) ToasterCat Studios 2025
 
-#include "World/TPSSpawnPool.h"
+#include "World/Spawn/TPSSpawnPool.h"
+
+#include "Army/Unit/TPSUnitID.h"
 
 UTPSSpawnPool::UTPSSpawnPool()
 {
@@ -13,7 +15,13 @@ void UTPSSpawnPool::AddSpawnPointToPool(ATPSSpawnPoint* spawn)
 {
 	if (IsValid(spawn)) {
 		SpawnPoints.Add(spawn);
-		SpawnPointsById.Add(FTPSUnitID::HashUnitIdentifier(spawn->AssignedUnit), spawn);
+	}
+}
+
+void UTPSSpawnPool::AddSpawnFormationToPool(ATPSSpawnFormation* formation)
+{
+	if (IsValid(formation)) {
+		SpawnFormations.Add(formation);
 	}
 }
 
@@ -42,20 +50,20 @@ ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForSquadRole(const ETPSUnitRole
 }
 
 
-ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForUnitAndSquadRole(const FTPSUnitID unitId, const ETPSUnitRole role)
+ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForUnitAndSquadRole(const UTPSCommandUnit* unit, const ETPSUnitRole role)
 {
 	// Exact fit by Unit ID - return immediately
-	int unitHash = FTPSUnitID::HashUnitIdentifier(unitId);
+	/*int unitHash = FTPSUnitID::HashUnitIdentifier(unitId);
 	if (SpawnPointsById.Contains(unitHash))
 	{
 		auto spawn = *SpawnPointsById.Find(unitHash);
 		if (spawn->IsSpawnAvailable()) {
 			return spawn;
 		}
-	}
+	}*/
 
 	ATPSSpawnPoint* bestSpawn = FindFirstAvailableSpawnPoint();
-	ETPSUnitLevel bestLevel = ETPSUnitLevel::ROOT;
+	/*ETPSUnitLevel bestLevel = ETPSUnitLevel::ROOT;
 
 	for (auto sp : SpawnPoints)
 	{
@@ -80,8 +88,8 @@ ATPSSpawnPoint* UTPSSpawnPool::FindBestSpawnPointForUnitAndSquadRole(const FTPSU
 				bestSpawn = sp;
 				bestLevel = sp->AssignedUnit.UnitLevel;				
 			}
-		}*/
-	}
+		}
+	}*/
 
 	return bestSpawn;
 }

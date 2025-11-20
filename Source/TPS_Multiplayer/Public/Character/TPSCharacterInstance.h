@@ -4,13 +4,18 @@
 
 #include "TPSCharacter.h"
 #include "TPSCharacterConfiguration.h"
+#include "TPSCharacterID.h"
 #include "TPSCharacterIdentity.h"
 #include "TPSCharacterRecord.h"
+
 #include "Equipment/TPSEquipmentLoadout.h"
 #include "Types/TPSHitInfo.h"
 
 #include "TPSCharacterInstance.generated.h"
 
+class UTPSCommandUnit;
+class UTPSArmyInstance;
+class UTPSTeamInstance;
 
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUpdateCharacterInstanceDisplay);
@@ -50,6 +55,9 @@ public:
 //~ ==================================================================== ~//
 
 public:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+    FTPSCharacterID CharacterID;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
     FTPSOperatorIdentity Identity;
 
@@ -59,17 +67,36 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
     FTPSOperatorRecord Record;
 
+
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UTPSEquipmentLoadout> Loadout = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
     bool IsAlive = true;
 
-
-
-
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
     FTPSHitInfo LastHit;
+
+
+    ////////////////////////////////////////////////////////
+    // Assignment Info (Team/Army/Unit)
+    //
+    // TODO: Migrate to "Assignment" Struct
+
+    // Assigned Team ID
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    ETPSTeamID GetAssignedTeamID() const;
+
+    // Assigned Unit
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    TObjectPtr<UTPSCommandUnit> AssignedUnit;
+    // Assigned Army
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    TObjectPtr<UTPSArmyInstance> AssignedArmy;
+    // Assigned Team
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    TObjectPtr<UTPSTeamInstance> AssignedTeam;
 
 
 

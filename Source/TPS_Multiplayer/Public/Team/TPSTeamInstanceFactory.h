@@ -57,13 +57,8 @@ public:
     UFUNCTION(BlueprintCallable)
     void AssignCharacterToTeamUnit(const FTPSUnitID unitId, UTPSCharacterInstance* character);
 
-
-    //~ Team Member / Character CRUD ~//
-
-    UFUNCTION(BlueprintCallable)
-    void ActivateCharacter(UTPSCharacterInstance* instance);
-
 private:
+    void _ConfigureArmy(UTPSArmyInstance* army, FTPSArmyDefinitionData data);
     void _ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSchemaData schema);
     void _PopulateUnit(UTPSCommandUnit* node);
     UTPSCharacterInstance* _NewCharacter();

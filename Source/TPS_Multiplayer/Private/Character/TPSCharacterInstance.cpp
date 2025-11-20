@@ -5,6 +5,7 @@
 #include "Net/UnrealNetwork.h"
 
 #include "Character/TPSCharacter.h"
+#include "Team/TPSTeamInstance.h"
 
 UTPSCharacterInstance::UTPSCharacterInstance()
 {
@@ -38,8 +39,6 @@ void UTPSCharacterInstance::SpawnActor(TSubclassOf<ATPSCharacter> actorTemplate,
 		actorTemplate,
 		spawnPoint->GetTransform());
 
-	//characterActor->Identity = Identity;
-	//characterActor->Configuration = Configuration;
 	characterActor->EquipmentManager->Loadout = Loadout;
 	characterActor->BindToCharacterInstance(this);
 
@@ -60,6 +59,17 @@ void UTPSCharacterInstance::DestroyActor()
 	}
 	SpawnedActor = nullptr;
 }
+
+
+ETPSTeamID UTPSCharacterInstance::GetAssignedTeamID() const
+{
+	if (IsValid(AssignedTeam.Get()))
+	{
+		return AssignedTeam.Get()->TeamID;
+	}
+	return ETPSTeamID::UNAFFILIATED;
+}
+
 
 
 

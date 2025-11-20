@@ -5,8 +5,10 @@
 
 #include <Kismet/GameplayStatics.h>
 
+#include "Army/Unit/TPSUnitHierarchy.h"
 #include "Character/TPSCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Team/TPSTeamID.h"
 
 AActor* UTPSFunctionLibrary::GetNearestActorOfClass(const UObject* worldContextObject, TSubclassOf<AActor> actorClass, FVector location, float radius)
 {
@@ -153,14 +155,19 @@ FString UTPSFunctionLibrary::GetNameForUnitID(const FTPSUnitID unitId)
     return TPSUnitIdToString(unitId);
 }
 
+FString UTPSFunctionLibrary::GetNameForUnitHierarchy(const FTPSUnitHierarchy hierarchy)
+{
+    return TPSUnitHierarchyToString(hierarchy);
+}
+
 int64 UTPSFunctionLibrary::GetHashForUnitID(const FTPSUnitID unitId)
 {
-    return FTPSUnitID::HashUnitIdentifier(unitId);
+    return 0;
 }
 
 int64 UTPSFunctionLibrary::GetHashForUnitHierarchy(const FTPSUnitID unitId)
 {
-    return FTPSUnitID::HashHierarchy(unitId);
+    return 0;
 }
 
 
@@ -172,10 +179,6 @@ FString UTPSFunctionLibrary::GetAbbreviationForRank(const ETPSCharacterRank rank
 FTPSUnitID UTPSFunctionLibrary::MakeChildUnitID(FTPSUnitID parentId, ETPSUnitLevel childLevel, int childNumber)
 {
     FTPSUnitID id = FTPSUnitID();
-    id.Hierarchy = FTPSUnitHierarchy::AppendLevelNumber(id.Hierarchy, id.UnitLevel, id.UnitNumber);
-    id.TeamID = parentId.TeamID;
-    id.UnitLevel = childLevel;
-    id.UnitNumber = childNumber;
 
     return id;
 }

@@ -3,8 +3,9 @@
 #pragma once
 
 #include "TPSUnitIdentity.h"
-#include "Army/Unit/TPSUnitSchema.h"
-#include "Army/Unit/TPSCommandGroup.h"
+#include "TPSUnitSchema.h"
+#include "TPSCommandGroup.h"
+
 #include "Character/TPSCharacterInstance.h"
 
 #include "TPSCommandUnit.generated.h"
@@ -33,9 +34,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UTPSUnitIdentity> Identity;
 
+	// TODO: Migrate to "Assignment" Struct
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TWeakObjectPtr<UTPSArmyInstance> AssignedArmy;
+
+	// TODO: Migrate to "Assignment" Struct
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TWeakObjectPtr<UTPSTeamInstance> AssignedTeam;
+
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	TWeakObjectPtr<UTPSCharacterInstance> Leader;
+
 
 public:
 	UFUNCTION(BlueprintCallable)

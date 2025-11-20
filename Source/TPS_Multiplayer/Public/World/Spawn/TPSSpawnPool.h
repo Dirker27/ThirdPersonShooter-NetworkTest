@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TPSSpawnFormation.h"
 
-#include "World/TPSSpawnPoint.h"
+#include "World/Spawn/TPSSpawnPoint.h"
 
 #include "TPSSpawnPool.generated.h"
 
@@ -22,6 +23,9 @@ protected:
 	TArray<TObjectPtr<ATPSSpawnPoint>> SpawnPoints;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TArray<TObjectPtr<ATPSSpawnFormation>> SpawnFormations;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TMap<int, TObjectPtr<ATPSSpawnPoint>> SpawnPointsById;
 
 public:
@@ -31,6 +35,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddSpawnPointToPool(ATPSSpawnPoint* spawn);
 
+	UFUNCTION(BlueprintCallable)
+	void AddSpawnFormationToPool(ATPSSpawnFormation* formation);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ATPSSpawnPoint* FindFirstAvailableSpawnPoint();
 
@@ -38,6 +45,6 @@ public:
 	ATPSSpawnPoint* FindBestSpawnPointForSquadRole(const ETPSUnitRole role);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ATPSSpawnPoint* FindBestSpawnPointForUnitAndSquadRole(const FTPSUnitID unitId, const ETPSUnitRole role);
+	ATPSSpawnPoint* FindBestSpawnPointForUnitAndSquadRole(const UTPSCommandUnit* unit, const ETPSUnitRole role);
 
 };

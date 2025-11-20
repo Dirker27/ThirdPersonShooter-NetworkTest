@@ -143,7 +143,7 @@ private:
 public:
 	// Character Death - invoked by admin or character on death detection
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void KillCharacter(const FGuid characterId);
+	void KillCharacter(const FTPSCharacterID characterId);
 
 	// Event Listener
 	UFUNCTION(BlueprintImplementableEvent)
