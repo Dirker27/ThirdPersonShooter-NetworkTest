@@ -63,17 +63,15 @@ void UTPSTeamInstanceFactory::ConfigureTeam(const ETPSTeamID teamId, FTPSTeamDef
 				state, 
 				UTPSArmyInstance::StaticClass(),
 				FName(FString("ARMY-").Append(def->Definition.ArmyID.Guid.ToString())));
-			army->AssignTeam(team->TeamID);
+			army->AssignToTeam(team);
 			_ConfigureArmy(army, def->Definition);
 
 			if (IsValid(def->Definition.RootUnitSchema))
 			{
 				UTPSCommandUnit* unit = NewObject<UTPSCommandUnit>(state, UTPSCommandUnit::StaticClass());
-				unit->AssignedArmy = army;
-				unit->AssignedTeam = team;
 				unit->UnitNumber = 1;
 
-				_ConfigureUnit(unit, def->Definition.RootUnitSchema->Schema);
+				_ConfigureUnit(unit, def->Definition.RootUnitSchema->Schema, army);
 				army->AssignRootUnit(unit);
 			}
 
@@ -98,7 +96,7 @@ void UTPSTeamInstanceFactory::_ConfigureArmy(UTPSArmyInstance* army, FTPSArmyDef
 
 
 // TODO: Migrate to UnitFactory
-void UTPSTeamInstanceFactory::_ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSchemaData schema)
+void UTPSTeamInstanceFactory::_ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSchemaData schema, UTPSArmyInstance* army)
 {
 	if (!IsValid(node)) { return; }
 	UE_LOG(LogTemp, Log, TEXT("Configuring Unit[%s]..."), *UTPSFunctionLibrary::GetNameForUnitID(node->UnitID));
@@ -107,15 +105,14 @@ void UTPSTeamInstanceFactory::_ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSche
 
 	node->UnitLevel = schema.Level;
 	node->Schema = schema;
+	army->AddUnit(node);
 
 	int unitNum = 1;
 	for (auto subUnitSchema : schema.SubUnitDefinitions)
 	{
 		UTPSCommandUnit* subUnit = NewObject<UTPSCommandUnit>(state, UTPSCommandUnit::StaticClass());
 		subUnit->UnitNumber = unitNum++;
-		subUnit->AssignedTeam = node->AssignedTeam;
-		subUnit->AssignedArmy = node->AssignedArmy;
-		_ConfigureUnit(subUnit, subUnitSchema->Schema);
+		_ConfigureUnit(subUnit, subUnitSchema->Schema, army);
 		node->AddSubCollection(subUnit);
 	}
 
@@ -145,10 +142,7 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandUnit* node)
 
 		// Store
 		node->AddMember(instance);
-		if (IsValid(node->AssignedArmy.Get()))
-		{
-			node->AssignedArmy->AddMember(instance);
-		}
+		instance->AssignToUnit(node);
 
 		ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
 		state->Characters.Add(instance);

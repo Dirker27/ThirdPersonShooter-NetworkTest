@@ -128,7 +128,7 @@ void ATPSGameMode::SpawnUnit(FTPSUnitID unitId)
 
 	if (UTPSCommandUnit* unit = state->GetUnit(unitId))
 	{
-		if (auto team = unit->AssignedTeam.Get()) {
+		if (auto team = unit->GetAssignedTeam()) {
 			_SpawnUnit(unit, team->SpawnPool);
 		}
 	}
@@ -139,7 +139,7 @@ void ATPSGameMode::_SpawnUnit(UTPSCommandUnit* unit, UTPSSpawnPool* spawnPool)
 	for (auto instance : unit->GetAllMembers())
 	{
 		AActor* spawn = spawnPool->FindBestSpawnPointForUnitAndSquadRole(
-			instance->AssignedUnit,
+			instance->GetAssignedUnit(),
 			instance->Identity.SquadRole);
 
 		instance->SpawnActor(PlayerCharacterTemplate, spawn);
@@ -249,7 +249,7 @@ AActor* ATPSGameMode::FindSpawnPointForCharacter(UTPSCharacterInstance* instance
 		return nullptr;
 	}
 
-	if (UTPSTeamInstance* team = instance->AssignedTeam.Get())
+	if (UTPSTeamInstance* team = instance->GetAssignedTeam())
 	{
 		return team->SpawnPool->FindBestSpawnPointForSquadRole(instance->Identity.SquadRole);
 	}

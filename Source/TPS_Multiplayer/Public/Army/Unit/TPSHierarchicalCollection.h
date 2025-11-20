@@ -28,19 +28,24 @@ class TPS_MULTIPLAYER_API UTPSHierarchicalCollection : public UObject
 public:
 	UTPSHierarchicalCollection();
 
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual bool IsSupportedForNetworking() const override;
+
+public:
 	// Composite UnitID - unique to the active trie (but not globally)
 	//
 	// Level + UnitID == "Squad 2"
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	FTPSUnitID UnitID;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	FTPSUnitHierarchy Hierarchy;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	TEnumAsByte<ETPSUnitLevel> UnitLevel;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	int UnitNumber;
 
 	// Broadcast Delegate - Team/Character/Player Roster Updated
@@ -49,13 +54,13 @@ public:
 
 protected:
 	// TODO: Make Generic/Template
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
 	TArray<TObjectPtr<UTPSCharacterInstance>> Members;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UTPSHierarchicalCollection> ParentCollection;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated)
 	TArray<TObjectPtr<UTPSHierarchicalCollection>> SubCollections;
 
 //~ ======================================================================== ~//
@@ -81,12 +86,15 @@ public:
 	TArray<UTPSHierarchicalCollection*> GetAllSubCollections();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UTPSCharacterInstance* GetMember(int targetIdNumber);
+	UTPSCharacterInstance* GetMember(int targetIdNumber) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	TArray<UTPSCharacterInstance*> GetAllMembers();
+	TArray<UTPSCharacterInstance*> GetAllMembers() const;
 
 public:
+
+	// TODO: Migrate to Function Library
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static ETPSUnitLevel LevelDown(ETPSUnitLevel level);
 

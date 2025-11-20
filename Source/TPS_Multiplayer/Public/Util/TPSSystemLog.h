@@ -35,8 +35,10 @@ enum ETPSLogSource : int
 	Character,
 	Weapon,
 
-	GameMode,
+	Army,
+	Network,
 
+	GameMode,
 	GameState
 };
 

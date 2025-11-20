@@ -9,9 +9,9 @@ void UTPSArmyInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(UTPSArmyInstance, ArmyID);
-    DOREPLIFETIME(UTPSArmyInstance, TeamID);
     DOREPLIFETIME(UTPSArmyInstance, Identity);
     DOREPLIFETIME(UTPSArmyInstance, RootUnit);
+    DOREPLIFETIME(UTPSArmyInstance, OwningPlayer);
 }
 
 bool UTPSArmyInstance::IsSupportedForNetworking() const
@@ -32,11 +32,20 @@ void UTPSArmyInstance::Initialize(FTPSArmyID id, UTPSArmyIdentity* ident)
     ArmyUpdate.Broadcast();
 }
 
-void UTPSArmyInstance::AssignTeam(const ETPSTeamID team)
+void UTPSArmyInstance::AssignToTeam(UTPSTeamInstance* team)
 {
-    TeamID = team;
+    AssignedTeam = team;
     ArmyUpdate.Broadcast();
 }
+
+// TODO: Elevate to "TeamAssignable" Interface
+ETPSTeamID UTPSArmyInstance::GetAssignedTeamID() const
+{
+    return IsValid(AssignedTeam.Get())
+        ? AssignedTeam->TeamID
+        : ETPSTeamID::UNAFFILIATED;
+}
+
 
 void UTPSArmyInstance::AssignRootUnit(UTPSCommandUnit* unit)
 {
@@ -47,6 +56,8 @@ void UTPSArmyInstance::AssignRootUnit(UTPSCommandUnit* unit)
 void UTPSArmyInstance::AddUnit(UTPSCommandUnit* unit)
 {
     Units.Add(unit);
+    unit->AssignToArmy(this);
+
     ArmyUpdate.Broadcast();
 }
 
@@ -56,7 +67,7 @@ void UTPSArmyInstance::AddMember(UTPSCharacterInstance* instance)
     ArmyUpdate.Broadcast();
 }
 
-void UTPSArmyInstance::BindToPlayer(const FTPSPlayerID playerId)
+void UTPSArmyInstance::BindToPlayer(ATPSPlayerState* player)
 {
-    OwningPlayer = playerId;
+    OwningPlayer = player;
 }

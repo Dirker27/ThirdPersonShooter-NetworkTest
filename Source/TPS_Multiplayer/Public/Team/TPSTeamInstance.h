@@ -12,6 +12,9 @@
 
 #include "TPSTeamInstance.generated.h"
 
+UDELEGATE(BlueprintAuthorityOnly)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTeamUpdate);
+
 UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSTeamInstance : public UObject
 {
@@ -22,7 +25,7 @@ public:
 
     // Broadcast Delegate - Team/Character/Player Roster Updated
     UPROPERTY(BlueprintAssignable)
-    FArmyUpdate ArmyUpdate;
+    FArmyUpdate TeamUpdate;
 
 protected:
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

@@ -2,9 +2,30 @@
 
 #include "Army/Unit/TPSHierarchicalCollection.h"
 
+#include "Net/UnrealNetwork.h"
+
 UTPSHierarchicalCollection::UTPSHierarchicalCollection()
 {
 }
+
+void UTPSHierarchicalCollection::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, UnitID);
+	DOREPLIFETIME(ThisClass, Hierarchy);
+	DOREPLIFETIME(ThisClass, UnitLevel);
+	DOREPLIFETIME(ThisClass, UnitNumber);
+	DOREPLIFETIME(ThisClass, Members);
+	DOREPLIFETIME(ThisClass, ParentCollection);
+	DOREPLIFETIME(ThisClass, SubCollections);
+}
+
+bool UTPSHierarchicalCollection::IsSupportedForNetworking() const
+{
+	return true;
+}
+
 
 
 bool UTPSHierarchicalCollection::AddMember(UTPSCharacterInstance* member)
@@ -12,6 +33,9 @@ bool UTPSHierarchicalCollection::AddMember(UTPSCharacterInstance* member)
 	if (CanAddMember(member))
 	{
 		int idNumber = Members.Add(member);
+		//member->AssignToUnit(this);
+
+		UnitUpdate.Broadcast();
 		return true;
 	}
 	return false;
@@ -22,6 +46,7 @@ bool UTPSHierarchicalCollection::AddSubCollection(UTPSHierarchicalCollection* su
 	if (CanAddSubCollection(subCollection))
 	{
 		int index = SubCollections.Add(subCollection);
+		UnitUpdate.Broadcast();
 		return true;
 	}
 	return false;
@@ -33,10 +58,9 @@ bool UTPSHierarchicalCollection::RemoveMember(const int idNumber)
 
 	if (auto member = Members[idNumber])
 	{
-		member->AssignedUnit = nullptr;
-		member->AssignedArmy = nullptr;
-		member->AssignedTeam = nullptr;
+		member->ClearAssignment();
 
+		UnitUpdate.Broadcast();
 		return true;
 	}
 	return false;
@@ -49,6 +73,7 @@ bool UTPSHierarchicalCollection::RemoveSubCollection(const int idNumber)
 	if (auto subCollection = SubCollections[idNumber])
 	{
 		subCollection->Hierarchy = FTPSUnitHierarchy();
+		UnitUpdate.Broadcast();
 		return true;
 	}
 	return false;
@@ -88,14 +113,14 @@ TArray<UTPSHierarchicalCollection*> UTPSHierarchicalCollection::GetAllSubCollect
 
 
 
-UTPSCharacterInstance* UTPSHierarchicalCollection::GetMember(int targetIdNumber)
+UTPSCharacterInstance* UTPSHierarchicalCollection::GetMember(int targetIdNumber) const
 {
 	if (targetIdNumber >= Members.Num()) { return nullptr; }
 
 	return Members[targetIdNumber];
 }
 
-TArray<UTPSCharacterInstance*> UTPSHierarchicalCollection::GetAllMembers()
+TArray<UTPSCharacterInstance*> UTPSHierarchicalCollection::GetAllMembers() const
 {
 	return Members;
 }

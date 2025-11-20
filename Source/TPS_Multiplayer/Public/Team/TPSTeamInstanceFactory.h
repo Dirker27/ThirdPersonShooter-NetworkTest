@@ -59,7 +59,7 @@ public:
 
 private:
     void _ConfigureArmy(UTPSArmyInstance* army, FTPSArmyDefinitionData data);
-    void _ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSchemaData schema);
+    void _ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSchemaData schema, UTPSArmyInstance* army);
     void _PopulateUnit(UTPSCommandUnit* node);
     UTPSCharacterInstance* _NewCharacter();
 };

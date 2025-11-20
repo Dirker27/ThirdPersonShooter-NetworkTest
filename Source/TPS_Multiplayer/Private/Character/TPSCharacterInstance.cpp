@@ -9,9 +9,6 @@
 
 UTPSCharacterInstance::UTPSCharacterInstance()
 {
-	//Identity = CreateDefaultSubobject<UTPSCharacterIdentity>(TEXT("Identity"));
-	//Configuration = CreateDefaultSubobject<UTPSCharacterConfiguration>(TEXT("Configuration"));
-	//Record = CreateDefaultSubobject<UTPSCharacterRecord>(TEXT("Record"));
 }
 
 void UTPSCharacterInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -68,6 +65,28 @@ ETPSTeamID UTPSCharacterInstance::GetAssignedTeamID() const
 		return AssignedTeam.Get()->TeamID;
 	}
 	return ETPSTeamID::UNAFFILIATED;
+}
+
+
+
+void UTPSCharacterInstance::AssignToUnit(UTPSCommandUnit* unit)
+{
+	if (!IsValid(unit)) { return; }
+
+	AssignedUnit = unit;
+	AssignedArmy = unit->AssignedArmy;
+	AssignedTeam = unit->AssignedTeam;
+
+	NotifyDisplayWidgets.Broadcast();
+}
+
+void UTPSCharacterInstance::ClearAssignment()
+{
+	AssignedUnit = nullptr;
+	AssignedArmy = nullptr;
+	AssignedTeam = nullptr;
+
+	NotifyDisplayWidgets.Broadcast();
 }
 
 

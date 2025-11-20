@@ -71,7 +71,7 @@ void UTPSAbilitySystemComponent::GrantPlayerBasedAbilities(UAbilitySet* abilityS
     UE_LOG(LogTemp, Log, TEXT("ASC for Actor[%s] updated."), *GetOwnerActor()->GetName());
     for (auto ability : GetActivatableAbilities())
     {
-        UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
+        //UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
     }
 }
 
@@ -81,7 +81,7 @@ void UTPSAbilitySystemComponent::RevokePlayerBasedAbilities()
 
     RevokeAbilities(PlayerBasedAbilitySpecHandles);
 
-    UE_LOG(LogTemp, Log, TEXT("Binding ASC to Owner's InputComponent..."));
+    UE_LOG(LogTemp, Log, TEXT("Abilities revoked from Actor[%s]."), *GetOwnerActor()->GetName());
     for (auto ability : GetActivatableAbilities())
     {
         UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);

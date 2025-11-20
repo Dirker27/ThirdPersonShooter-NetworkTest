@@ -1,7 +1,6 @@
 #include "GAS/TPSGameplayAbility.h"
 
 #include "AbilitySystemComponent.h"
-#include "GameplayTagContainer.h"
 
 UTPSGameplayAbility::UTPSGameplayAbility()
 {
@@ -34,26 +33,26 @@ void UTPSGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (HasAuthority(&ActivationInfo))
+	/*if (HasAuthority(&ActivationInfo))
 	{
 		UE_LOG(LogTemp, Log, TEXT("[SERVER] Ability[%s] START."), *GetName());
 	}
 	else
 	{
 		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Ability[%s] START."), *GetName());
-	}
+	}*/
 }
 
 void UTPSGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
-	if (HasAuthority(&ActivationInfo))
+	/*if (HasAuthority(&ActivationInfo))
 	{
 		UE_LOG(LogTemp, Log, TEXT("[SERVER] Ability[%s] END."), *GetName());
 	}
 	else
 	{
 		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Ability[%s] END."), *GetName());
-	}
+	}*/
 }

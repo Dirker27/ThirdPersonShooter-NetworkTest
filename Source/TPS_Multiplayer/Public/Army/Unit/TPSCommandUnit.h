@@ -17,6 +17,10 @@
 UCLASS()
 class TPS_MULTIPLAYER_API UTPSCommandUnit : public UTPSCommandGroup
 {
+	friend class UTPSArmyInstance;
+	friend class UTPSCharacterInstance;
+	friend class UTPSTeamInstance;
+
 	GENERATED_BODY()
 
 public:
@@ -31,17 +35,37 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTPSUnitSchemaData Schema;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UTPSUnitIdentity> Identity;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	FTPSUnitIdentityData Identity;
 
+
+
+protected:
+	////////////////////////////////////////////////////////
+	// Assignment Info (Team/Army/Unit)
+	//
 	// TODO: Migrate to "Assignment" Struct
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	TWeakObjectPtr<UTPSArmyInstance> AssignedArmy;
 
-	// TODO: Migrate to "Assignment" Struct
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	TWeakObjectPtr<UTPSTeamInstance> AssignedTeam;
 
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSTeamInstance* GetAssignedTeam() { return AssignedTeam.Get(); }
+
+	// Assigned Team ID
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ETPSTeamID GetAssignedTeamID() const;
+
+	UFUNCTION(BlueprintCallable)
+	void AssignToArmy(UTPSArmyInstance* army);
+
+
+	////////////////////////////////////////////////////////
+	// Leadership Info (Team/Army/Unit)
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)

@@ -27,6 +27,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUpdateCharacterInstanceDisplay);
 UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSCharacterInstance : public UObject
 {
+    friend class UTPSCommandUnit;
+
     GENERATED_BODY()
 
 public:
@@ -84,19 +86,35 @@ public:
     //
     // TODO: Migrate to "Assignment" Struct
 
+protected:
+    // Assigned Unit
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    TWeakObjectPtr<UTPSCommandUnit> AssignedUnit;
+    // Assigned Army
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    TWeakObjectPtr<UTPSArmyInstance> AssignedArmy;
+    // Assigned Team
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    TWeakObjectPtr<UTPSTeamInstance> AssignedTeam;
+
+public:
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    UTPSCommandUnit* GetAssignedUnit() { return AssignedUnit.Get(); }
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    UTPSTeamInstance* GetAssignedTeam() { return AssignedTeam.Get(); }
+
     // Assigned Team ID
     UFUNCTION(BlueprintCallable, BlueprintPure)
     ETPSTeamID GetAssignedTeamID() const;
 
-    // Assigned Unit
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-    TObjectPtr<UTPSCommandUnit> AssignedUnit;
-    // Assigned Army
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-    TObjectPtr<UTPSArmyInstance> AssignedArmy;
-    // Assigned Team
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-    TObjectPtr<UTPSTeamInstance> AssignedTeam;
+    // Assigned Team ID
+    UFUNCTION(BlueprintCallable)
+    void AssignToUnit(UTPSCommandUnit* unit);
+
+    UFUNCTION(BlueprintCallable)
+    void ClearAssignment();
+
 
 
 

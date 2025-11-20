@@ -21,8 +21,11 @@ FLinearColor UTPSSystemLog::GetColorForLog(ETPSLogSource source)
 		return FLinearColor::FromSRGBColor(FColor::White);
 	case GameState:
 		return FLinearColor::Green;
+	case Army:
+		return FLinearColor::FromSRGBColor(FColor::FromHex("AAFFAAAA"));
+	default:
+		return FLinearColor::Black;
 	}
-	return FLinearColor::Black;
 }
 
 

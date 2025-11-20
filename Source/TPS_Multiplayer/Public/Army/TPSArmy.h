@@ -7,12 +7,13 @@
 #include "Army/TPSArmyID.h"
 #include "Army/TPSArmyIdentity.h"
 #include "Army/Unit/TPSCommandUnit.h"
-#include "Player/TPSPlayerID.h"
 #include "Player/TPSPlayerState.h"
 #include "Team/TPSTeamID.h"
 
 #include "TPSArmy.generated.h"
 
+
+class UTPSTeamInstance;
 
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FArmyUpdate);
@@ -20,6 +21,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FArmyUpdate);
 UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSArmyInstance : public UObject
 {
+    friend class UTPSCommandUnit;
+
     GENERATED_BODY()
 
 public:
@@ -52,13 +55,11 @@ private:
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
-    TEnumAsByte<ETPSTeamID> TeamID;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
     TObjectPtr<UTPSCommandUnit> RootUnit;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
-    FTPSPlayerID OwningPlayer;
+    TWeakObjectPtr<ATPSPlayerState> OwningPlayer;
+
 
 
     // All characters that have *ever* been a part of this army
@@ -66,13 +67,26 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
     TArray<TObjectPtr<UTPSCharacterInstance>> Members;
 
-
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
+    TArray<TObjectPtr<UTPSCharacterInstance>> ActiveMembers;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
     TArray<TObjectPtr<UTPSCommandUnit>> Units;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
-    TArray<TObjectPtr<UTPSCharacterInstance>> ActiveMembers;
+
+
+
+    ////////////////////////////////////////////////////////
+    // Assignment Info (Team/Army/Unit)
+    //
+protected:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    TWeakObjectPtr<UTPSTeamInstance> AssignedTeam;
+
+public:
+    // Assigned Team ID
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    ETPSTeamID GetAssignedTeamID() const;
 
 
 //~ ==================================================================== ~//
@@ -83,7 +97,7 @@ public:
     void Initialize(FTPSArmyID id, UTPSArmyIdentity* ident);
 
     UFUNCTION(BlueprintCallable)
-    void AssignTeam(const ETPSTeamID team);
+    void AssignToTeam(UTPSTeamInstance* team);
 
     UFUNCTION(BlueprintCallable)
     void AssignRootUnit(UTPSCommandUnit* unit);
@@ -98,5 +112,5 @@ public:
     void AddMember(UTPSCharacterInstance* instance);
 
     UFUNCTION(BlueprintCallable)
-    void BindToPlayer(const FTPSPlayerID player);
+    void BindToPlayer(ATPSPlayerState* player);
 };

@@ -555,11 +555,6 @@ UTPSCharacterInstance* UTPSCharacterInstanceFactory::ConfigureCharacterInstanceF
 	//
 	instance->CharacterID.Guid = FGuid::NewGuid();
 
-	// Assign to Command Hierarchy
-	instance->AssignedTeam = unit->AssignedTeam.Get();
-	instance->AssignedArmy = unit->AssignedArmy.Get();
-	instance->AssignedUnit = unit;
-
 	// Coin flip for gender - 50%
 	bool isMale = FMath::RandRange(0, 1) > 0;
 	if (isMale) {
