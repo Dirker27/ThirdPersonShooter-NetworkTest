@@ -24,6 +24,11 @@ public:
 		return Guid == other.Guid;
 	}
 
+	FString ToString() const
+	{
+		return Guid.ToString();
+	}
+
 	friend uint32 GetTypeHash(const FTPSUnitID& id)
 	{
 		return uint32(CityHash64((char*)&id.Guid, sizeof(FGuid)));

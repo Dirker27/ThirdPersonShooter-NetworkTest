@@ -37,19 +37,26 @@ protected:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS")
-	TObjectPtr<UTPSTeamInstanceFactory> TeamInstanceFactory;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS")
 	TObjectPtr<UTPSWorldManager> WorldManager;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS")
-	TObjectPtr<UTPSCharacterInstanceFactory> CharacterInstanceFactory;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS")
 	TObjectPtr<UTPSCombatLog> CombatLog;
-
 
 //~ ==================================================================== ~//
 //  CONFIGURATION
 //~ ==================================================================== ~//
 public:
+
+	// Should we run in DEBUG mode?
+	//
+	// TODO: Cascade this setting to peer actors that support Debug modes.
+	//   - https://toastercatstudios.atlassian.net/browse/PC-71
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "TPS|Debug")
+	bool IsDebugEnabled = false;
+
+
+	////////////////////////////////////////////////////////
+	// Game Type / Objectives
+
 	// Display name for the GameType - "DeathMatch", "Capture the Flag", etc.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
 	FString GameTypeName;
@@ -68,20 +75,42 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
 	double TimeLimitSeconds;
 
-	// Should we run in DEBUG mode?
-	// TODO: Cascade this setting to peer actors that support Debug modes.
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="TPS|Debug")
-	bool IsDebugEnabled = false;
+	////////////////////////////////////////////////////////
+	// Gameplay Functions
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPS|Config")
+	TSubclassOf<ATPSCharacter> DefaultCharacterTemplate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPS|Schema")
-	TSubclassOf<ATPSCharacter> PlayerCharacterTemplate;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|Schema")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|Config")
 	TSubclassOf<ATPSCharacter> BotTemplate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPS|Schema")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPS|Config")
 	TMap<TEnumAsByte<ETPSTeamID>, TObjectPtr<UTPSTeamDefinition>> TeamDefinitionMap;
+
+
+	////////////////////////////////////////////////////////
+	// Factories / Instance Providers
+	//
+	// TODO: Abstract Factories to "Provider" classes that can deserialize
+	//   instances from Back-End player profiles / DB.
+
+	// Team Instance Provider
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPS|Config")
+	TObjectPtr<UTPSTeamInstanceFactory> TeamFactory;
+
+	// Army Instance Provider
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPS|Config")
+	TObjectPtr<UTPSArmyInstanceFactory> ArmyFactory;
+
+	// Unit Instance Provider
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPS|Config")
+	TObjectPtr<UTPSUnitInstanceFactory> UnitFactory;
+
+	// Character Instance Provider
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TPS|Config")
+	TObjectPtr<UTPSCharacterInstanceFactory> CharacterFactory;
+
+
 
 //~ ============================================================= ~//
 //  OPERATIONS
@@ -114,7 +143,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void InitializeTeams();
 
-	// Populates a Team and its sub-units with generated Character instances.
+	// Populates a Team by instantiating and registering armies and
+	//   sub-units with generated Character instances.
+	// TODO: Fetch instances from Player-supplied Units and Rosters
 	UFUNCTION(BlueprintCallable)
 	void PopulateTeams();
 
@@ -123,17 +154,28 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void IndexSpawnPoints();
 
+
 	// Spawn all teams with Instances defined entire team.
 	UFUNCTION(BlueprintCallable)
 	void SpawnTeams();
 
 	// Spawn an entire team.
 	UFUNCTION(BlueprintCallable)
-	void SpawnTeam(ETPSTeamID teamId);
+	bool SpawnTeam(ETPSTeamID teamId);
+
+	// Spawn a specific army (including ALL sub-units)
+	UFUNCTION(BlueprintCallable)
+	bool SpawnArmy(FTPSArmyID unitId);
 
 	// Spawn a specific unit (including sub-units)
 	UFUNCTION(BlueprintCallable)
-	void SpawnUnit(FTPSUnitID unitId);
+	bool SpawnUnit(FTPSUnitID unitId);
+
+	// Spawn a specific character
+	UFUNCTION(BlueprintCallable)
+	bool SpawnCharacter(FTPSCharacterID characterId);
+
+
 private:
 	void _SpawnUnit(UTPSCommandUnit* unit, UTPSSpawnPool* spawnPool);
 

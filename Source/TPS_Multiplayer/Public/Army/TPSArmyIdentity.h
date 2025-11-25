@@ -30,10 +30,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FLinearColor BannerColor = FLinearColor::Black;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTPSUnitIdentifier* FlagshipUnit ;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGuid LeadCharacterId;
 };

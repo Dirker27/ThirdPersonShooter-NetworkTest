@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "Components/ActorComponent.h"
-
 #include "TPSTeamInstance.h"
+#include "Army/TPSArmyInstanceFactory.h"
+#include "Army/Unit/TPSUnitInstanceFactory.h"
+#include "Character/TPSCharacterInstanceFactory.h"
 
 #include "TPSTeamInstanceFactory.generated.h"
 
@@ -15,27 +16,29 @@
 UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSTeamInstanceFactory : public UActorComponent
 {
+    friend class ATPSGameMode;
+
     GENERATED_BODY()
 
 public:
     UTPSTeamInstanceFactory();
 
 protected:
-    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TObjectPtr<UTPSArmyInstanceFactory> ArmyFactory;
 
-//~ ==================================================================== ~//
-//  STATE
-//~ ==================================================================== ~//
-private:
-    /* STUB */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TObjectPtr<UTPSUnitInstanceFactory> UnitFactory;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TObjectPtr<UTPSCharacterInstanceFactory> CharacterFactory;
 
 //~ ==================================================================== ~//
 //  OPERATIONS
 //~ ==================================================================== ~//
 public:
-
-    static UTPSTeamInstance* NewTeamInstance(const ETPSTeamID teamId, const FTPSTeamDefinitionData teamConfig, AActor* owner);
-    static UTPSCommandUnit* NewTeamUnitInstance(const FTPSUnitID teamId, const FTPSUnitSchemaData unitConfig, AActor* owner);
+    UTPSTeamInstance* NewTeamInstance(const ETPSTeamID teamId, const FTPSTeamDefinitionData teamConfig, AActor* owner);
+    UTPSCommandUnit* NewTeamUnitInstance(const FTPSUnitID teamId, const FTPSUnitSchemaData unitConfig, AActor* owner);
 
 
     //~ Team CRUD ~//
@@ -49,15 +52,13 @@ public:
     UFUNCTION(BlueprintCallable)
     void PopulateTeam(const ETPSTeamID teamId, TArray<UTPSCharacterInstance*> roster);
 
-    // Assign the Character to a Team, choosing an appropriate unit to fill.
-    UFUNCTION(BlueprintCallable)
-    void AssignCharacterToTeam(const ETPSTeamID teamId, UTPSCharacterInstance* character);
-
     // Assign the Character to a specific Unit within a Team.
     UFUNCTION(BlueprintCallable)
     void AssignCharacterToTeamUnit(const FTPSUnitID unitId, UTPSCharacterInstance* character);
 
 private:
+    ATPSGameState* State() const;
+
     void _ConfigureArmy(UTPSArmyInstance* army, FTPSArmyDefinitionData data);
     void _ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSchemaData schema, UTPSArmyInstance* army);
     void _PopulateUnit(UTPSCommandUnit* node);

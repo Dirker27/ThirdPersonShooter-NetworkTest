@@ -88,6 +88,9 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintPure)
     ETPSTeamID GetAssignedTeamID() const;
 
+    // Assigned Team ID
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    UTPSTeamInstance* GetAssignedTeam() const;
 
 //~ ==================================================================== ~//
 //  OPERATIONS

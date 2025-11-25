@@ -33,26 +33,28 @@ void UTPSGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	/*if (HasAuthority(&ActivationInfo))
+	FString owner = ActorInfo->OwnerActor.Get() ? ActorInfo->OwnerActor.Get()->GetName() : "UNKNOWN-ASC";
+	if (HasAuthority(&ActivationInfo))
 	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] Ability[%s] START."), *GetName());
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] Ability[%s] START for Actor[%s]."), *GetName(), *owner);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Ability[%s] START."), *GetName());
-	}*/
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Ability[%s] START for Actor[%s]."), *GetName(), *owner);
+	}
 }
 
 void UTPSGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
-	/*if (HasAuthority(&ActivationInfo))
+	FString owner = ActorInfo->OwnerActor.Get() ? ActorInfo->OwnerActor.Get()->GetName() : "UNKNOWN-ASC";
+	if (HasAuthority(&ActivationInfo))
 	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] Ability[%s] END."), *GetName());
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] Ability[%s] END for Actor[%s]."), *GetName(), *owner);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Ability[%s] END."), *GetName());
-	}*/
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Ability[%s] END for Actor[%s]."), *GetName(), *owner);
+	}
 }

@@ -2,6 +2,8 @@
 
 #include "Army/TPSArmy.h"
 
+#include "Team/TPSTeamInstance.h"
+
 #include "Net/UnrealNetwork.h"
 
 void UTPSArmyInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -41,10 +43,18 @@ void UTPSArmyInstance::AssignToTeam(UTPSTeamInstance* team)
 // TODO: Elevate to "TeamAssignable" Interface
 ETPSTeamID UTPSArmyInstance::GetAssignedTeamID() const
 {
-    return IsValid(AssignedTeam.Get())
-        ? AssignedTeam->TeamID
+    return AssignedTeam.IsValid()
+        ? AssignedTeam.Get()->TeamID
         : ETPSTeamID::UNAFFILIATED;
 }
+
+UTPSTeamInstance* UTPSArmyInstance::GetAssignedTeam() const
+{
+    return AssignedTeam.IsValid()
+        ? AssignedTeam.Get()
+        : nullptr;
+}
+
 
 
 void UTPSArmyInstance::AssignRootUnit(UTPSCommandUnit* unit)

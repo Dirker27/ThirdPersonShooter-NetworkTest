@@ -57,7 +57,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
 	TArray<TObjectPtr<UTPSCharacterInstance>> Members;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated)
 	TObjectPtr<UTPSHierarchicalCollection> ParentCollection;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated)

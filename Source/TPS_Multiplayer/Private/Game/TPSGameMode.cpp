@@ -17,9 +17,10 @@
 ATPSGameMode::ATPSGameMode()
 {
 	WorldManager = CreateDefaultSubobject<UTPSWorldManager>(TEXT("WorldState"));
-	TeamInstanceFactory = CreateDefaultSubobject<UTPSTeamInstanceFactory>(TEXT("TeamInstanceFactory"));
-	CharacterInstanceFactory = CreateDefaultSubobject<UTPSCharacterInstanceFactory>(TEXT("CharacterInstanceFactory"));
 	CombatLog = CreateDefaultSubobject<UTPSCombatLog>(TEXT("CombatLog"));
+
+	TeamFactory = CreateDefaultSubobject<UTPSTeamInstanceFactory>(TEXT("TeamFactory"));
+	CharacterFactory = CreateDefaultSubobject<UTPSCharacterInstanceFactory>(TEXT("CharacterFactory"));
 }
 ATPSGameMode::~ATPSGameMode() { }
 
@@ -27,6 +28,14 @@ void ATPSGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::BeginPlay()"));
+
+	if (IsValid(TeamFactory)) {
+		TeamFactory->ArmyFactory = ArmyFactory;
+		TeamFactory->UnitFactory = UnitFactory;
+		TeamFactory->CharacterFactory = CharacterFactory;
+	} else {
+		UE_LOG(LogTemp, Log, TEXT("[GAME MODE] NO INSTANCE FACTORY PROVIDED!!!"));
+	}
 }
 
 
@@ -65,6 +74,9 @@ void ATPSGameMode::HandleMatchHasEnded()
 
 void ATPSGameMode::BroadcastMessage(FTPSBroadcastMessage message)
 {
+	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::BroadcastMessage([%s]-[%s])"),
+		*message.Heading, *message.SubHeading);
+
 	State()->UpdateBroadcastMessage(message);
 
 	CombatLog->LogMessage(FTPSLogMessage(message.Heading, message.SubHeading));
@@ -112,26 +124,78 @@ void ATPSGameMode::IndexSpawnPoints()
 }
 
 
-void ATPSGameMode::SpawnTeam(ETPSTeamID teamId)
+
+
+
+bool ATPSGameMode::SpawnCharacter(FTPSCharacterID characterId)
 {
-	if (UTPSTeamInstance* t = State()->GetTeam(teamId))
+	UE_LOG(LogTemp, Log, TEXT("Spawning Character[%s]..."), *characterId.ToString());
+
+	if (UTPSCharacterInstance* character = State()->GetCharacter(characterId))
 	{
-		for (auto army : t->Armies) {
-			_SpawnUnit(army->GetRootUnit(), t->SpawnPool);
+		if (auto team = character->GetAssignedTeam()) {
+			character->SpawnActor(DefaultCharacterTemplate, FindSpawnPointForCharacter(character));
+			UE_LOG(LogTemp, Log, TEXT("Character[%s] spawned."), *characterId.ToString());
+			return true;
 		}
+	}
+	UE_LOG(LogTemp, Log, TEXT("FAILED to spawn Character[%s]!"), *characterId.ToString());
+	return false;
+}
+
+void ATPSGameMode::SpawnTeams()
+{
+	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::InitializeTeams()"));
+
+	TArray<TObjectPtr<UTPSCharacterInstance>> roster;
+	for (auto team : State()->Teams)
+	{
+		SpawnTeam(team->TeamID);
 	}
 }
 
-void ATPSGameMode::SpawnUnit(FTPSUnitID unitId)
+bool ATPSGameMode::SpawnTeam(ETPSTeamID teamId)
 {
-	ATPSGameState* state = State();
+	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::SpawnTeam([%s])"), *TPSTeamIdToString(teamId));
 
-	if (UTPSCommandUnit* unit = state->GetUnit(unitId))
+	bool success = true;
+	if (UTPSTeamInstance* t = State()->GetTeam(teamId))
+	{
+		for (auto army : t->Armies) {
+			success &= SpawnArmy(army->ArmyID);
+		}
+	}
+	return success;
+}
+
+bool ATPSGameMode::SpawnArmy(FTPSArmyID armyId)
+{
+	UE_LOG(LogTemp, Log, TEXT("Spawning Army[%s]..."), *armyId.ToString());
+	if (UTPSArmyInstance* a = State()->GetArmy(armyId))
+	{
+		if (auto unit = a->GetRootUnit()) {
+			SpawnUnit(a->GetRootUnit()->UnitID);
+			UE_LOG(LogTemp, Log, TEXT("Army[%s] spawned."), *armyId.ToString());
+			return true;
+		}
+	}
+	UE_LOG(LogTemp, Log, TEXT("FAILED to spawn Army[%s]!"), *armyId.ToString());
+	return false;
+}
+
+bool ATPSGameMode::SpawnUnit(FTPSUnitID unitId)
+{
+	UE_LOG(LogTemp, Log, TEXT("Spawning Unit[%s]..."), *unitId.ToString());
+	if (UTPSCommandUnit* unit = State()->GetUnit(unitId))
 	{
 		if (auto team = unit->GetAssignedTeam()) {
 			_SpawnUnit(unit, team->SpawnPool);
+			UE_LOG(LogTemp, Log, TEXT("Unit[%s] spawned."), *unitId.ToString());
+			return true;
 		}
 	}
+	UE_LOG(LogTemp, Log, TEXT("FAILED to spawn Unit[%s]!"), *unitId.ToString());
+	return false;
 }
 
 void ATPSGameMode::_SpawnUnit(UTPSCommandUnit* unit, UTPSSpawnPool* spawnPool)
@@ -142,7 +206,7 @@ void ATPSGameMode::_SpawnUnit(UTPSCommandUnit* unit, UTPSSpawnPool* spawnPool)
 			instance->GetAssignedUnit(),
 			instance->Identity.SquadRole);
 
-		instance->SpawnActor(PlayerCharacterTemplate, spawn);
+		instance->SpawnActor(DefaultCharacterTemplate, spawn);
 	}
 
 	for (auto subUnit : unit->GetAllSubCollections())
@@ -153,42 +217,40 @@ void ATPSGameMode::_SpawnUnit(UTPSCommandUnit* unit, UTPSSpawnPool* spawnPool)
 
 
 
+
+
+
+
 void ATPSGameMode::InitializeTeams()
 {
+	UE_LOG(LogTemp, Log, TEXT("[GameMode] Initializing Teams..."));
 	for (auto teamConfig : TeamDefinitionMap)
 	{
-		TeamInstanceFactory->CreateTeam(teamConfig.Key);
-		TeamInstanceFactory->ConfigureTeam(teamConfig.Key, teamConfig.Value->Definition);
+		TeamFactory->CreateTeam(teamConfig.Key);
+		TeamFactory->ConfigureTeam(teamConfig.Key, teamConfig.Value->Definition);
 	}
+	UE_LOG(LogTemp, Log, TEXT("[GameMode] Teams Initialized."));
 }
 
 
 void ATPSGameMode::PopulateTeams()
 {
+	UE_LOG(LogTemp, Log, TEXT("[GameMode] Populating Teams..."));
 	TArray<TObjectPtr<UTPSCharacterInstance>> roster;
 	for (auto team : State()->Teams)
 	{
-		TeamInstanceFactory->PopulateTeam(team->TeamID, roster);
+		TeamFactory->PopulateTeam(team->TeamID, roster);
 	}
+	UE_LOG(LogTemp, Log, TEXT("[GameMode] Teams Populated."));
 }
-
-void ATPSGameMode::SpawnTeams()
-{
-	TArray<TObjectPtr<UTPSCharacterInstance>> roster;
-	for (auto team : State()->Teams)
-	{
-		SpawnTeam(team->TeamID);
-	}
-}
-
 
 void ATPSGameMode::KillCharacter_Implementation(const FTPSCharacterID characterId)
 {
-	UE_LOG(LogTemp, Log, TEXT("RECEIVED REQUEST::KillCharacter([%s])..."), *characterId.Guid.ToString());
-	ATPSGameState* state = GetGameState<ATPSGameState>();
+	UE_LOG(LogTemp, Log, TEXT("RECEIVED REQUEST - TPSGameMode::KillCharacter([%s])..."), *characterId.Guid.ToString());
 
-	if (auto character = state->GetCharacter(characterId))
+	if (auto character = State()->GetCharacter(characterId))
 	{
+		UE_LOG(LogTemp, Log, TEXT("Eliminating Character[%s]..."), *characterId.ToString());
 		character->Die();
 
 		auto report = GenerateEliminationReportForCharacterDeath(character);
@@ -196,6 +258,7 @@ void ATPSGameMode::KillCharacter_Implementation(const FTPSCharacterID characterI
 
 		// Broadcast Event -> BP GameMode handler
 		OnCharacterElimination(report);
+		UE_LOG(LogTemp, Log, TEXT("Character[%s] Eliminated."), *characterId.ToString());
 	}
 }
 
@@ -308,17 +371,17 @@ void ATPSGameMode::RequestPossession_Implementation(ATPSPlayerController* contro
 void ATPSGameMode::SpawnNewPlayerCharacter_Implementation(AController* controller)
 {
 	ATPSCharacter* spawned = nullptr;
-	if (IsValid(PlayerCharacterTemplate))
+	if (IsValid(DefaultCharacterTemplate))
 	{
 		AActor* spawnPoint = FindPlayerStart(controller, TEXT(""));
 		if (IsValid(spawnPoint))
 		{
-			spawned = GetWorld()->SpawnActor<ATPSCharacter>(PlayerCharacterTemplate,
+			spawned = GetWorld()->SpawnActor<ATPSCharacter>(DefaultCharacterTemplate,
 				spawnPoint->GetTransform().GetLocation(), spawnPoint->GetTransform().Rotator());
 		}
 		else
 		{
-			spawned = GetWorld()->SpawnActor<ATPSCharacter>(PlayerCharacterTemplate);
+			spawned = GetWorld()->SpawnActor<ATPSCharacter>(DefaultCharacterTemplate);
 		}
 	}
 

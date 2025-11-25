@@ -71,7 +71,7 @@ void UTPSAbilitySystemComponent::GrantPlayerBasedAbilities(UAbilitySet* abilityS
     UE_LOG(LogTemp, Log, TEXT("ASC for Actor[%s] updated."), *GetOwnerActor()->GetName());
     for (auto ability : GetActivatableAbilities())
     {
-        //UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
+        UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
     }
 }
 
@@ -132,12 +132,12 @@ void UTPSAbilitySystemComponent::BindToInputComponent(UInputComponent* inputComp
     if (!IsValid(enhacedInput) || !IsValid(InputBindings)) { return; }
 
     UE_LOG(LogTemp, Log, TEXT("Binding ASC to Owner's InputComponent..."));
-
     for (const FAbilityInputToInputActionBinding& binding : InputBindings->Bindings)
     {
         enhacedInput->BindAction(binding.InputAction, ETriggerEvent::Started, this, &ThisClass::AbilityInputBindingPressedHandler, binding.AbilityInput);
         enhacedInput->BindAction(binding.InputAction, ETriggerEvent::Completed, this, &ThisClass::AbilityInputBindingReleasedHandler, binding.AbilityInput);
     }
+    UE_LOG(LogTemp, Log, TEXT("ASC Input Bound."));
 }
 
 void UTPSAbilitySystemComponent::ReleaseAbilityBindingsFromInputComponent(UEnhancedInputComponent* inputComponent)
