@@ -42,10 +42,10 @@ public:
 	// State
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
-	TObjectPtr<ATPSCharacter> PossessedCharacter;
+	TWeakObjectPtr<ATPSCharacter> PossessedCharacter;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
-	TObjectPtr<ATPSPawn> PossessedPawn;
+	TWeakObjectPtr<ATPSPawn> PossessedPawn;
 
 	// Disables Camera->Character Rotation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

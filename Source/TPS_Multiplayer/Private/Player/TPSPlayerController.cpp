@@ -52,11 +52,11 @@ void ATPSPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (PossessedCharacter)
+	if (PossessedCharacter.IsValid())
 	{
 		PossessedCharacter->SetTargetLocation(GetCameraTargetLocation());
 	}
-	if (PossessedPawn)
+	if (PossessedPawn.IsValid())
 	{
 		PossessedPawn->SetTargetLocation(GetCameraTargetLocation());
 	}
@@ -267,7 +267,7 @@ void ATPSPlayerController::PossessNearestPlayablePawn_Implementation()
 	if (IsValid(mode)) {
 		UE_LOG(LogTemp, Log, TEXT("Requesting POSSESS for PlayerController[%s]-Character[%s]..."),
 		*GetName(), *character->GetName());
-		mode->RequestPossession(this, character);
+		mode->RequestPossessCharacterActor(this, character);
 	}
 }
 void ATPSPlayerController::PossessPawn()

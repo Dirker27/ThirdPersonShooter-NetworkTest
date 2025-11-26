@@ -15,11 +15,20 @@ struct TPS_MULTIPLAYER_API FTPSPlayerID
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGuid Guid;
 
+	// Copied from PlayerState.PlayerId
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 UEPlayerID;
+
 
 public:
 	bool operator == (const FTPSPlayerID other) const
 	{
 		return Guid == other.Guid;
+	}
+
+	FString ToString() const
+	{
+		return Guid.ToString();
 	}
 
 	friend uint32 GetTypeHash(const FTPSPlayerID& id)

@@ -1,6 +1,7 @@
 // (C) ToasterCat Studios 2025
 
 #include "Player/TPSPlayerState.h"
+#include "Team/TPSTeamInstance.h"
 
 #include "Character/TPSCharacter.h"
 #include "Net/UnrealNetwork.h"
@@ -19,26 +20,30 @@ void ATPSPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, TeamID);
-	DOREPLIFETIME(ThisClass, FactionID);
-	DOREPLIFETIME(ThisClass, Army);
+	DOREPLIFETIME(ThisClass, ID);
+	DOREPLIFETIME(ThisClass, AssignedArmy);
+	DOREPLIFETIME(ThisClass, AssignedTeam);
+}
+
+
+void ATPSPlayerState::AssignToTeam(UTPSTeamInstance* team)
+{
+	AssignedTeam = team;
+	PlayerStateUpdate.Broadcast();
+}
+
+// TODO: Elevate to "TeamAssignable" Interface
+ETPSTeamID ATPSPlayerState::GetAssignedTeamID() const
+{
+	return AssignedTeam.IsValid()
+		? AssignedTeam.Get()->TeamID
+		: ETPSTeamID::UNAFFILIATED;
 }
 
 
 void ATPSPlayerState::BeginPlay() {
 	Super::BeginPlay();
 }
-
-void ATPSPlayerState::Tick(float DeltaSeconds)
-{
-	//- Broadcast to UI Listeners -----------------------=
-	//
-	if (ShouldNotify) {
-		NotifyDisplayWidgets.Broadcast();
-		ShouldNotify = false;
-	}
-}
-
 
 UAbilitySystemComponent* ATPSPlayerState::GetAbilitySystemComponent() const
 {
@@ -52,6 +57,6 @@ UAbilitySystemComponent* ATPSPlayerState::GetAbilitySystemComponent() const
 
 void ATPSPlayerState::ReportProjectileHit(FHitResult hit)
 {
-	ShouldNotify = true;
+	PlayerStateUpdate.Broadcast();
 }
 

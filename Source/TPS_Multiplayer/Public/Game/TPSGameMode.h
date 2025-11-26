@@ -65,6 +65,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
 	FString GameTypeDescription;
 
+	// Whether Players are required to be a part of a team.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
+	bool bRequiresPlayerTeam;
+
+	// Whether Players are required to be a part of a team.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
+	bool bRequiresPlayerArmy;
+
 	// Points required for a team to win the round.
 	// TODO: Allow for differing win conditions and target values.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
@@ -126,6 +134,12 @@ public:
 	virtual void HandleMatchHasStarted() override;
 	virtual void HandleMatchHasEnded() override;
 
+	// New Player Joined
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSTeamInstance* GetRandomTeam() const;
+
 	//virtual bool ReadyToEndMatch() const override;
 
 	UFUNCTION(BlueprintCallable)
@@ -136,8 +150,8 @@ public:
 
 
 
-
-
+	////////////////////////////////////////////////////////
+	// Match Setup / Spawning Instances
 
 	// Instantiates Teams in GameState with configurations defined in TeamDefinitionMap
 	UFUNCTION(BlueprintCallable)
@@ -154,8 +168,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void IndexSpawnPoints();
 
-
-	// Spawn all teams with Instances defined entire team.
+	// Spawn all registered instances in all registered teams.
 	UFUNCTION(BlueprintCallable)
 	void SpawnTeams();
 
@@ -175,14 +188,29 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool SpawnCharacter(FTPSCharacterID characterId);
 
-
 private:
 	void _SpawnUnit(UTPSCommandUnit* unit, UTPSSpawnPool* spawnPool);
 
 
 	////////////////////////////////////////////////////////
-	// Gameplay Functions
+	// Pawn Possession
 public:
+	// Possess a provided Character Actor (will absorb instance)
+	UFUNCTION(Server, Reliable, Category = "Possess")
+	void RequestPossessCharacterActor(ATPSPlayerController* controller, ATPSCharacter* character);
+
+	// Possess an Empty Character
+	UFUNCTION(Server, Reliable, Category = "Possess")
+	void RequestPossessCharacterInstance(ATPSPlayerController* controller, UTPSCharacterInstance* character);
+
+protected:
+	UFUNCTION(BlueprintCallable, BlueprintPure, BlueprintNativeEvent)
+	bool CanCharacterBePossessedByPlayer(ATPSPlayerState* player, UTPSCharacterInstance* character) const;
+
+
+	////////////////////////////////////////////////////////
+	// Actor / Character Lifecycle
+public: 
 	// Character Death - invoked by admin or character on death detection
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void KillCharacter(const FTPSCharacterID characterId);
@@ -232,13 +260,9 @@ public:
 	UFUNCTION(Exec, Category = "Debug|Visibility")
 	void TPS_ToggleDebugForAllCharacters();
 
-	////////////////////////////////////////////////////////
-	// Pawn Possession
 
-	// Possess an Empty Character
-	UFUNCTION(Server, Reliable, Category = "Possess")
-	void RequestPossession(ATPSPlayerController* controller, ATPSCharacter* character);
 
+public:
 	////////////////////////////////////////////////////////
 	// Spawn Actors and Bots
 

@@ -162,7 +162,7 @@ void ATPSGameState::IndexCharacters()
 UTPSTeamInstance* ATPSGameState::GetTeam(const ETPSTeamID teamId)
 {
     // lazy JIT indexing
-    if (TeamsById.IsEmpty())
+    /*if (TeamsById.IsEmpty())
     {
         IndexTeams();
     }
@@ -171,7 +171,7 @@ UTPSTeamInstance* ATPSGameState::GetTeam(const ETPSTeamID teamId)
     if (auto team = TeamsById.Find(teamId))
     {
         return *team;
-    }
+    }*/
 
     // perform slow fetch (fallback)
     for (auto team : Teams)
@@ -230,7 +230,7 @@ UTPSArmyInstance* ATPSGameState::GetArmy(const FTPSArmyID armyId)
 UTPSCommandUnit* ATPSGameState::GetUnit(const FTPSUnitID unitId)
 {
     // lazy JIT index
-    if (TeamUnitsById.IsEmpty())
+    /*if (TeamUnitsById.IsEmpty())
     {
         IndexTeamUnits();
     }
@@ -239,7 +239,7 @@ UTPSCommandUnit* ATPSGameState::GetUnit(const FTPSUnitID unitId)
     if (auto unit = TeamUnitsById.Find(unitId))
     {
         return *unit;
-    }
+    }*/
 
     // perform slow fetch (fallback)
     for (auto unit : TeamUnits)
@@ -270,7 +270,7 @@ UTPSCharacterInstance* ATPSGameState::GetUnitLeader(const FTPSUnitID unitId)
 UTPSCharacterInstance* ATPSGameState::GetCharacter(const FTPSCharacterID characterId)
 {
     // lazy JIT index
-    if (CharactersById.IsEmpty())
+    /*if (CharactersById.IsEmpty())
     {
         IndexCharacters();
     }
@@ -279,7 +279,7 @@ UTPSCharacterInstance* ATPSGameState::GetCharacter(const FTPSCharacterID charact
     if (auto character = CharactersById.Find(characterId))
     {
         return *character;
-    }
+    }*/
 
     // perform slow fetch (fallback)
     for (auto character : Characters)

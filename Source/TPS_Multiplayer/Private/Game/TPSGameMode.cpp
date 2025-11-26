@@ -72,6 +72,38 @@ void ATPSGameMode::HandleMatchHasEnded()
 }
 
 
+void ATPSGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::PostLogin()"));
+
+	if (auto ps = NewPlayer->GetPlayerState<ATPSPlayerState>())
+	{
+		ps->ID.Guid = FGuid::NewGuid();
+		ps->ID.UEPlayerID = ps->GetPlayerId();
+		UE_LOG(LogTemp, Log, TEXT("Player[%s]-[%i] logged in."),
+			*ps->ID.ToString(), ps->GetPlayerId());
+	}
+
+	/*if (ATPSPlayerState* ps = NewPlayer->GetPlayerState<ATPSPlayerState>())
+	{
+		ps->AssignToTeam(GetRandomTeam());
+	}*/
+}
+
+UTPSTeamInstance* ATPSGameMode::GetRandomTeam() const
+{
+	if (State()->Teams.IsEmpty()) { return nullptr; }
+
+	int max = State()->Teams.Num() - 1;
+	int i = FMath::RandRange(0, max);
+	return State()->Teams[i];
+}
+
+
+
+
 void ATPSGameMode::BroadcastMessage(FTPSBroadcastMessage message)
 {
 	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::BroadcastMessage([%s]-[%s])"),
@@ -357,12 +389,37 @@ void ATPSGameMode::DebugGlobal() {
 	TPS_ToggleDebugForAllCharacters();
 }
 
-void ATPSGameMode::RequestPossession_Implementation(ATPSPlayerController* controller, ATPSCharacter* character)
+void ATPSGameMode::RequestPossessCharacterActor_Implementation(ATPSPlayerController* controller, ATPSCharacter* character)
 {
 	if (IsValid(controller) && IsValid(character) && character->CanBePossessedByPlayer)
 	{
 		controller->Possess(character);
 	}
+}
+
+void ATPSGameMode::RequestPossessCharacterInstance_Implementation(ATPSPlayerController* controller, UTPSCharacterInstance* character)
+{
+	if (!IsValid(controller) || !IsValid(character)) { return; }
+
+	if (ATPSPlayerState* player = controller->GetPlayerState<ATPSPlayerState>())
+	{
+		if (! CanCharacterBePossessedByPlayer(player, character))
+		{
+			return;
+		}
+	}
+
+	controller->Possess(character->GetSpawnedActor());
+}
+
+bool ATPSGameMode::CanCharacterBePossessedByPlayer_Implementation(ATPSPlayerState* player, UTPSCharacterInstance* character) const
+{
+	if (!IsValid(player) || !IsValid(character)) { return false; }
+
+	return player->GetAssignedTeamID() == character->GetAssignedTeamID()
+		&& character->IsAlive
+		&& IsValid(character->GetSpawnedActor())
+		&& character->GetSpawnedActor()->CanBePossessedByPlayer;
 }
 
 

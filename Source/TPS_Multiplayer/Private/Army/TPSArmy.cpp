@@ -80,4 +80,5 @@ void UTPSArmyInstance::AddMember(UTPSCharacterInstance* instance)
 void UTPSArmyInstance::BindToPlayer(ATPSPlayerState* player)
 {
     OwningPlayer = player;
+    ArmyUpdate.Broadcast();
 }

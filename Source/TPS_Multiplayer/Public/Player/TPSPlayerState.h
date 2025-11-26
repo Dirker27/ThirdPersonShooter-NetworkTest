@@ -4,17 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
-
 #include "AbilitySystemInterface.h"
-#include "Army/TPSArmyID.h"
-#include "Faction/TPSFactionID.h"
+
+#include "TPSPlayerID.h"
+
 #include "GAS/GASAbilitySet.h"
 #include "Team/TPSTeamID.h"
 
 #include "TPSPlayerState.generated.h"
 
+
+class UTPSArmyInstance;
+class UTPSTeamInstance;
+
+
 UDELEGATE(BlueprintAuthorityOnly)
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUpdatePlayerStateDisplay);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerStateUpdate);
 
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSPlayerState : public APlayerState, public IAbilitySystemInterface
@@ -29,7 +34,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaSeconds) override;
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 //~ ======================================================================== ~//
@@ -41,27 +45,59 @@ public:
 
 	// Broadcast Delegate
 	UPROPERTY(BlueprintAssignable)
-	FUpdatePlayerStateDisplay NotifyDisplayWidgets;
-private:
-	bool ShouldNotify = false;
+	FPlayerStateUpdate PlayerStateUpdate;
 
 
 //~ ======================================================================== ~//
 //  ATTRIBUTES
 //~ ======================================================================== ~//
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+	FTPSPlayerID ID;
 
 	////////////////////////////////////////////////////////
 	// Team Affiliations
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	TEnumAsByte<ETPSTeamID> TeamID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	TEnumAsByte<ETPSFactionID> FactionID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-	FTPSArmyID Army;
+	FTPSArmyID Army;*/
+
+
+//~ ======================================================================== ~//
+//  LIVE STATE
+//~ ======================================================================== ~//
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TWeakObjectPtr<AActor> FocusActor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TWeakObjectPtr<AActor> TargetActor;
+
+protected:
+	// Assigned Army
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	TWeakObjectPtr<UTPSArmyInstance> AssignedArmy;
+
+	// Assigned Team
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	TWeakObjectPtr<UTPSTeamInstance> AssignedTeam;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void AssignToTeam(UTPSTeamInstance* team);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSTeamInstance* GetAssignedTeam() { return AssignedTeam.Get(); }
+
+	// Assigned Team ID
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ETPSTeamID GetAssignedTeamID() const;
+
 
 //~ ======================================================================== ~//
 //  ABILITY SYSTEM

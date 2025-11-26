@@ -24,7 +24,7 @@ static const TArray<FString> _SquadNameList = {
     "Kilo",
     "Lima",
     "Mike",
-    "November"
+    "November",
     "Omega",
     "Papa",
     "Quebec",
