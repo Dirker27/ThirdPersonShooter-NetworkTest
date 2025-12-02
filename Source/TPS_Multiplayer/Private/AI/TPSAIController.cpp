@@ -7,15 +7,11 @@ ATPSAIController::ATPSAIController(const FObjectInitializer& ObjectInitializer)
 }
 
 
-/*void ATPSAIController::Tick(float DeltaTime)
+void ATPSAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-void ATPSAIController::Reset()
-{
-	
-}
 
 
 void ATPSAIController::PostInitializeComponents()
@@ -47,17 +43,48 @@ void ATPSAIController::OnUnPossess()
 	Super::OnUnPossess();
 }
 
+void ATPSAIController::Reset()
+{
+	Super::Reset();
+}
+
+bool ATPSAIController::LineOfSightTo(const AActor* Other, FVector ViewPoint, bool bAlternateChecks) const
+{
+	return Super::LineOfSightTo(Other, ViewPoint, bAlternateChecks);
+}
+
+
+//~ ======================================================================== ~//
+//  AI CONTROLLER BEHAVIOR
+//~ ======================================================================== ~//
+
 void ATPSAIController::SetPawn(APawn* InPawn)
 {
 	Super::SetPawn(InPawn);
 }
 
-
-//~ ======================================================================== ~//
-//  DEBUG
-//~ ======================================================================== ~//
-
-void ATPSAIController::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& DebugDisplay, float& YL, float& YPos)
+void ATPSAIController::ActorsPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 {
-	Super::DisplayDebug(Canvas, DebugDisplay, YL, YPos);
-}*/
+	Super::Reset();
+}
+
+void ATPSAIController::UpdateControlRotation(float DeltaTime, bool bUpdatePawn)
+{
+	Super::UpdateControlRotation(DeltaTime, bUpdatePawn);
+}
+
+void ATPSAIController::SetFocalPoint(FVector NewFocus, EAIFocusPriority::Type InPriority)
+{
+	Super::SetFocalPoint(NewFocus, InPriority);
+}
+
+void ATPSAIController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority)
+{
+	Super::SetFocus(NewFocus, InPriority);
+}
+
+void ATPSAIController::ClearFocus(EAIFocusPriority::Type InPriority)
+{
+	Super::ClearFocus(InPriority);
+}
+
