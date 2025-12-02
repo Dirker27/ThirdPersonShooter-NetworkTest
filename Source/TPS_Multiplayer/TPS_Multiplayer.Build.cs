@@ -9,6 +9,7 @@ public class TPS_Multiplayer : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
 		PublicDependencyModuleNames.AddRange(new string[] { 
+			"AIModule",
 			"Core",
 			"CoreOnline",
 			"CoreUObject",
