@@ -10,6 +10,8 @@ ATPSPlayerState::ATPSPlayerState()
 {
 	SetReplicates(true);
 	NetUpdateFrequency = 1.f;
+
+	SetIsABot(false);
 }
 
 ATPSPlayerState::~ATPSPlayerState() {

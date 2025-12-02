@@ -77,7 +77,7 @@ void UTPSCharacterInstance::AssignToUnit(UTPSCommandUnit* unit)
 	AssignedArmy = unit->AssignedArmy;
 	AssignedTeam = unit->AssignedTeam;
 
-	NotifyDisplayWidgets.Broadcast();
+	CharacterInstanceUpdate.Broadcast();
 }
 
 void UTPSCharacterInstance::ClearAssignment()
@@ -86,7 +86,7 @@ void UTPSCharacterInstance::ClearAssignment()
 	AssignedArmy = nullptr;
 	AssignedTeam = nullptr;
 
-	NotifyDisplayWidgets.Broadcast();
+	CharacterInstanceUpdate.Broadcast();
 }
 
 
@@ -103,7 +103,7 @@ void UTPSCharacterInstance::Die()
 		SpawnedActor->Die();
 	}
 
-	NotifyDisplayWidgets.Broadcast();
+	CharacterInstanceUpdate.Broadcast();
 }
 
 
@@ -113,7 +113,7 @@ void UTPSCharacterInstance::Focus()
 
 	SpawnedActor->IsFocused = true;
 
-	NotifyDisplayWidgets.Broadcast();
+	CharacterInstanceUpdate.Broadcast();
 }
 
 void UTPSCharacterInstance::UnFocus()
@@ -122,7 +122,7 @@ void UTPSCharacterInstance::UnFocus()
 
 	SpawnedActor->IsFocused = false;
 
-	NotifyDisplayWidgets.Broadcast();
+	CharacterInstanceUpdate.Broadcast();
 }
 
 

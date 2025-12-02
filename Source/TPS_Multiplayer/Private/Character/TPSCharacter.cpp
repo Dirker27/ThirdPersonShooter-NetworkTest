@@ -280,7 +280,7 @@ void ATPSCharacter::Tick(float deltaTime)
 	//- Broadcast to UI Listeners -----------------------=
 	//
 	if (ShouldNotify) {
-		NotifyDisplayWidgets.Broadcast();
+		CharacterActorUpdate.Broadcast();
 		ShouldNotify = false;
 	}
 }
@@ -325,6 +325,27 @@ ETPSTeamID ATPSCharacter::GetAssignedTeamID() const
 		: ETPSTeamID::UNAFFILIATED;
 }
 
+UTPSTeamInstance* ATPSCharacter::GetAssignedTeam() const
+{
+	return IsValid(CharacterInstance)
+		? CharacterInstance->GetAssignedTeam()
+		: nullptr;
+}
+
+UTPSCommandUnit* ATPSCharacter::GetAssignedUnit() const
+{
+	return IsValid(CharacterInstance)
+		? CharacterInstance->GetAssignedUnit()
+		: nullptr;
+}
+
+UTPSArmyInstance* ATPSCharacter::GetAssignedArmy() const
+{
+	return IsValid(CharacterInstance)
+		? CharacterInstance->GetAssignedArmy()
+		: nullptr;
+}
+
 
 bool ATPSCharacter::IsInitialized() const
 {
@@ -337,6 +358,14 @@ bool ATPSCharacter::IsAlive() const
 		? CharacterInstance->IsAlive
 		: (CurrentBehaviorState != Incapacitated);
 }
+
+
+
+
+//~ ============================================================= ~//
+//  STATE-DEPENDENT SYNTHETIC GETTERS
+//~ ============================================================= ~//
+
 bool ATPSCharacter::IsCrouching() const
 {
 	return (CurrentLocomotionState == Crouching || CurrentLocomotionState == Prone);
@@ -442,6 +471,8 @@ void ATPSCharacter::RevertCharacterState() {
 void ATPSCharacter::InterruptIdle()
 {
 	IdleSeconds = 0;
+
+	ShouldNotify = true;
 }
 
 
@@ -567,6 +598,8 @@ void ATPSCharacter::StartDeath_Implementation()
 	ApplyBehaviorState(Incapacitated);
 
 	OnDeathStart();
+
+	ShouldNotify = true;
 }
 
 
@@ -581,6 +614,8 @@ void ATPSCharacter::CompleteDeath_Implementation()
 	}
 
 	OnDeathComplete();
+
+	ShouldNotify = true;
 }
 
 
@@ -601,11 +636,15 @@ void ATPSCharacter::StartBoost()
 {
 	IsBoosting = true;
 	OnBoostAbilityStart();
+
+	ShouldNotify = true;
 }
 void ATPSCharacter::EndBoost()
 {
 	IsBoosting = false;
 	OnBoostAbilityEnd();
+
+	ShouldNotify = true;
 }
 
 // - AIM -//
@@ -621,6 +660,8 @@ void ATPSCharacter::StartAim()
 	}
 
 	OnAimAbilityStart();
+
+	ShouldNotify = true;
 }
 void ATPSCharacter::EndAim()
 {
@@ -633,6 +674,8 @@ void ATPSCharacter::EndAim()
 	}
 
 	OnAimAbilityEnd();
+
+	ShouldNotify = true;
 }
 
 // - FIRE WEAPON / USE EQUIPMENT -//
@@ -648,6 +691,8 @@ void ATPSCharacter::StartFireWeapon()
 	}
 
 	OnFireWeaponAbilityStart();
+
+	ShouldNotify = true;
 }
 void ATPSCharacter::EndFireWeapon()
 {
@@ -660,6 +705,8 @@ void ATPSCharacter::EndFireWeapon()
 	}
 
 	OnFireWeaponAbilityEnd();
+
+	ShouldNotify = true;
 }
 
 // - EQUIP WEAPON -//
@@ -668,10 +715,14 @@ void ATPSCharacter::StartEquipWeapon()
 {
 	IsEquipping = true;
 	OnEquipWeaponAbilityStart();
+
+	ShouldNotify = true;
 }
 void ATPSCharacter::EndEquipWeapon() {
 	IsEquipping = false;
 	OnEquipWeaponAbilityEnd();
+
+	ShouldNotify = true;
 }
 
 // - UN-EQUIP WEAPON -//
@@ -680,11 +731,15 @@ void ATPSCharacter::StartUnEquipWeapon()
 {
 	IsEquipping = true;
 	OnUnEquipWeaponAbilityStart();
+
+	ShouldNotify = true;
 }
 void ATPSCharacter::EndUnEquipWeapon()
 {
 	IsEquipping = false;
 	OnUnEquipWeaponAbilityEnd();
+
+	ShouldNotify = true;
 }
 
 // - RELOAD WEAPON -//
@@ -693,11 +748,15 @@ void ATPSCharacter::StartReloadWeapon()
 {
 	IsReloading = true;
 	OnReloadWeaponAbilityStart();
+
+	ShouldNotify = true;
 }
 void ATPSCharacter::EndReloadWeapon()
 {
 	IsReloading = false;
 	OnReloadWeaponAbilityEnd();
+
+	ShouldNotify = true;
 }
 
 // - INTERACT -//
@@ -706,11 +765,15 @@ void ATPSCharacter::StartInteract()
 {
 	IsInteracting = true;
 	OnInteractAbilityStart();
+
+	ShouldNotify = true;
 }
 void ATPSCharacter::EndInteract()
 {
 	IsInteracting = false;
 	OnInteractAbilityEnd();
+
+	ShouldNotify = true;
 }
 
 // - SWITCH STANCE -//
@@ -770,20 +833,22 @@ void ATPSCharacter::PossessedBy(AController* NewController) // server
 
 	if (HasAuthority())
 	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character[%s]::PossessedBy()"), *GetName());
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character[%s]::PossessedBy(Controller[%s])"), *GetName(), *NewController->GetName());
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character[%s]::PossessedBy()"), *GetName());
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character[%s]::PossessedBy(Controller[%s])"), *GetName(), *NewController->GetName());
 	}
 
-	if (ATPSPlayerState* ps = GetPlayerState<ATPSPlayerState>())
+	if (ATPSPlayerState* ps = NewController->GetPlayerState<ATPSPlayerState>())
 	{
 		if (HasAuthority())
 		{
 			AbilitySystem->GrantPlayerBasedAbilities(ps->PlayerAbilitySet);
 		}
 	}
+
+	ShouldNotify = true;
 }
 
 void ATPSCharacter::OnRep_PlayerState() // client
@@ -798,16 +863,18 @@ void ATPSCharacter::OnRep_PlayerState() // client
 	{
 		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character[%s]::OnRep_PlayerState()"), *GetName());
 	}*/
+	ShouldNotify = true;
 }
 
 void ATPSCharacter::UnPossessed()
 {
+	Super::UnPossessed();
+
 	if (HasAuthority())
 	{
 		AbilitySystem->RevokePlayerBasedAbilities();
 	}
-
-	Controller = nullptr; // why necessary? Controllers are not rep'd - passing ref would point to invalid.
+	ShouldNotify = true;
 }
 
 

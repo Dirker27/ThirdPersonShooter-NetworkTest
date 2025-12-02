@@ -49,7 +49,7 @@ public:
 
     // Broadcast Delegate
     UPROPERTY(BlueprintAssignable)
-    FUpdateCharacterInstanceDisplay NotifyDisplayWidgets;
+    FUpdateCharacterInstanceDisplay CharacterInstanceUpdate;
 
 
 //~ ==================================================================== ~//
@@ -99,16 +99,18 @@ protected:
 
 public:
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    UTPSCommandUnit* GetAssignedUnit() { return AssignedUnit.Get(); }
+    UTPSCommandUnit* GetAssignedUnit() const { return AssignedUnit.Get(); }
 
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    UTPSTeamInstance* GetAssignedTeam() { return AssignedTeam.Get(); }
+    UTPSArmyInstance* GetAssignedArmy() const { return AssignedArmy.Get(); }
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    UTPSTeamInstance* GetAssignedTeam() const { return AssignedTeam.Get(); }
 
     // Assigned Team ID
     UFUNCTION(BlueprintCallable, BlueprintPure)
     ETPSTeamID GetAssignedTeamID() const;
 
-    // Assigned Team ID
     UFUNCTION(BlueprintCallable)
     void AssignToUnit(UTPSCommandUnit* unit);
 

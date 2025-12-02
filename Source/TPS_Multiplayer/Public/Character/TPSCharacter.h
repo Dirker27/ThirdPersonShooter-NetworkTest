@@ -27,7 +27,7 @@
 #include "TPSCharacter.generated.h"
 
 class UTPSCharacterInstance;
-
+class UTPSCommandUnit;
 
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterAttributeUpdate);
@@ -65,7 +65,7 @@ public:
 
 	// Broadcast Delegate
 	UPROPERTY(BlueprintAssignable)
-	FCharacterAttributeUpdate NotifyDisplayWidgets;
+	FCharacterAttributeUpdate CharacterActorUpdate;
 private:
 	// Trigger a broadcast to all listening display widgets to perform an Update cycle.
 	//   Should set to 'true' whenever states or attributes are changed.
@@ -143,8 +143,21 @@ public:
 	TObjectPtr<UTPSCharacterConfiguration> Configuration;
 
 
+
+	//////////////////////////////////////////////////////
+	// Assignment Info
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ETPSTeamID GetAssignedTeamID() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSTeamInstance* GetAssignedTeam() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSCommandUnit* GetAssignedUnit() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSArmyInstance* GetAssignedArmy() const;
 
 
 
@@ -392,16 +405,13 @@ public:
 
 
 //~ ======================================================================== ~//
-//  CONTROLLER POSSESSION
+//  CONTROLLER / PLAYER POSSESSION
 //~ ======================================================================== ~//
 protected:
 	// Bind to AbilitySystem in PlayerState
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void UnPossessed() override;
 	virtual void OnRep_PlayerState() override;
-
-
-
 
 //~ ======================================================================== ~//
 //  ABILITY SYSTEM
