@@ -9,6 +9,36 @@
 
 static const FLinearColor TEXT_COLOR_ABILITY_LOG = FLinearColor::Yellow;
 
+static const TArray<FString> _NATO_ALPHABET = {
+	"Alpha",
+	"Bravo",
+	"Charlie",
+	"Delta",
+	"Echo",
+	"Foxtrot",
+	"Golf",
+	"Hotel",
+	"India",
+	"Juliett",
+	"Kilo",
+	"Lima",
+	"Mike",
+	"November",
+	"Omega",
+	"Papa",
+	"Quebec",
+	"Romeo",
+	"Sierra",
+	"Tango",
+	"Uniform",
+	"Victor",
+	"Whiskey",
+	"X-Ray",
+	"Yankee",
+	"Zulu",
+};
+
+
 UCLASS(BlueprintType)
 class TPS_MULTIPLAYER_API UTPSConstants : public UObject
 {

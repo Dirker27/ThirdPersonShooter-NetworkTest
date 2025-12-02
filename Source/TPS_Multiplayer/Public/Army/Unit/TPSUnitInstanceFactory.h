@@ -9,37 +9,6 @@
 
 // TODO: [PC-228] Replace with JSON list and provide via Blueprint
 static const TArray<FString> _SquadNameList = {
-
-    // TODO: Migrate to NATO Constant
-	"Alpha",
-    "Bravo",
-    "Charlie",
-    "Delta",
-    "Echo",
-    "Foxtrot",
-    "Golf",
-    "Hotel",
-    "India",
-    "Juliett",
-    "Kilo",
-    "Lima",
-    "Mike",
-    "November",
-    "Omega",
-    "Papa",
-    "Quebec",
-    "Romeo",
-    "Sierra",
-    "Tango",
-    "Uniform",
-    "Victor",
-    "Whiskey",
-    "X-Ray",
-    "Yankee",
-    "Zulu",
-
-
-
     "Wrecker",
     "Zombie",
     "Warlock",
@@ -62,7 +31,24 @@ static const TArray<FString> _SquadNameList = {
     "Panther",
     "Tiger",
     "Leeroy",
-    "Spartan"
+    "Spartan",
+    "Wraith",
+    "Abel",
+    "Whiskey",
+    "Joker",
+    "Harvard",
+    "Ivy",
+    "Yale",
+    "Terra",
+    "Stonewall",
+    "Delta",
+    "Scooby",
+    "Panda",
+    "Grizzly",
+    "Tiger",
+    "Libra",
+    "Cancer",
+    "Gamma"
 };
 
 

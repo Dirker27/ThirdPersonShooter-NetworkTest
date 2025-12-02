@@ -7,6 +7,7 @@
 #include "AbilitySystemInterface.h"
 
 #include "TPSPlayerID.h"
+#include "Army/Unit/TPSCommandUnit.h"
 
 #include "GAS/GASAbilitySet.h"
 #include "Team/TPSTeamID.h"
@@ -55,28 +56,32 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
 	FTPSPlayerID ID;
 
-	////////////////////////////////////////////////////////
-	// Team Affiliations
-
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-	TEnumAsByte<ETPSTeamID> TeamID;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-	TEnumAsByte<ETPSFactionID> FactionID;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-	FTPSArmyID Army;*/
-
 
 //~ ======================================================================== ~//
 //  LIVE STATE
 //~ ======================================================================== ~//
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	////////////////////////////////////////////////////////
+	// Control / Targeting Data
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	TWeakObjectPtr<AActor> FocusActor;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	TWeakObjectPtr<AActor> TargetActor;
+
+	// Actor(s) currently being controlled by the Player (possessed by Controller)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	TWeakObjectPtr<AActor> ControlledActor;
+
+	// Unit(s) currently being controlled by the Player
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	TWeakObjectPtr<UTPSCommandUnit> ControlledUnit;
+
+
+
+	////////////////////////////////////////////////////////
+	// Army / Team Affiliations
 
 protected:
 	// Assigned Army
@@ -89,11 +94,14 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void AssignToTeam(UTPSTeamInstance* team);
+	void AssignToArmy(UTPSArmyInstance* army);
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSArmyInstance* GetAssignedArmy() { return AssignedArmy.Get(); }
 
+	UFUNCTION(BlueprintCallable)
+	void AssignToTeam(UTPSTeamInstance* team);
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSTeamInstance* GetAssignedTeam() { return AssignedTeam.Get(); }
-
 	// Assigned Team ID
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ETPSTeamID GetAssignedTeamID() const;

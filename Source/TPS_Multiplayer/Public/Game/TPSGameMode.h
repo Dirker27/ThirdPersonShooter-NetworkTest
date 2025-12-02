@@ -31,9 +31,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-//~ ==================================================================== ~//
+//~ ====================================================================== ~//
 //  COMPONENTS
-//~ ==================================================================== ~//
+//~ ====================================================================== ~//
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS")
@@ -41,9 +41,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TPS")
 	TObjectPtr<UTPSCombatLog> CombatLog;
 
-//~ ==================================================================== ~//
+
+//~ ====================================================================== ~//
 //  CONFIGURATION
-//~ ==================================================================== ~//
+//~ ====================================================================== ~//
 public:
 
 	// Should we run in DEBUG mode?
@@ -52,6 +53,7 @@ public:
 	//   - https://toastercatstudios.atlassian.net/browse/PC-71
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "TPS|Debug")
 	bool IsDebugEnabled = false;
+
 
 
 	////////////////////////////////////////////////////////
@@ -83,6 +85,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
 	double TimeLimitSeconds;
 
+
+
 	////////////////////////////////////////////////////////
 	// Gameplay Functions
 
@@ -94,6 +98,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="TPS|Config")
 	TMap<TEnumAsByte<ETPSTeamID>, TObjectPtr<UTPSTeamDefinition>> TeamDefinitionMap;
+
 
 
 	////////////////////////////////////////////////////////
@@ -120,9 +125,9 @@ public:
 
 
 
-//~ ============================================================= ~//
+//~ ====================================================================== ~//
 //  OPERATIONS
-//~ ============================================================= ~//
+//~ ====================================================================== ~//
 public:
 
 	////////////////////////////////////////////////////////
@@ -193,19 +198,42 @@ private:
 
 
 	////////////////////////////////////////////////////////
+	// Assignment Operations
+
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Assign")
+	void AssignToArmyAndPossess(ATPSPlayerController* controller, UTPSArmyInstance* army);
+
+
+
+	UFUNCTION(BlueprintCallable)
+	void AssignPlayerToArmy(ATPSPlayerState* player, UTPSArmyInstance* army) const;
+
+	UFUNCTION(BlueprintCallable)
+	void AssignPlayerToTeam(ATPSPlayerState* player, UTPSTeamInstance* team) const;
+
+
+	////////////////////////////////////////////////////////
 	// Pawn Possession
 public:
 	// Possess a provided Character Actor (will absorb instance)
-	UFUNCTION(Server, Reliable, Category = "Possess")
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Possess")
 	void RequestPossessCharacterActor(ATPSPlayerController* controller, ATPSCharacter* character);
 
 	// Possess an Empty Character
-	UFUNCTION(Server, Reliable, Category = "Possess")
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Possess")
 	void RequestPossessCharacterInstance(ATPSPlayerController* controller, UTPSCharacterInstance* character);
+
+
+	// Possess the Leader of a Unit
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Possess")
+	void RequestPossessUnitLeader(ATPSPlayerController * controller, UTPSCommandUnit* unit);
+
 
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure, BlueprintNativeEvent)
 	bool CanCharacterBePossessedByPlayer(ATPSPlayerState* player, UTPSCharacterInstance* character) const;
+
+
 
 
 	////////////////////////////////////////////////////////

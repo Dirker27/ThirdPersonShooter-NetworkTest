@@ -193,7 +193,7 @@ bool ATPSGameMode::SpawnTeam(ETPSTeamID teamId)
 	bool success = true;
 	if (UTPSTeamInstance* t = State()->GetTeam(teamId))
 	{
-		for (auto army : t->Armies) {
+		for (auto army : t->GetArmies()) {
 			success &= SpawnArmy(army->ArmyID);
 		}
 	}
@@ -245,6 +245,37 @@ void ATPSGameMode::_SpawnUnit(UTPSCommandUnit* unit, UTPSSpawnPool* spawnPool)
 	{
 		_SpawnUnit(Cast<UTPSCommandUnit>(subUnit), spawnPool);
 	}
+}
+
+
+
+void ATPSGameMode::AssignToArmyAndPossess_Implementation(ATPSPlayerController* controller, UTPSArmyInstance* army)
+{
+	ATPSPlayerState* player = controller->GetPlayerState<ATPSPlayerState>();
+
+	AssignPlayerToArmy(player, army);
+
+	if (auto team = army->GetAssignedTeam()) {
+		AssignPlayerToTeam(player, team);
+	}
+
+	if (auto unit = army->GetRootUnit())
+	{
+		RequestPossessUnitLeader_Implementation(controller, unit);
+	}
+}
+
+
+void ATPSGameMode::AssignPlayerToArmy(ATPSPlayerState* player, UTPSArmyInstance* army) const
+{
+	player->AssignToArmy(army);
+	army->BindToPlayer(player);
+}
+
+void ATPSGameMode::AssignPlayerToTeam(ATPSPlayerState* player, UTPSTeamInstance* team) const
+{
+	player->AssignToTeam(team);
+	team->AddPlayer(player);
 }
 
 
@@ -401,16 +432,28 @@ void ATPSGameMode::RequestPossessCharacterInstance_Implementation(ATPSPlayerCont
 {
 	if (!IsValid(controller) || !IsValid(character)) { return; }
 
-	if (ATPSPlayerState* player = controller->GetPlayerState<ATPSPlayerState>())
-	{
-		if (! CanCharacterBePossessedByPlayer(player, character))
+	if (ATPSPlayerState* player = controller->GetPlayerState<ATPSPlayerState>()) {
+		if (CanCharacterBePossessedByPlayer(player, character))
 		{
-			return;
+			controller->Possess(character->GetSpawnedActor());
 		}
 	}
-
-	controller->Possess(character->GetSpawnedActor());
 }
+
+
+void ATPSGameMode::RequestPossessUnitLeader_Implementation(ATPSPlayerController* controller, UTPSCommandUnit* unit)
+{
+	if (!IsValid(controller) || !IsValid(unit)) { return; }
+
+	if (auto player = controller->GetPlayerState<ATPSPlayerState>()) {
+		if (CanCharacterBePossessedByPlayer(player, unit->GetLeader()))
+		{
+			controller->Possess(unit->GetLeader()->GetSpawnedActor());
+		}
+	}
+}
+
+
 
 bool ATPSGameMode::CanCharacterBePossessedByPlayer_Implementation(ATPSPlayerState* player, UTPSCharacterInstance* character) const
 {

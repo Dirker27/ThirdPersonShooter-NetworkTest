@@ -52,10 +52,36 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
     int ScoredPoints;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+protected:
+    // Loose Team Members (Characters) that are not associated with an Army.
+    //
+    // TODO: Make Generic "TeamAssignable" for non-character units.
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+    TArray<TObjectPtr<UTPSCharacterInstance>> Members;
+
+    // All armies associated with this team.
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
     TArray<TObjectPtr<UTPSArmyInstance>> Armies;
 
     // All *active* (connected) players that are a part of this team.
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
-    TArray<TObjectPtr<UTPSCharacterInstance>> ActivePlayers;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+    TArray<TObjectPtr<ATPSPlayerState>> Players;
+
+public:
+    UFUNCTION(BlueprintCallable)
+    void AddMember(UTPSCharacterInstance* member);
+    UFUNCTION(BlueprintCallable)
+    void AddArmy(UTPSArmyInstance* army);
+    UFUNCTION(BlueprintCallable)
+    void AddPlayer(ATPSPlayerState* player);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    TArray<UTPSCharacterInstance*> GetMembers() const { return Members; }
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    TArray<UTPSArmyInstance*> GetArmies() const { return Armies; }
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    TArray<ATPSPlayerState*> GetActivePlayers() const { return Players; }
+
 };

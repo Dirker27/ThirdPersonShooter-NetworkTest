@@ -16,13 +16,41 @@ void UTPSTeamInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(ThisClass, TeamID);
-    DOREPLIFETIME(ThisClass, Armies);
-
     DOREPLIFETIME(ThisClass, ScoredPoints);
-    DOREPLIFETIME(ThisClass, ActivePlayers);
+
+    DOREPLIFETIME(ThisClass, Members);
+    DOREPLIFETIME(ThisClass, Armies);
+    DOREPLIFETIME(ThisClass, Players);
 }
 
 bool UTPSTeamInstance::IsSupportedForNetworking() const
 {
     return true;
+}
+
+void UTPSTeamInstance::AddMember(UTPSCharacterInstance* member)
+{
+    if (IsValid(member))
+    {
+        Members.Add(member);
+        TeamUpdate.Broadcast();
+    }
+}
+
+void UTPSTeamInstance::AddArmy(UTPSArmyInstance* army)
+{
+    if (IsValid(army))
+    {
+        Armies.Add(army);
+        TeamUpdate.Broadcast();
+    }
+}
+
+void UTPSTeamInstance::AddPlayer(ATPSPlayerState* player)
+{
+    if (IsValid(player))
+    {
+        Players.Add(player);
+        TeamUpdate.Broadcast();
+    }
 }

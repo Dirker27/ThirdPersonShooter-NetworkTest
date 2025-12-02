@@ -23,6 +23,17 @@ void ATPSPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ThisClass, ID);
 	DOREPLIFETIME(ThisClass, AssignedArmy);
 	DOREPLIFETIME(ThisClass, AssignedTeam);
+	DOREPLIFETIME(ThisClass, FocusActor);
+	DOREPLIFETIME(ThisClass, TargetActor);
+	DOREPLIFETIME(ThisClass, ControlledActor);
+	DOREPLIFETIME(ThisClass, ControlledUnit);
+}
+
+
+void ATPSPlayerState::AssignToArmy(UTPSArmyInstance* army)
+{
+	AssignedArmy = army;
+	PlayerStateUpdate.Broadcast();
 }
 
 

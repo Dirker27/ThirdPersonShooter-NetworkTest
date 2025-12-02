@@ -43,7 +43,7 @@ void UTPSTeamInstanceFactory::ConfigureTeam(const ETPSTeamID teamId, FTPSTeamDef
 			army->AssignToTeam(team);
 			_ConfigureArmy(army, def->Definition);
 
-			team->Armies.Add(army);
+			team->AddArmy(army);
 		}
 	}
 }
@@ -120,10 +120,17 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandUnit* node)
 		// Store
 		node->AddMember(instance);
 		instance->AssignToUnit(node);
+		if (instance->Identity.SquadRole == Leader) {
+			node->SetLeader(instance);
+		}
 
 		State()->Characters.Add(instance);
 		State()->AddReplicatedSubObject(instance);
 		UE_LOG(LogTemp, Log, TEXT("Character[%s] instantiated."), *instance->CharacterID.Guid.ToString());
+	}
+	if (!IsValid(node->GetLeader()) && !node->GetAllMembers().IsEmpty())
+	{
+		node->SetLeader(node->GetAllMembers()[0]);
 	}
 
 	for (auto subUnit : node->GetAllSubCollections())
@@ -138,7 +145,7 @@ void UTPSTeamInstanceFactory::PopulateTeam(ETPSTeamID teamId, TArray<UTPSCharact
 	ATPSGameState* state = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
 	if (auto team = state->GetTeam(teamId))
 	{
-		for (auto army : team->Armies)
+		for (auto army : team->GetArmies())
 		{
 			_PopulateUnit(army->GetRootUnit());
 		}
