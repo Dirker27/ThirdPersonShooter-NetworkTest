@@ -24,11 +24,6 @@ ATPSCharacter::ATPSCharacter()
 
 	//- Sub-Components ------------------------------------=
 	//
-	// TODO: Initialize or load these from persistent store
-	//Identity = CreateDefaultSubobject<UTPSCharacterIdentity>(TEXT("DefaultIdentity"));
-	//Record = CreateDefaultSubobject<UTPSCharacterRecord>(TEXT("DefaultRecord"));
-	Configuration = CreateDefaultSubobject<UTPSCharacterConfiguration>(TEXT("DefaultConfiguration"));
-	//
 	Inventory = CreateDefaultSubobject<UTPSCharacterInventory>(TEXT("Inventory"));
 	//
 	EquipmentManager = CreateDefaultSubobject<UTPSEquipmentManager>(TEXT("EquipmentManager"));
@@ -90,6 +85,7 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 	DOREPLIFETIME(ATPSCharacter, CurrentLocomotionState);
 	DOREPLIFETIME(ATPSCharacter, CurrentBehaviorState);
+	DOREPLIFETIME(ATPSCharacter, Stance);
 
 	DOREPLIFETIME(ATPSCharacter, IsBoosting);
 	DOREPLIFETIME(ATPSCharacter, IsCrouchInputReceived);
@@ -98,10 +94,12 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ATPSCharacter, IsEquipping);
 	DOREPLIFETIME(ATPSCharacter, IsReloading);
 	DOREPLIFETIME(ATPSCharacter, IsInteracting);
+	DOREPLIFETIME(ATPSCharacter, IsTransitioning);
 	DOREPLIFETIME(ATPSCharacter, IsInMenu);
 
 	//DOREPLIFETIME(ATPSCharacter, TargetLookLocation);
 	DOREPLIFETIME(ATPSCharacter, TargetLookRotation);
+	DOREPLIFETIME(ATPSCharacter, HasDeathTriggered);
 }
 
 
@@ -372,7 +370,7 @@ bool ATPSCharacter::IsCrouching() const
 }
 bool ATPSCharacter::IsIdle() const
 {
-	return IdleSeconds >= Configuration->IdleThresholdSeconds;
+	return IdleSeconds >= GetConfiguration().IdleThresholdSeconds;
 }
 
 FVector2D ATPSCharacter::GetCurrentAccuracyTolerance() const
@@ -383,8 +381,8 @@ FVector2D ATPSCharacter::GetCurrentAccuracyTolerance() const
 		accuracyModifier = asc->GetSet<UWeaponAttributeSet>()->GetAccuracyModifier();
 	}
 
-	return FVector2D(Configuration->BaseAccuracyTolerance, 
-					 Configuration->BaseAccuracyTolerance) / accuracyModifier;
+	return FVector2D(GetConfiguration().BaseAccuracyTolerance,
+		GetConfiguration().BaseAccuracyTolerance) / accuracyModifier;
 }
 
 ATPSWeapon* ATPSCharacter::GetEquippedWeapon() const

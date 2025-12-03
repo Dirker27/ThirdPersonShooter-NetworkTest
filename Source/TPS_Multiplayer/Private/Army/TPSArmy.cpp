@@ -10,10 +10,15 @@ void UTPSArmyInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-    DOREPLIFETIME(UTPSArmyInstance, ArmyID);
-    DOREPLIFETIME(UTPSArmyInstance, Identity);
-    DOREPLIFETIME(UTPSArmyInstance, RootUnit);
-    DOREPLIFETIME(UTPSArmyInstance, OwningPlayer);
+    DOREPLIFETIME(ThisClass, ArmyID);
+    DOREPLIFETIME(ThisClass, Identity);
+    DOREPLIFETIME(ThisClass, RootUnit);
+    DOREPLIFETIME(ThisClass, OwningPlayer);
+
+    DOREPLIFETIME(ThisClass, Members);
+    DOREPLIFETIME(ThisClass, ActiveMembers);
+    DOREPLIFETIME(ThisClass, Units);
+    DOREPLIFETIME(ThisClass, AssignedTeam);
 }
 
 bool UTPSArmyInstance::IsSupportedForNetworking() const

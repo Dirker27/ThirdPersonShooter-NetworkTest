@@ -9,6 +9,7 @@
 #include "TPSCharacterRecord.h"
 
 #include "Equipment/TPSEquipmentLoadout.h"
+#include "Player/TPSPlayerState.h"
 #include "Types/TPSHitInfo.h"
 
 #include "TPSCharacterInstance.generated.h"
@@ -74,8 +75,12 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TObjectPtr<UTPSEquipmentLoadout> Loadout = nullptr;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing=OnRep_IsAlive)
     bool IsAlive = true;
+
+    UFUNCTION()
+    void OnRep_IsAlive();
+
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
     FTPSHitInfo LastHit;
@@ -87,15 +92,19 @@ public:
     // TODO: Migrate to "Assignment" Struct
 
 protected:
+
     // Assigned Unit
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing=OnRep_Assignment)
     TWeakObjectPtr<UTPSCommandUnit> AssignedUnit;
     // Assigned Army
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_Assignment)
     TWeakObjectPtr<UTPSArmyInstance> AssignedArmy;
     // Assigned Team
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_Assignment)
     TWeakObjectPtr<UTPSTeamInstance> AssignedTeam;
+
+    UFUNCTION()
+    void OnRep_Assignment();
 
 public:
     UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -155,6 +164,16 @@ public:
 
     UFUNCTION(BlueprintCallable)
     ATPSCharacter* GetSpawnedActor() const { return SpawnedActor; }
+
+
+    // Player who currently owns/controls this instance (Spawned Actor is Possessed)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_OwningPlayer)
+    TWeakObjectPtr<ATPSPlayerState> OwningPlayer;
+
+    UFUNCTION()
+    void OnRep_OwningPlayer();
+
+
 
 private:
     UFUNCTION()

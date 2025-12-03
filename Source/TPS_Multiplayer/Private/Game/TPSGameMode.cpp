@@ -203,10 +203,10 @@ bool ATPSGameMode::SpawnTeam(ETPSTeamID teamId)
 bool ATPSGameMode::SpawnArmy(FTPSArmyID armyId)
 {
 	UE_LOG(LogTemp, Log, TEXT("Spawning Army[%s]..."), *armyId.ToString());
-	if (UTPSArmyInstance* a = State()->GetArmy(armyId))
+	if (UTPSArmyInstance* army = State()->GetArmy(armyId))
 	{
-		if (auto unit = a->GetRootUnit()) {
-			SpawnUnit(a->GetRootUnit()->UnitID);
+		if (auto unit = army->GetRootUnit()) {
+			SpawnUnit(army->GetRootUnit()->UnitID);
 			UE_LOG(LogTemp, Log, TEXT("Army[%s] spawned."), *armyId.ToString());
 			return true;
 		}

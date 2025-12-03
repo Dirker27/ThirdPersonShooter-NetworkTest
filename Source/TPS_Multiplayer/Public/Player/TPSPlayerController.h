@@ -25,6 +25,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+
 //~ ==================================================================== ~//
 //  COMPONENTS
 //~ ==================================================================== ~//
@@ -33,8 +34,9 @@ protected:
 	virtual void SetupInputComponent() override;
 	virtual void OnRep_PlayerState() override;
 
+
 //~ ==================================================================== ~//
-//  ATTRIBUTES
+//  LIVE STATE
 //~ ==================================================================== ~//
 public:
 
@@ -51,13 +53,38 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool IsFreeCam;
 
+
 //~ ==================================================================== ~//
-//  BEHAVIOR OPERATIONS
+//  OPERATIONS
 //~ ==================================================================== ~//
 public:
-	FVector GetCameraTargetLocation() const;
 
-	void NotifyPawnDeath();
+	////////////////////////////////////////////////////////
+	// Initialization & Lifecycle
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsHUDInitialized = false;
+
+	void TryInitializeHUD();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnInitializeHUD();
+
+
+	////////////////////////////////////////////////////////
+	// Possession
+
+	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnUnPossess() override;
+
+	virtual void OnRep_Pawn() override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPossessPawn_Replicated();
+
+
+
+
+
 
 	UFUNCTION(Server, Reliable, Category = "Pawn|Respawn")
 	void RequestRespawn();
@@ -68,9 +95,15 @@ public:
 	UFUNCTION(Server, Reliable, Category = "Pawn|Possess")
 	void UnPossessCurrentPawn();
 
+	////////////////////////////////////////////////////////
+	// Targeting Behavior
 
-	virtual void OnPossess(APawn* InPawn) override;
-	virtual void OnUnPossess() override;
+	FVector GetCameraTargetLocation() const;
+
+	void NotifyPawnDeath();
+
+
+
 
 
 

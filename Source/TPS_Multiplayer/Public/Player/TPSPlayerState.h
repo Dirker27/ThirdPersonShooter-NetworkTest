@@ -7,7 +7,6 @@
 #include "AbilitySystemInterface.h"
 
 #include "TPSPlayerID.h"
-#include "Army/Unit/TPSCommandUnit.h"
 
 #include "GAS/GASAbilitySet.h"
 #include "Team/TPSTeamID.h"
@@ -15,6 +14,7 @@
 #include "TPSPlayerState.generated.h"
 
 
+class UTPSCommandUnit;
 class UTPSArmyInstance;
 class UTPSTeamInstance;
 

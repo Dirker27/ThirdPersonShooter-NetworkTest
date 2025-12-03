@@ -27,6 +27,7 @@ void ATPSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
     // WorldState
     DOREPLIFETIME(ThisClass, Teams);
+    DOREPLIFETIME(ThisClass, Armies);
     DOREPLIFETIME(ThisClass, TeamUnits);
     DOREPLIFETIME(ThisClass, Characters);
     DOREPLIFETIME(ThisClass, Players);
@@ -176,7 +177,7 @@ UTPSTeamInstance* ATPSGameState::GetTeam(const ETPSTeamID teamId)
     // perform slow fetch (fallback)
     for (auto team : Teams)
     {
-        if (team->TeamID == teamId)
+        if (IsValid(team) && team->TeamID == teamId)
         {
             return team;
         }

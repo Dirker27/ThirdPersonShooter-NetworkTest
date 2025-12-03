@@ -52,6 +52,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static FLinearColor GetColorForLog(ETPSLogSource source);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static float GetDurationForLogLevel(ETPSSystemLogLevel level);
+
 
 	UFUNCTION(BlueprintCallable)
 	static void Log(const FText message, const ETPSSystemLogLevel level = INFO);

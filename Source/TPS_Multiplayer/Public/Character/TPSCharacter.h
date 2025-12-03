@@ -26,7 +26,10 @@
 
 #include "TPSCharacter.generated.h"
 
+
 class UTPSCharacterInstance;
+class UTPSTeamInstance;
+class UTPSArmyInstance;
 class UTPSCommandUnit;
 
 UDELEGATE(BlueprintAuthorityOnly)
@@ -137,12 +140,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration")
 	bool CanDie = false;
 
-	// Character Attributes Configuration
-	//   Can be overridden by PlayerState on Possession.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TPSCharacter|Configuration", Replicated)
-	TObjectPtr<UTPSCharacterConfiguration> Configuration;
-
-
 
 	//////////////////////////////////////////////////////
 	// Assignment Info
@@ -215,7 +212,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
 	bool HasDeathTriggered;
 	//
-	// IsInitialized (Synthetic)
+	// IsHUDInitialized (Synthetic)
 	//   True if bound to CharacterInstance.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsInitialized() const;
@@ -267,6 +264,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ATPSWeapon* GetEquippedWeapon() const;
 
+
 	////////////////////////////////////////////////////////
 	// Input / Ability States
 
@@ -296,6 +294,8 @@ public:
 	//
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input", Replicated)
 	bool IsInMenu;
+
+
 
 	//////////////////////////////////////////////////////
 	// UI Visibility

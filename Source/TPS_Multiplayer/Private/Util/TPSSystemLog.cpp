@@ -28,6 +28,22 @@ FLinearColor UTPSSystemLog::GetColorForLog(ETPSLogSource source)
 	}
 }
 
+float UTPSSystemLog::GetDurationForLogLevel(ETPSSystemLogLevel level)
+{
+	switch (level)
+	{
+	case ERROR:
+		return 20.f;
+	case WARN:
+		return 10.f;
+	case INFO:
+		return 5.f;
+	default:
+		return 1.f;
+	}
+}
+
+
 
 void UTPSSystemLog::Log(const FText message, const ETPSSystemLogLevel level)
 {

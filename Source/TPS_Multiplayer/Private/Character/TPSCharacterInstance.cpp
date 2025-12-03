@@ -15,6 +15,8 @@ void UTPSCharacterInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(ThisClass, CharacterID);
+
 	DOREPLIFETIME(ThisClass, Instigator);
 	DOREPLIFETIME(ThisClass, Identity);
 	DOREPLIFETIME(ThisClass, Configuration);
@@ -23,6 +25,26 @@ void UTPSCharacterInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(ThisClass, SpawnedActor);
 	DOREPLIFETIME(ThisClass, IsAlive);
 	DOREPLIFETIME(ThisClass, LastHit);
+
+	DOREPLIFETIME(ThisClass, OwningPlayer);
+	DOREPLIFETIME(ThisClass, AssignedUnit);
+	DOREPLIFETIME(ThisClass, AssignedArmy);
+	DOREPLIFETIME(ThisClass, AssignedTeam);
+}
+
+void UTPSCharacterInstance::OnRep_IsAlive()
+{
+	CharacterInstanceUpdate.Broadcast();
+}
+
+void UTPSCharacterInstance::OnRep_OwningPlayer()
+{
+	CharacterInstanceUpdate.Broadcast();
+}
+
+void UTPSCharacterInstance::OnRep_Assignment()
+{
+	CharacterInstanceUpdate.Broadcast();
 }
 
 

@@ -23,11 +23,6 @@ void UTPSTeamInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     DOREPLIFETIME(ThisClass, Players);
 }
 
-bool UTPSTeamInstance::IsSupportedForNetworking() const
-{
-    return true;
-}
-
 void UTPSTeamInstance::AddMember(UTPSCharacterInstance* member)
 {
     if (IsValid(member))

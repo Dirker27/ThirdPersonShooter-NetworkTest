@@ -6,6 +6,7 @@
 #include <Kismet/GameplayStatics.h>
 
 #include "Army/Unit/TPSUnitHierarchy.h"
+#include "Army/Unit/TPSUnitID.h"
 #include "Character/TPSCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Team/TPSTeamID.h"

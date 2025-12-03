@@ -1,6 +1,5 @@
 // (C) ToasterCat Studios 2025
 
-
 #include "Player/TPSPlayerController.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -24,6 +23,28 @@ void ATPSPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BeginPlay()"));
+
+	if (IsLocalPlayerController()) {
+		TryInitializeHUD();
+	}
+}
+
+// Executes ON OWNING CLIENT when PlayerState is connected to Controller from Server
+void ATPSPlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::OnRep_PlayerState()"));
+
+	TryInitializeHUD();
+}
+
+// Executes ON OWNING CLIENT when Pawn is connected to Controller from Server
+void ATPSPlayerController::OnRep_Pawn()
+{
+	Super::OnRep_Pawn();
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::OnRep_Pawn()"));
+
+	OnPossessPawn_Replicated();
 }
 
 void ATPSPlayerController::SetupInputComponent()
@@ -32,20 +53,20 @@ void ATPSPlayerController::SetupInputComponent()
 	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::SetupInputComponent()"));
 }
 
-void ATPSPlayerController::OnRep_PlayerState()
-{
-	Super::OnRep_PlayerState();
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::OnRep_PlayerState()"));
-}
-
 // PlayerControllers are NOT replicated to peer clients
 //   This sync will only ever be between Server<->OwningClient
+// ie:
+//     Player1 <-> Server == Controller1
+//     Player2 <-> Server == Controller2
+//     Player1 <-> Player2 != Controller1 || Controller2
 void ATPSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ATPSPlayerController, PossessedCharacter);
-	DOREPLIFETIME(ATPSPlayerController, PossessedPawn);
+	DOREPLIFETIME(ThisClass, PossessedCharacter);
+	DOREPLIFETIME(ThisClass, PossessedPawn);
+
+	//DOREPLIFETIME(ThisClass, IsHUDInitialized);
 }
 
 void ATPSPlayerController::Tick(float DeltaSeconds)
@@ -61,6 +82,20 @@ void ATPSPlayerController::Tick(float DeltaSeconds)
 		PossessedPawn->SetTargetLocation(GetCameraTargetLocation());
 	}
 }
+
+
+void ATPSPlayerController::TryInitializeHUD()
+{
+	if (!IsValid(PlayerState)) { return; }
+	if (IsHUDInitialized) { return; }
+
+	UE_LOG(LogTemp, Log, TEXT("Initializing PlayerController[%s] with PlayerState[%s]..."), *GetName(), *PlayerState.GetName());
+	OnInitializeHUD();
+
+	IsHUDInitialized = true;
+	UE_LOG(LogTemp, Log, TEXT("PlayerController[%s] initialized with PlayerState[%s]."), *GetName(), *PlayerState.GetName());
+}
+
 
 
 

@@ -20,8 +20,8 @@ void UTPSTeamInstanceFactory::CreateTeam(const ETPSTeamID teamId)
 		FName(FString("TEAM-").Append(TPSTeamIdToString(teamId))));
 	team->TeamID = teamId;
 
-	State()->Teams.Add(team);
 	State()->AddReplicatedSubObject(team);
+	State()->Teams.Add(team);
 }
 
 
@@ -64,10 +64,15 @@ void UTPSTeamInstanceFactory::_ConfigureArmy(UTPSArmyInstance* army, FTPSArmyDef
 		unit->Identity.BannerColor = army->Identity->BannerColor;
 		_ConfigureUnit(unit, data.RootUnitSchema->Schema, army);
 		army->AssignRootUnit(unit);
+
+		State()->AddReplicatedSubObject(unit);
+		State()->TeamUnits.Add(unit);
 	}
 
 	// Index to TPSGameState
+	State()->AddReplicatedSubObject(army);
 	State()->Armies.Add(army);
+	UE_LOG(LogTemp, Log, TEXT("Army[%s] instantiated."), *army->ArmyID.ToString());
 }
 
 
@@ -75,7 +80,7 @@ void UTPSTeamInstanceFactory::_ConfigureArmy(UTPSArmyInstance* army, FTPSArmyDef
 void UTPSTeamInstanceFactory::_ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSchemaData schema, UTPSArmyInstance* army)
 {
 	if (!IsValid(node)) { return; }
-	UE_LOG(LogTemp, Log, TEXT("Configuring Unit[%s]..."), *UTPSFunctionLibrary::GetNameForUnitID(node->UnitID));
+	UE_LOG(LogTemp, Log, TEXT("Instantiating Unit[%s]..."), *UTPSFunctionLibrary::GetNameForUnitID(node->UnitID));
 
 	node->UnitLevel = schema.Level;
 	node->Identity.Alias = UTPSUnitInstanceFactory::RandomSquadName();
@@ -94,8 +99,9 @@ void UTPSTeamInstanceFactory::_ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSche
 	}
 
 	// Index to TPSGameState
-	State()->TeamUnits.Add(node);
 	State()->AddReplicatedSubObject(node);
+	State()->TeamUnits.Add(node);
+	UE_LOG(LogTemp, Log, TEXT("Unit[%s] instantiated."), *node->UnitID.ToString());
 }
 
 
@@ -112,7 +118,7 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandUnit* node)
 		// Configure (via CharacterFactory)
 		CharacterFactory->ConfigureCharacterInstanceForUnitAndRole(instance,
 			node, roleDefinition);
-		UE_LOG(LogTemp, Log, TEXT("Instantiating Character[%s]..."), *instance->CharacterID.Guid.ToString());
+		UE_LOG(LogTemp, Log, TEXT("Instantiating CharacterInstance[%s]..."), *instance->CharacterID.Guid.ToString());
 
 		// Assign Loadout
 		instance->Loadout = roleDefinition.Loadout;
@@ -126,7 +132,7 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandUnit* node)
 
 		State()->Characters.Add(instance);
 		State()->AddReplicatedSubObject(instance);
-		UE_LOG(LogTemp, Log, TEXT("Character[%s] instantiated."), *instance->CharacterID.Guid.ToString());
+		UE_LOG(LogTemp, Log, TEXT("CharacterInstance[%s] instantiated."), *instance->CharacterID.Guid.ToString());
 	}
 	if (!IsValid(node->GetLeader()) && !node->GetAllMembers().IsEmpty())
 	{

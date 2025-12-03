@@ -29,7 +29,7 @@ public:
 
 protected:
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-    virtual bool IsSupportedForNetworking() const override;
+    virtual bool IsSupportedForNetworking() const override { return true; }
 
 //~ ==================================================================== ~//
 //  ATTRIBUTES
