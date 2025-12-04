@@ -16,9 +16,8 @@
 #include "TPSGameMode.generated.h"
 
 /**
- * 
- *
- * No point in replicating - GameMode is SERVER-ONLY.
+ * No point in replicating - GameMode exists and executes on SERVER-ONLY.
+ *   GetGameMode() will return nullptr on all client instances.
  */
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSGameMode : public AGameMode

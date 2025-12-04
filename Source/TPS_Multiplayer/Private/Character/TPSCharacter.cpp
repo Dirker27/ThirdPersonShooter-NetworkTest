@@ -875,6 +875,10 @@ void ATPSCharacter::UnPossessed()
 	ShouldNotify = true;
 }
 
+void ATPSCharacter::NotifyControllerChanged()
+{
+	Super::NotifyControllerChanged();
+}
 
 
 

@@ -18,41 +18,6 @@ ATPSPlayerController::ATPSPlayerController()
 	//SetHidden(false);
 }
 
-
-void ATPSPlayerController::BeginPlay()
-{
-	Super::BeginPlay();
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BeginPlay()"));
-
-	if (IsLocalPlayerController()) {
-		TryInitializeHUD();
-	}
-}
-
-// Executes ON OWNING CLIENT when PlayerState is connected to Controller from Server
-void ATPSPlayerController::OnRep_PlayerState()
-{
-	Super::OnRep_PlayerState();
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::OnRep_PlayerState()"));
-
-	TryInitializeHUD();
-}
-
-// Executes ON OWNING CLIENT when Pawn is connected to Controller from Server
-void ATPSPlayerController::OnRep_Pawn()
-{
-	Super::OnRep_Pawn();
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::OnRep_Pawn()"));
-
-	OnPossessPawn_Replicated();
-}
-
-void ATPSPlayerController::SetupInputComponent()
-{
-	Super::SetupInputComponent();
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::SetupInputComponent()"));
-}
-
 // PlayerControllers are NOT replicated to peer clients
 //   This sync will only ever be between Server<->OwningClient
 // ie:
@@ -63,40 +28,97 @@ void ATPSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, PossessedCharacter);
-	DOREPLIFETIME(ThisClass, PossessedPawn);
+	DOREPLIFETIME(ThisClass, ControllerState);
+}
 
-	//DOREPLIFETIME(ThisClass, IsHUDInitialized);
+void ATPSPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BeginPlay()"));
+
+	if (auto p = BoundPlayer())
+	{
+		BindToPlayer(p);
+	}
+}
+
+// Executes ON OWNING CLIENT when PlayerState is connected to Controller from Server
+void ATPSPlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::OnRep_PlayerState()"));
+
+	if (auto p = BoundPlayer())
+	{
+		BindToPlayer(p);
+	}
+}
+
+// Executes ON OWNING CLIENT when Pawn is connected to Controller from Server
+void ATPSPlayerController::OnRep_Pawn()
+{
+	Super::OnRep_Pawn();
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::OnRep_Pawn()"));
+}
+
+void ATPSPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::SetupInputComponent()"));
+}
+
+void ATPSPlayerController::SetControllerState(const ETPSControllerState state)
+{
+	ControllerState = state;
+	ControllerStateUpdate.Broadcast();
+}
+
+void ATPSPlayerController::OnRep_ControllerState()
+{
+	ControllerStateUpdate.Broadcast();
+}
+
+void ATPSPlayerController::BindToPlayer(ATPSPlayerState* newPlayer)
+{
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BindToPlayer([%s])"), *newPlayer->GetName());
+	OnBindToPlayer(newPlayer);
+}
+
+void ATPSPlayerController::BindToCharacter(ATPSCharacter* newCharacter)
+{
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BindToCharacter([%s])"), *newCharacter->GetName());
+	OnBindToCharacter(newCharacter);
+}
+void ATPSPlayerController::UnBindFromCharacter(ATPSCharacter* oldCharacter)
+{
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::UnBindFromCharacter([%s])"), *oldCharacter->GetName());
+	OnUnBindFromCharacter(oldCharacter);
+}
+
+void ATPSPlayerController::BindToPawn(ATPSPawn* newPawn)
+{
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BindToPawn([%s])"), *newPawn->GetName());
+	OnBindToPawn(newPawn);
+}
+void ATPSPlayerController::UnBindFromPawn(ATPSPawn* oldPawn)
+{
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::UnBindFromPawn([%s])"), *oldPawn->GetName());
+	OnBindToPawn(oldPawn);
 }
 
 void ATPSPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (PossessedCharacter.IsValid())
+	if (auto character  = PossessedCharacter())
 	{
-		PossessedCharacter->SetTargetLocation(GetCameraTargetLocation());
+		character->SetTargetLocation(GetCameraTargetLocation());
 	}
-	if (PossessedPawn.IsValid())
+	else if (auto p = PossessedPawn())
 	{
-		PossessedPawn->SetTargetLocation(GetCameraTargetLocation());
+		p->SetTargetLocation(GetCameraTargetLocation());
 	}
 }
-
-
-void ATPSPlayerController::TryInitializeHUD()
-{
-	if (!IsValid(PlayerState)) { return; }
-	if (IsHUDInitialized) { return; }
-
-	UE_LOG(LogTemp, Log, TEXT("Initializing PlayerController[%s] with PlayerState[%s]..."), *GetName(), *PlayerState.GetName());
-	OnInitializeHUD();
-
-	IsHUDInitialized = true;
-	UE_LOG(LogTemp, Log, TEXT("PlayerController[%s] initialized with PlayerState[%s]."), *GetName(), *PlayerState.GetName());
-}
-
-
 
 
 //~ ====================================================================== ~//
@@ -141,9 +163,6 @@ void ATPSPlayerController::NotifyPawnDeath()
 {
 	RequestRespawn();
 }
-
-
-
 
 
 
@@ -265,15 +284,6 @@ void ATPSPlayerController::Respawn()
 void ATPSPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-
-	if (ATPSCharacter* c = Cast<ATPSCharacter>(InPawn))
-	{
-		PossessedCharacter = c;
-	}
-	else if (ATPSPawn* p = Cast<ATPSPawn>(InPawn))
-	{
-		PossessedPawn = p;
-	}
 }
 
 
@@ -316,8 +326,6 @@ void ATPSPlayerController::PossessPawn()
 void ATPSPlayerController::OnUnPossess()
 {
 	Super::OnUnPossess();
-	PossessedCharacter = nullptr;
-	PossessedPawn = nullptr;
 }
 
 void ATPSPlayerController::UnPossessCurrentPawn_Implementation()

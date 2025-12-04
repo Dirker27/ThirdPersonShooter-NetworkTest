@@ -65,9 +65,6 @@ void UTPSCharacterInstance::SpawnActor(TSubclassOf<ATPSCharacter> actorTemplate,
 	characterActor->SpawnDefaultController();
 
 	SpawnedActor = characterActor;
-
-
-	
 }
 
 void UTPSCharacterInstance::DestroyActor()

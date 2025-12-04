@@ -136,7 +136,6 @@ public:
 	//////////////////////////////////////////////////////
 	// Reporting
 
-	// Broadcast Delegate
 	UFUNCTION(BlueprintCallable)
 	void ReportProjectileHit(FHitResult hit);
 

@@ -39,7 +39,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterAttributeUpdate);
  * Defines an arbitrary Character in our game's universe.
  *
  *   - Identity: A character's persona (name, alignment, assignment)
- *   - State: Life experience (XP, stats, and history)
+ *   - Record: Life experience (XP, stats, and history)
  *   - Configuration: Attributes and characteristics (Strength, accuracy)
  */
 UCLASS()
@@ -57,7 +57,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+	virtual void NotifyControllerChanged() override;
 
 //~ ======================================================================== ~//
 //  COMPONENTS

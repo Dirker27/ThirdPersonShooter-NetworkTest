@@ -3,15 +3,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TPSPlayerState.h"
 #include "GameFramework/PlayerController.h"
 
 #include "Character/Types/TPSCharacterBehaviorState.h"
 #include "Character/TPSCharacter.h"
+#include "Pawn/TPSPawn.h"
 #include "Player/TPSControllerConfiguration.h"
 
 #include "TPSPlayerController.generated.h"
 
-class ATPSPawn;
+UENUM(BlueprintType)
+enum ETPSControllerState : int
+{
+	Initializing,
+	Active,
+	Disconnected
+};
+
+
+UDELEGATE(BlueprintAuthorityOnly)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FControllerStateUpdate);
 
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSPlayerController : public APlayerController
@@ -35,6 +47,10 @@ protected:
 	virtual void OnRep_PlayerState() override;
 
 
+	// Broadcast Delegate
+	UPROPERTY(BlueprintAssignable)
+	FControllerStateUpdate ControllerStateUpdate;
+
 //~ ==================================================================== ~//
 //  LIVE STATE
 //~ ==================================================================== ~//
@@ -43,15 +59,33 @@ public:
 	////////////////////////////////////////////////////////
 	// State
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
-	TWeakObjectPtr<ATPSCharacter> PossessedCharacter;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_ControllerState)
+	TEnumAsByte<ETPSControllerState> ControllerState = Initializing;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
-	TWeakObjectPtr<ATPSPawn> PossessedPawn;
+	UFUNCTION()
+	void OnRep_ControllerState();
+
 
 	// Disables Camera->Character Rotation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool IsFreeCam;
+
+
+
+	////////////////////////////////////////////////////////
+	// Synthetic Getters
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ATPSCharacter* PossessedCharacter() { return Cast<ATPSCharacter>(GetPawn()); }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ATPSPawn* PossessedPawn() { return Cast<ATPSPawn>(GetPawn()); }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ATPSPlayerState* BoundPlayer() { return GetPlayerState<ATPSPlayerState>(); }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsInitialized() { return IsValid(BoundPlayer()); }
 
 
 //~ ==================================================================== ~//
@@ -62,38 +96,39 @@ public:
 	////////////////////////////////////////////////////////
 	// Initialization & Lifecycle
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool IsHUDInitialized = false;
-
-	void TryInitializeHUD();
+	UFUNCTION(BlueprintCallable)
+	void BindToPlayer(ATPSPlayerState* newPlayer);
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnInitializeHUD();
+	void OnBindToPlayer(ATPSPlayerState* newPlayer);
+
+	UFUNCTION(BlueprintCallable)
+	void BindToCharacter(ATPSCharacter* newCharacter);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnBindToCharacter(ATPSCharacter* newCharacter);
+	UFUNCTION(BlueprintCallable)
+	void UnBindFromCharacter(ATPSCharacter* oldCharacter);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnUnBindFromCharacter(ATPSCharacter* oldCharacter);
+
+	UFUNCTION(BlueprintCallable)
+	void BindToPawn(ATPSPawn* newPawn);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnBindToPawn(ATPSPawn* newPawn);
+	UFUNCTION(BlueprintCallable)
+	void UnBindFromPawn(ATPSPawn* oldPawn);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnUnBindFromPawn(ATPSPawn* oldPawn);
 
 
 	////////////////////////////////////////////////////////
 	// Possession
 
+	// Fires on SERVER
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
 
+	// Fires on CLIENT
 	virtual void OnRep_Pawn() override;
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnPossessPawn_Replicated();
-
-
-
-
-
-
-	UFUNCTION(Server, Reliable, Category = "Pawn|Respawn")
-	void RequestRespawn();
-
-	UFUNCTION(Server, Reliable, Category = "Pawn|Possess")
-	void PossessNearestPlayablePawn();
-
-	UFUNCTION(Server, Reliable, Category = "Pawn|Possess")
-	void UnPossessCurrentPawn();
 
 	////////////////////////////////////////////////////////
 	// Targeting Behavior
@@ -105,7 +140,11 @@ public:
 
 
 
+	////////////////////////////////////////////////////////
+	// UI States & Menu Selection
 
+	UFUNCTION(BlueprintCallable)
+	void SetControllerState(const ETPSControllerState state);
 
 //~ ==================================================================== ~//
 //  CONSOLE COMMANDS (Developer-only API)
@@ -157,6 +196,15 @@ public:
 
 	UFUNCTION(Exec, Category = "Pawn|Respawn")
 	void Respawn();
+
+	UFUNCTION(Server, Reliable, Category = "Pawn|Respawn")
+	void RequestRespawn();
+
+	UFUNCTION(Server, Reliable, Category = "Pawn|Possess")
+	void PossessNearestPlayablePawn();
+
+	UFUNCTION(Server, Reliable, Category = "Pawn|Possess")
+	void UnPossessCurrentPawn();
 
 	UFUNCTION(Exec, Category = "Pawn|Possess")
 	void PossessPawn();
