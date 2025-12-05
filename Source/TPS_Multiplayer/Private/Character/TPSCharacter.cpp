@@ -222,8 +222,8 @@ void ATPSCharacter::Tick(float deltaTime)
 	CurrentLookLocation = FMath::Lerp(CurrentLookLocation, TargetLookLocation, LookTargetInterpRate);
 	//CurrentLookLocation = FMath::FInterpTo(CurrentLookLocation, TargetLookLocation, deltaTime, LookTargetInterpRate);
 	if (IsTargetingLocation) {
-		FVector delta = CurrentLookLocation - GetActorLocation();
-		TargetLookRotation = delta.Rotation();
+		//FVector delta = CurrentLookLocation - GetActorLocation();
+		//TargetLookRotation = delta.Rotation();
 	}
 	else {
 		FRotator vr = GetViewRotation();

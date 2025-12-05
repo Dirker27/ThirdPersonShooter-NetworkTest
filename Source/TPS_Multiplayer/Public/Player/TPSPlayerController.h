@@ -130,9 +130,12 @@ public:
 	// Fires on CLIENT
 	virtual void OnRep_Pawn() override;
 
+
+
 	////////////////////////////////////////////////////////
 	// Targeting Behavior
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector GetCameraTargetLocation() const;
 
 	void NotifyPawnDeath();
