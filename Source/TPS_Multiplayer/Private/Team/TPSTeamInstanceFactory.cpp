@@ -20,8 +20,7 @@ void UTPSTeamInstanceFactory::CreateTeam(const ETPSTeamID teamId)
 		FName(FString("TEAM-").Append(TPSTeamIdToString(teamId))));
 	team->TeamID = teamId;
 
-	State()->AddReplicatedSubObject(team);
-	State()->Teams.Add(team);
+	State()->RegisterTeam(team);
 }
 
 
@@ -65,13 +64,11 @@ void UTPSTeamInstanceFactory::_ConfigureArmy(UTPSArmyInstance* army, FTPSArmyDef
 		_ConfigureUnit(unit, data.RootUnitSchema->Schema, army);
 		army->AssignRootUnit(unit);
 
-		State()->AddReplicatedSubObject(unit);
-		State()->TeamUnits.Add(unit);
+		State()->RegisterUnit(unit);
 	}
 
 	// Index to TPSGameState
-	State()->AddReplicatedSubObject(army);
-	State()->Armies.Add(army);
+	State()->RegisterArmy(army);
 	UE_LOG(LogTemp, Log, TEXT("Army[%s] instantiated."), *army->ArmyID.ToString());
 }
 
@@ -99,8 +96,7 @@ void UTPSTeamInstanceFactory::_ConfigureUnit(UTPSCommandUnit* node, FTPSUnitSche
 	}
 
 	// Index to TPSGameState
-	State()->AddReplicatedSubObject(node);
-	State()->TeamUnits.Add(node);
+	State()->RegisterUnit(node);
 	UE_LOG(LogTemp, Log, TEXT("Unit[%s] instantiated."), *node->UnitID.ToString());
 }
 
@@ -130,8 +126,7 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandUnit* node)
 			node->SetLeader(instance);
 		}
 
-		State()->Characters.Add(instance);
-		State()->AddReplicatedSubObject(instance);
+		State()->RegisterCharacter(instance);
 		UE_LOG(LogTemp, Log, TEXT("CharacterInstance[%s] instantiated."), *instance->CharacterID.Guid.ToString());
 	}
 	if (!IsValid(node->GetLeader()) && !node->GetAllMembers().IsEmpty())

@@ -28,7 +28,7 @@ void ATPSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
     // WorldState
     DOREPLIFETIME(ThisClass, Teams);
     DOREPLIFETIME(ThisClass, Armies);
-    DOREPLIFETIME(ThisClass, TeamUnits);
+    DOREPLIFETIME(ThisClass, Units);
     DOREPLIFETIME(ThisClass, Characters);
     DOREPLIFETIME(ThisClass, Players);
 
@@ -95,6 +95,7 @@ FString ATPSGameState::GetTimeRemainingSecondsAsString() const
 }
 
 
+
 int ATPSGameState::GetTeamScore(const ETPSTeamID teamId)
 {
     if (auto team = GetTeam(teamId))
@@ -105,83 +106,152 @@ int ATPSGameState::GetTeamScore(const ETPSTeamID teamId)
 }
 
 
-void ATPSGameState::IndexTeams()
-{
-    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexTeams()..."));
 
-    TeamsById.Empty();
+
+
+void ATPSGameState::OnRep_Teams()
+{
+    IndexLocalTeamIds();
+}
+void ATPSGameState::IndexLocalTeamIds()
+{
+    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexLocalTeamIds()..."));
+
+    TeamsById.Empty(Teams.Num());
 
     for (auto team : Teams)
     {
-        TeamsById.Add(team->TeamID, team);
+        if (IsValid(team)) {
+            TeamsById.Add(team->TeamID, team);
+        }
     }
 }
 
-void ATPSGameState::IndexArmies()
+void ATPSGameState::OnRep_Armies()
 {
-    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexArmies()..."));
+    IndexLocalArmyIds();
+}
+void ATPSGameState::IndexLocalArmyIds()
+{
+    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexLocalArmyIds()..."));
 
-    ArmiesById.Empty();
+    ArmiesById.Empty(Armies.Num());
 
     for (auto army : Armies)
     {
-        ArmiesById.Add(army->ArmyID, army);
+        if (IsValid(army))
+        {
+            ArmiesById.Add(army->ArmyID, army);
+        }
     }
 }
 
-void ATPSGameState::IndexTeamUnits()
+
+void ATPSGameState::OnRep_Units()
 {
-    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexTeamUnits()..."));
+    IndexLocalUnitIds();
+}
+void ATPSGameState::IndexLocalUnitIds()
+{
+    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexLocalUnitIds()..."));
 
-    TeamUnitsById.Empty();
+    UnitsById.Empty(Units.Num());
 
-    for (auto unit : TeamUnits)
+    for (auto unit : Units)
     {
-        TeamUnitsById.Add(unit->UnitID, unit);
+        if (IsValid(unit))
+        {
+            UnitsById.Add(unit->UnitID, unit);
+        }
     }
 }
 
-void ATPSGameState::IndexCharacters()
-{
-    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexCharacters()..."));
 
-    CharactersById.Empty();
+void ATPSGameState::OnRep_Characters()
+{
+    IndexLocalCharacterIds();
+}
+void ATPSGameState::IndexLocalCharacterIds()
+{
+    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexLocalCharacterIds()..."));
+
+    CharactersById.Empty(Characters.Num());
 
     for (auto character : Characters)
     {
-        // TODO: Use FTPSCharacterId
-        CharactersById.Add(character->CharacterID, character);
+        if (IsValid(character))
+        {
+            // TODO: Use FTPSCharacterId
+            CharactersById.Add(character->CharacterID, character);
+        }
+    }
+}
+
+void ATPSGameState::OnRep_Players()
+{
+    IndexLocalPlayerIds();
+}
+void ATPSGameState::IndexLocalPlayerIds()
+{
+    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexLocalPlayerIds()..."));
+
+    PlayersById.Empty(Players.Num());
+
+    for (auto player : Players)
+    {
+        if (IsValid(player))
+        {
+            // TODO: Use FTPSPlayerId?
+            PlayersById.Add(player->GetPlayerId(), player);
+        }
+    }
+}
+
+
+//~ ==================================================================== ~//
+//  TEAM STORAGE
+//~ ==================================================================== ~//
+
+void ATPSGameState::RegisterTeam_Implementation(UTPSTeamInstance* team)
+{
+    Teams.Add(team);
+    TeamsById.Add(team->TeamID, team);
+    AddReplicatedSubObject(team);
+
+    InstanceRegistryUpdate.Broadcast();
+}
+
+void ATPSGameState::UnRegisterTeam_Implementation(const ETPSTeamID tId)
+{
+    if (auto team = GetTeam(tId))
+    {
+        Teams.Remove(team);
+        TeamsById.Remove(tId);
+        RemoveReplicatedSubObject(team);
+
+        InstanceRegistryUpdate.Broadcast();
     }
 }
 
 
 
-//~ ==================================================================== ~//
-//  TEAM Reads
-//~ ==================================================================== ~//
-
 UTPSTeamInstance* ATPSGameState::GetTeam(const ETPSTeamID teamId)
 {
-    // lazy JIT indexing
-    /*if (TeamsById.IsEmpty())
-    {
-        IndexTeams();
-    }
-
     // perform quick fetch (use indexes)
     if (auto team = TeamsById.Find(teamId))
     {
         return *team;
-    }*/
+    }
 
     // perform slow fetch (fallback)
+    /*UE_LOG(LogTemp, Log, TEXT("WARNING: Using SLOW FETCH for TeamId[%s]"), *TPSTeamIdToString(teamId));
     for (auto team : Teams)
     {
         if (IsValid(team) && team->TeamID == teamId)
         {
             return team;
         }
-    }
+    }*/
     return nullptr;
 }
 
@@ -212,44 +282,92 @@ int ATPSGameState::GetTotalTeamMemberCount(const ETPSTeamID teamId)
 
 
 //~ ==================================================================== ~//
-//  UNIT Reads
+//  ARMY / UNIT STORAGE
 //~ ==================================================================== ~//
+
+void ATPSGameState::RegisterArmy_Implementation(UTPSArmyInstance* army)
+{
+    Armies.Add(army);
+    ArmiesById.Add(army->ArmyID, army);
+    AddReplicatedSubObject(army);
+
+    InstanceRegistryUpdate.Broadcast();
+}
+
+void ATPSGameState::UnRegisterArmy_Implementation(const FTPSArmyID aId)
+{
+    if (auto army = GetArmy(aId))
+    {
+        Armies.Remove(army);
+        ArmiesById.Remove(aId);
+        RemoveReplicatedSubObject(army);
+
+        InstanceRegistryUpdate.Broadcast();
+    }
+}
+
+
 
 UTPSArmyInstance* ATPSGameState::GetArmy(const FTPSArmyID armyId)
 {
+    // perform quick fetch (use indexes)
+    if (auto team = ArmiesById.Find(armyId))
+    {
+        return *team;
+    }
+
+    // perform slow fetch (fallback)
+    /*UE_LOG(LogTemp, Log, TEXT("WARNING: Using SLOW FETCH for ArmyId[%s]"), *armyId.ToString());
     for (auto army : Armies)
     {
         if (armyId.Guid == army->ArmyID.Guid)
         {
             return army;
         }
-    }
+    }*/
     return nullptr;
+}
+
+
+void ATPSGameState::RegisterUnit_Implementation(UTPSCommandUnit* unit)
+{
+    Units.Add(unit);
+    UnitsById.Add(unit->UnitID, unit);
+    AddReplicatedSubObject(unit);
+
+    InstanceRegistryUpdate.Broadcast();
+}
+
+void ATPSGameState::UnRegisterUnit_Implementation(const FTPSUnitID uId)
+{
+    if (auto unit = GetUnit(uId))
+    {
+        Units.Remove(unit);
+        UnitsById.Remove(uId);
+        RemoveReplicatedSubObject(unit);
+
+        InstanceRegistryUpdate.Broadcast();
+    }
 }
 
 
 UTPSCommandUnit* ATPSGameState::GetUnit(const FTPSUnitID unitId)
 {
-    // lazy JIT index
-    /*if (TeamUnitsById.IsEmpty())
-    {
-        IndexTeamUnits();
-    }
-
     // perform quick fetch (use indexes)
-    if (auto unit = TeamUnitsById.Find(unitId))
+    if (auto unit = UnitsById.Find(unitId))
     {
         return *unit;
-    }*/
+    }
 
     // perform slow fetch (fallback)
-    for (auto unit : TeamUnits)
+    /*UE_LOG(LogTemp, Log, TEXT("WARNING: Using SLOW FETCH for UnitId[%s]"), *unitId.ToString());
+    for (auto unit : Units)
     {
         if (unit->UnitID == unitId)
         {
             return unit;
         }
-    }
+    }*/
     return nullptr;
 }
 
@@ -264,35 +382,103 @@ UTPSCharacterInstance* ATPSGameState::GetUnitLeader(const FTPSUnitID unitId)
 
 
 //~ ==================================================================== ~//
-//  CHARACTER Reads
+//  CHARACTER CRUD
 //~ ==================================================================== ~//
 
 
+void ATPSGameState::RegisterCharacter_Implementation(UTPSCharacterInstance* character)
+{
+    Characters.Add(character);
+    CharactersById.Add(character->CharacterID, character);
+    AddReplicatedSubObject(character);
+
+    InstanceRegistryUpdate.Broadcast();
+}
+
+void ATPSGameState::UnRegisterCharacter_Implementation(const FTPSCharacterID cId)
+{
+    if (auto character = GetCharacter(cId))
+    {
+        Characters.Remove(character);
+        CharactersById.Remove(cId);
+        RemoveReplicatedSubObject(character);
+
+        InstanceRegistryUpdate.Broadcast();
+    }
+}
+
 UTPSCharacterInstance* ATPSGameState::GetCharacter(const FTPSCharacterID characterId)
 {
-    // lazy JIT index
-    /*if (CharactersById.IsEmpty())
-    {
-        IndexCharacters();
-    }
-
     // perform quick fetch (use indexes)
     if (auto character = CharactersById.Find(characterId))
     {
         return *character;
-    }*/
+    }
 
     // perform slow fetch (fallback)
+    /*UE_LOG(LogTemp, Log, TEXT("WARNING: Using SLOW FETCH for CharacterId[%s]"), *characterId.ToString());
     for (auto character : Characters)
     {
         if (character->CharacterID == characterId)
         {
             return character;
         }
-    }
+    }*/
 
     return nullptr;
 }
+
+
+
+//~ ==================================================================== ~//
+//  PLAYER CRUD
+//~ ==================================================================== ~//
+
+
+void ATPSGameState::RegisterPlayer_Implementation(ATPSPlayerState* player)
+{
+    Players.Add(player);
+    PlayersById.Add(player->GetPlayerId(), player);
+    AddReplicatedSubObject(player);
+
+    InstanceRegistryUpdate.Broadcast();
+}
+
+void ATPSGameState::UnRegisterPlayer_Implementation(const int pId)
+{
+    if (auto player = GetPlayer(pId))
+    {
+        Players.Remove(player);
+        PlayersById.Remove(pId);
+        RemoveReplicatedSubObject(player);
+
+        InstanceRegistryUpdate.Broadcast();
+    }
+}
+
+ATPSPlayerState* ATPSGameState::GetPlayer(const int pId)
+{
+    // perform quick fetch (use indexes)
+    if (auto player = PlayersById.Find(pId))
+    {
+        return *player;
+    }
+
+    // perform slow fetch (fallback)
+    /*UE_LOG(LogTemp, Log, TEXT("WARNING: Using SLOW FETCH for PlayerId[%i]"), pId);
+    for (auto player : Players)
+    {
+        if (player->GetPlayerId() == pId)
+        {
+            return player;
+        }
+    }*/
+
+    return nullptr;
+}
+
+
+
 
 
 

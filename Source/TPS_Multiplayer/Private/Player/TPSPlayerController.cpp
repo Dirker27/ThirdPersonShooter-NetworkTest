@@ -36,10 +36,7 @@ void ATPSPlayerController::BeginPlay()
 	Super::BeginPlay();
 	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BeginPlay()"));
 
-	if (auto p = BoundPlayer())
-	{
-		BindToPlayer(p);
-	}
+	BindConsoleCallbacks();
 }
 
 // Executes ON OWNING CLIENT when PlayerState is connected to Controller from Server
@@ -50,15 +47,52 @@ void ATPSPlayerController::OnRep_PlayerState()
 
 	if (auto p = BoundPlayer())
 	{
-		BindToPlayer(p);
+		BindControllerToPlayer(p);
 	}
 }
 
 // Executes ON OWNING CLIENT when Pawn is connected to Controller from Server
 void ATPSPlayerController::OnRep_Pawn()
 {
-	Super::OnRep_Pawn();
 	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::OnRep_Pawn()"));
+	Super::OnRep_Pawn();
+
+	OnPawnPossessionChanged();
+}
+
+void ATPSPlayerController::OnPawnPossessionChanged()
+{
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER] TPSPlayerController::OnPawnPossessionChanged()"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT] TPSPlayerController::OnPawnPossessionChanged()"));
+	}
+
+
+	// Unbind from Old
+	if (auto c = BoundCharacter.Get())
+	{
+		UnBindControllerFromCharacter(c);
+	}
+	if (auto p = BoundPawn.Get())
+	{
+		UnBindControllerFromPawn(p);
+	}
+
+
+
+	// Bind to New (if present)
+	if (auto c = PossessedCharacter())
+	{
+		BindControllerToCharacter(c);
+	}
+	else if (auto p = PossessedPawn())
+	{
+		BindControllerToPawn(p);
+	}
 }
 
 void ATPSPlayerController::SetupInputComponent()
@@ -78,32 +112,40 @@ void ATPSPlayerController::OnRep_ControllerState()
 	ControllerStateUpdate.Broadcast();
 }
 
-void ATPSPlayerController::BindToPlayer(ATPSPlayerState* newPlayer)
+void ATPSPlayerController::BindControllerToPlayer(ATPSPlayerState* newPlayer)
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BindToPlayer([%s])"), *newPlayer->GetName());
-	OnBindToPlayer(newPlayer);
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BindControllerToPlayer([%s])"), *newPlayer->GetName());
+	OnControllerBoundToPlayer(newPlayer);
 }
 
-void ATPSPlayerController::BindToCharacter(ATPSCharacter* newCharacter)
+void ATPSPlayerController::BindControllerToCharacter(ATPSCharacter* newCharacter)
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BindToCharacter([%s])"), *newCharacter->GetName());
-	OnBindToCharacter(newCharacter);
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BindControllerToCharacter([%s])"), *newCharacter->GetName());
+
+	OnControllerBoundToCharacter(newCharacter);
+	BoundCharacter = newCharacter; // Set after to avoid un-binding callbacks on a bad ref if BP binding fails
 }
-void ATPSPlayerController::UnBindFromCharacter(ATPSCharacter* oldCharacter)
+void ATPSPlayerController::UnBindControllerFromCharacter(ATPSCharacter* oldCharacter)
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::UnBindFromCharacter([%s])"), *oldCharacter->GetName());
-	OnUnBindFromCharacter(oldCharacter);
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::UnBindControllerFromCharacter([%s])"), *oldCharacter->GetName());
+
+	BoundCharacter = nullptr;
+	OnControllerUnBoundFromCharacter(oldCharacter);
 }
 
-void ATPSPlayerController::BindToPawn(ATPSPawn* newPawn)
+void ATPSPlayerController::BindControllerToPawn(ATPSPawn* newPawn)
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BindToPawn([%s])"), *newPawn->GetName());
-	OnBindToPawn(newPawn);
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BindControllerToPawn([%s])"), *newPawn->GetName());
+
+	OnControllerBoundToPawn(newPawn);
+	BoundPawn = newPawn; // Set after to avoid un-binding callbacks on a bad ref if BP binding fails
 }
-void ATPSPlayerController::UnBindFromPawn(ATPSPawn* oldPawn)
+void ATPSPlayerController::UnBindControllerFromPawn(ATPSPawn* oldPawn)
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::UnBindFromPawn([%s])"), *oldPawn->GetName());
-	OnBindToPawn(oldPawn);
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::UnBindControllerFromPawn([%s])"), *oldPawn->GetName());
+
+	BoundPawn = nullptr;
+	OnControllerUnBoundFromPawn(oldPawn);
 }
 
 void ATPSPlayerController::Tick(float DeltaSeconds)
@@ -284,6 +326,8 @@ void ATPSPlayerController::Respawn()
 void ATPSPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+
+	OnPawnPossessionChanged();
 }
 
 
@@ -326,6 +370,8 @@ void ATPSPlayerController::PossessPawn()
 void ATPSPlayerController::OnUnPossess()
 {
 	Super::OnUnPossess();
+
+	OnPawnPossessionChanged();
 }
 
 void ATPSPlayerController::UnPossessCurrentPawn_Implementation()

@@ -91,33 +91,47 @@ public:
 //~ ==================================================================== ~//
 //  OPERATIONS
 //~ ==================================================================== ~//
-public:
+protected:
 
 	////////////////////////////////////////////////////////
 	// Initialization & Lifecycle
 
 	UFUNCTION(BlueprintCallable)
-	void BindToPlayer(ATPSPlayerState* newPlayer);
+	void BindControllerToPlayer(ATPSPlayerState* newPlayer);
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnBindToPlayer(ATPSPlayerState* newPlayer);
+	void OnControllerBoundToPlayer(ATPSPlayerState* newPlayer);
+
+	// Character that Controller has been Bound to.
+	//   Used as a lingering reference to un-bind dependencies
+	//   and callbacks from Character after un-possessing.
+	//
+	// NOT GUARANTEED to be the same as PossessedCharacter()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TWeakObjectPtr<ATPSCharacter> BoundCharacter = nullptr;
 
 	UFUNCTION(BlueprintCallable)
-	void BindToCharacter(ATPSCharacter* newCharacter);
+	void BindControllerToCharacter(ATPSCharacter* newCharacter);
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnBindToCharacter(ATPSCharacter* newCharacter);
+	void OnControllerBoundToCharacter(ATPSCharacter* newCharacter);
 	UFUNCTION(BlueprintCallable)
-	void UnBindFromCharacter(ATPSCharacter* oldCharacter);
+	void UnBindControllerFromCharacter(ATPSCharacter* oldCharacter);
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnUnBindFromCharacter(ATPSCharacter* oldCharacter);
+	void OnControllerUnBoundFromCharacter(ATPSCharacter* oldCharacter);
+
+	// Pawn that Controller has been Bound to.
+	//   Used as a lingering reference to un-bind dependencies
+	//   and callbacks from Pawn after un-possessing.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TWeakObjectPtr<ATPSPawn> BoundPawn = nullptr;
 
 	UFUNCTION(BlueprintCallable)
-	void BindToPawn(ATPSPawn* newPawn);
+	void BindControllerToPawn(ATPSPawn* newPawn);
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnBindToPawn(ATPSPawn* newPawn);
+	void OnControllerBoundToPawn(ATPSPawn* newPawn);
 	UFUNCTION(BlueprintCallable)
-	void UnBindFromPawn(ATPSPawn* oldPawn);
+	void UnBindControllerFromPawn(ATPSPawn* oldPawn);
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnUnBindFromPawn(ATPSPawn* oldPawn);
+	void OnControllerUnBoundFromPawn(ATPSPawn* oldPawn);
 
 
 	////////////////////////////////////////////////////////
@@ -130,11 +144,15 @@ public:
 	// Fires on CLIENT
 	virtual void OnRep_Pawn() override;
 
+	// Called when Pawn is changed (dropped OR acquired)
+	//UFUNCTION(BlueprintImplementableEvent)
+	void OnPawnPossessionChanged();
+
 
 
 	////////////////////////////////////////////////////////
 	// Targeting Behavior
-
+public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector GetCameraTargetLocation() const;
 

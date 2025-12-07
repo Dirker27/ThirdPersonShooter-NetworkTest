@@ -19,7 +19,7 @@ UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMatchStateUpdate);
 
 UDELEGATE(BlueprintAuthorityOnly)
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTeamRosterUpdate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInstanceRegistryUpdate);
 
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMessageUpdate);
@@ -90,64 +90,108 @@ public:
 
 
 
-//~ ==================================================================== ~//
+//~ ======================================================================= ~//
 //  WORLD REGISTRY
 //	--------------
 //	- Spawned Characters and Items
 //	- Teams and Sub-Units
 //	- Connected Players
-//~ ==================================================================== ~//
+//~ ======================================================================= ~//
 protected:
 	// Broadcast Delegate - Team/Character/Player Roster Updated
 	UPROPERTY(BlueprintAssignable)
-	FTeamRosterUpdate RosterUpdate;
+	FInstanceRegistryUpdate InstanceRegistryUpdate;
 
-public:
-	// All Teams instantiated in the World
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
-	TArray<TObjectPtr<UTPSTeamInstance>> Teams;
-
-	// All Army instances instantiated in the World
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
-	TArray<TObjectPtr<UTPSArmyInstance>> Armies;
-
-	// All TeamUnits instantiated in the World (all teams)
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
-	TArray<TObjectPtr<UTPSCommandUnit>> TeamUnits;
-
-	// All CharacterInstances (not actors) *ever* instantiated in the World
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
-	TArray<TObjectPtr<UTPSCharacterInstance>> Characters;
-
-	// All PlayerStates *ever* instantiated in the World
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
-	TArray<TObjectPtr<ATPSPlayerState>> Players;
 
 	////////////////////////////////////////////////////////
-	// Local-only indices
-	//   (not replicated, but point to rep'd UObjects)
+	// TEAM Instances
+public:
+	// All Teams instantiated in the World
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_Teams)
+	TArray<TObjectPtr<UTPSTeamInstance>> Teams;
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TMap<TEnumAsByte<ETPSTeamID>, TObjectPtr<UTPSTeamInstance>> TeamsById;
+	UFUNCTION()
+	void OnRep_Teams();
+private:
+	void IndexLocalTeamIds();
 
+
+	////////////////////////////////////////////////////////
+	// ARMY Instances
+public:
+	// All Army instances instantiated in the World
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_Armies)
+	TArray<TObjectPtr<UTPSArmyInstance>> Armies;
+protected:
+	// Local-Only Index
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TMap<FTPSArmyID, TObjectPtr<UTPSArmyInstance>> ArmiesById;
+	UFUNCTION()
+	void OnRep_Armies();
+private:
+	void IndexLocalArmyIds();
 
+
+	////////////////////////////////////////////////////////
+	// UNIT Instances
+public:
+	// All Units instantiated in the World (all teams and armies)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_Units)
+	TArray<TObjectPtr<UTPSCommandUnit>> Units;
+protected:
+	// Local-Only Index
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TMap<FTPSUnitID, TObjectPtr<UTPSCommandUnit>> TeamUnitsById;
+	TMap<FTPSUnitID, TObjectPtr<UTPSCommandUnit>> UnitsById;
+	UFUNCTION()
+	void OnRep_Units();
+private:
+	void IndexLocalUnitIds();
 
+
+	////////////////////////////////////////////////////////
+	// CHARACTER Instances
+public:
+	// All CharacterInstances (not actors) *ever* instantiated in the World
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_Characters)
+	TArray<TObjectPtr<UTPSCharacterInstance>> Characters;
+protected:
+	// Local-Only Index
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TMap<FTPSCharacterID, TObjectPtr<UTPSCharacterInstance>> CharactersById;
-
+	UFUNCTION()
+	void OnRep_Characters();
 private:
-	void IndexTeams();
-	void IndexArmies();
-	void IndexTeamUnits();
-	void IndexCharacters();
+	void IndexLocalCharacterIds();
+
+	////////////////////////////////////////////////////////
+	// PLAYER Instances
+public:
+	// All PlayerStates *ever* instantiated in the World
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_Players)
+	TArray<TObjectPtr<ATPSPlayerState>> Players;
+protected:
+	// Local-Only Index
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TMap<int32, TObjectPtr<ATPSPlayerState>> PlayersById;
+	UFUNCTION()
+	void OnRep_Players();
+private:
+	void IndexLocalPlayerIds();
+
+
+
 
 public:
 	////////////////////////////////////////////////////////
 	// Team CRUD
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void RegisterTeam(UTPSTeamInstance* team);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void UnRegisterTeam(const ETPSTeamID tId);
 
 	// Retrieve a Team Instance that matches the provided TeamID
 	//   Will be NULL if Team Instance was not created in the current match.
@@ -171,11 +215,27 @@ public:
 
 
 	////////////////////////////////////////////////////////
-	// Team Sub-Unit CRUD
+	// Army CRUD
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void RegisterArmy(UTPSArmyInstance* army);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void UnRegisterArmy(const FTPSArmyID aId);
 
 	// Find a Command Unit that matches the provided UnitID
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSArmyInstance* GetArmy(const FTPSArmyID armyId);
+
+
+	////////////////////////////////////////////////////////
+	// Unit CRUD
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void RegisterUnit(UTPSCommandUnit* unit);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void UnRegisterUnit(const FTPSUnitID uId);
 
 	// Find a Command Unit that matches the provided UnitID
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -188,10 +248,27 @@ public:
 	////////////////////////////////////////////////////////
 	// Character CRUD
 
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void RegisterCharacter(UTPSCharacterInstance* character);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void UnRegisterCharacter(const FTPSCharacterID cId);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSCharacterInstance* GetCharacter(const FTPSCharacterID characterId);
 
 
+	////////////////////////////////////////////////////////
+	// Player CRUD
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void RegisterPlayer(ATPSPlayerState* player);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void UnRegisterPlayer(const int pId);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ATPSPlayerState* GetPlayer(const int pId);
 
 
 //~ ==================================================================== ~//
