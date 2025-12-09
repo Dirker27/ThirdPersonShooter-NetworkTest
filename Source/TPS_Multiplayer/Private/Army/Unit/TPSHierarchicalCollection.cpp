@@ -33,7 +33,6 @@ bool UTPSHierarchicalCollection::AddMember(UTPSCharacterInstance* member)
 	if (CanAddMember(member))
 	{
 		int idNumber = Members.Add(member);
-		//member->AssignToUnit(this);
 
 		UnitUpdate.Broadcast();
 		return true;

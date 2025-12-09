@@ -44,7 +44,7 @@ protected:
 	////////////////////////////////////////////////////////
 	// Assignment Info (Team/Army/Unit)
 	//
-	// TODO: Migrate to "Assignment" Struct
+	// TODO: Elevate to Assignable Interfaces [PC-237] [PC-236] [PC-257]
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	TWeakObjectPtr<UTPSArmyInstance> AssignedArmy;
@@ -53,6 +53,9 @@ protected:
 	TWeakObjectPtr<UTPSTeamInstance> AssignedTeam;
 
 public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSArmyInstance* GetAssignedArmy() { return AssignedArmy.Get(); }
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSTeamInstance* GetAssignedTeam() { return AssignedTeam.Get(); }
 

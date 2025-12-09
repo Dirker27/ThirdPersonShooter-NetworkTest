@@ -174,7 +174,7 @@ public:
 protected:
 	// Local-Only Index
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TMap<int32, TObjectPtr<ATPSPlayerState>> PlayersById;
+	TMap<FTPSPlayerID, TObjectPtr<ATPSPlayerState>> PlayersById;
 	UFUNCTION()
 	void OnRep_Players();
 private:
@@ -265,10 +265,10 @@ public:
 	void RegisterPlayer(ATPSPlayerState* player);
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
-	void UnRegisterPlayer(const int pId);
+	void UnRegisterPlayer(const FTPSPlayerID pId);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ATPSPlayerState* GetPlayer(const int pId);
+	ATPSPlayerState* GetPlayer(const FTPSPlayerID pId);
 
 
 //~ ==================================================================== ~//

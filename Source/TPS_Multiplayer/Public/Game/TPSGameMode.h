@@ -68,11 +68,11 @@ public:
 
 	// Whether Players are required to be a part of a team.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
-	bool bRequiresPlayerTeam;
+	bool RequiresPlayerTeam;
 
 	// Whether Players are required to be a part of a team.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
-	bool bRequiresPlayerArmy;
+	bool RequiresPlayerArmy;
 
 	// Points required for a team to win the round.
 	// TODO: Allow for differing win conditions and target values.
@@ -137,14 +137,20 @@ public:
 	virtual void EndMatch() override;
 	virtual void HandleMatchHasStarted() override;
 	virtual void HandleMatchHasEnded() override;
+	//virtual bool ReadyToEndMatch() const override;
 
 	// New Player Joined
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void Logout(AController* Exiting) override;
+
+	UFUNCTION(BlueprintCallable)
+	void AssignPlayerToAvailableArmy(ATPSPlayerState* player);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSTeamInstance* GetRandomTeam() const;
 
-	//virtual bool ReadyToEndMatch() const override;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UTPSArmyInstance* GetFirstAvailableArmy() const;
 
 	UFUNCTION(BlueprintCallable)
 	void BroadcastMessage(FTPSBroadcastMessage message);

@@ -32,30 +32,38 @@ void ATPSPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 }
 
 
+void ATPSPlayerState::BeginPlay() {
+	Super::BeginPlay();
+}
+
+
+// TODO: [PC-257] Elevate to "ArmyAssignable" Interface
 void ATPSPlayerState::AssignToArmy(UTPSArmyInstance* army)
 {
+	if (!IsValid(army)) { return; }
+
 	AssignedArmy = army;
+	AssignedTeam = army->GetAssignedTeam();
+
 	PlayerStateUpdate.Broadcast();
 }
 
-
+// TODO: [PC-237] Elevate to "TeamAssignable" Interface
 void ATPSPlayerState::AssignToTeam(UTPSTeamInstance* team)
 {
+	if (!IsValid(team)) { return; }
+
 	AssignedTeam = team;
+
 	PlayerStateUpdate.Broadcast();
 }
 
-// TODO: Elevate to "TeamAssignable" Interface
+// TODO: [PC-237] Elevate to "TeamAssignable" Interface
 ETPSTeamID ATPSPlayerState::GetAssignedTeamID() const
 {
 	return AssignedTeam.IsValid()
 		? AssignedTeam.Get()->TeamID
 		: ETPSTeamID::UNAFFILIATED;
-}
-
-
-void ATPSPlayerState::BeginPlay() {
-	Super::BeginPlay();
 }
 
 UAbilitySystemComponent* ATPSPlayerState::GetAbilitySystemComponent() const

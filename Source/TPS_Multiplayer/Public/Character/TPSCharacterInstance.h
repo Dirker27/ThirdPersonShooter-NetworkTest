@@ -51,7 +51,8 @@ public:
     // Broadcast Delegate
     UPROPERTY(BlueprintAssignable)
     FUpdateCharacterInstanceDisplay CharacterInstanceUpdate;
-
+private:
+    bool ShouldNotify = false;
 
 //~ ==================================================================== ~//
 //  STATE
@@ -87,26 +88,36 @@ public:
 
 
     ////////////////////////////////////////////////////////
-    // Assignment Info (Team/Army/Unit)
+    // Assignment Info (Player/Team/Army/Unit)
     //
-    // TODO: Migrate to "Assignment" Struct
+    // TODO: Elevate to Assignable Interfaces [PC-237] [PC-236] [PC-257]
 
 protected:
 
+    // OwningPlayer
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_OwningPlayer)
+    TWeakObjectPtr<ATPSPlayerState> OwningPlayer;
+    UFUNCTION()
+    void OnRep_OwningPlayer();
+
+
     // Assigned Unit
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing=OnRep_Assignment)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_Assignment)
     TWeakObjectPtr<UTPSCommandUnit> AssignedUnit;
     // Assigned Army
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_Assignment)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Assignment)
     TWeakObjectPtr<UTPSArmyInstance> AssignedArmy;
     // Assigned Team
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_Assignment)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Assignment)
     TWeakObjectPtr<UTPSTeamInstance> AssignedTeam;
 
     UFUNCTION()
     void OnRep_Assignment();
 
 public:
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    ATPSPlayerState* GetOwningPlayer() const { return OwningPlayer.Get(); }
+
     UFUNCTION(BlueprintCallable, BlueprintPure)
     UTPSCommandUnit* GetAssignedUnit() const { return AssignedUnit.Get(); }
 
@@ -122,6 +133,18 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void AssignToUnit(UTPSCommandUnit* unit);
+
+    UFUNCTION(BlueprintCallable)
+    void AssignToArmy(UTPSArmyInstance* army);
+
+    UFUNCTION(BlueprintCallable)
+    void AssignToTeam(UTPSTeamInstance* team);
+
+    UFUNCTION(BlueprintCallable)
+    void BindInstanceToPlayer(ATPSPlayerState* player);
+
+    UFUNCTION(BlueprintCallable)
+    void UnBindInstanceFromPlayer(ATPSPlayerState* player);
 
     UFUNCTION(BlueprintCallable)
     void ClearAssignment();
@@ -166,15 +189,8 @@ public:
     ATPSCharacter* GetSpawnedActor() const { return SpawnedActor; }
 
 
-    // Player who currently owns/controls this instance (Spawned Actor is Possessed)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_OwningPlayer)
-    TWeakObjectPtr<ATPSPlayerState> OwningPlayer;
 
-    UFUNCTION()
-    void OnRep_OwningPlayer();
-
-
-
+    //~ Inherited from Lyra ~//
 private:
     UFUNCTION()
     void OnRep_Instigator() {};

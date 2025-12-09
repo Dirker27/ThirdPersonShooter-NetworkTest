@@ -63,8 +63,6 @@ void UTPSTeamInstanceFactory::_ConfigureArmy(UTPSArmyInstance* army, FTPSArmyDef
 		unit->Identity.BannerColor = army->Identity->BannerColor;
 		_ConfigureUnit(unit, data.RootUnitSchema->Schema, army);
 		army->AssignRootUnit(unit);
-
-		State()->RegisterUnit(unit);
 	}
 
 	// Index to TPSGameState
@@ -119,13 +117,18 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandUnit* node)
 		// Assign Loadout
 		instance->Loadout = roleDefinition.Loadout;
 
-		// Store
+		// Assign to Unit/Army
 		node->AddMember(instance);
+		if (auto army = node->GetAssignedArmy())
+		{
+			army->AddMember(instance);
+		}
 		instance->AssignToUnit(node);
 		if (instance->Identity.SquadRole == Leader) {
 			node->SetLeader(instance);
 		}
 
+		// Store
 		State()->RegisterCharacter(instance);
 		UE_LOG(LogTemp, Log, TEXT("CharacterInstance[%s] instantiated."), *instance->CharacterID.Guid.ToString());
 	}

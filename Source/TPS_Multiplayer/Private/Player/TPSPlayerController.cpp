@@ -122,12 +122,22 @@ void ATPSPlayerController::BindControllerToCharacter(ATPSCharacter* newCharacter
 {
 	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BindControllerToCharacter([%s])"), *newCharacter->GetName());
 
+	if (auto instance = newCharacter->GetCharacterInstance())
+	{
+		instance->BindInstanceToPlayer(BoundPlayer());
+	}
+
 	OnControllerBoundToCharacter(newCharacter);
 	BoundCharacter = newCharacter; // Set after to avoid un-binding callbacks on a bad ref if BP binding fails
 }
 void ATPSPlayerController::UnBindControllerFromCharacter(ATPSCharacter* oldCharacter)
 {
 	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::UnBindControllerFromCharacter([%s])"), *oldCharacter->GetName());
+
+	if (auto instance = oldCharacter->GetCharacterInstance())
+	{
+		instance->UnBindInstanceFromPlayer(BoundPlayer());
+	}
 
 	BoundCharacter = nullptr;
 	OnControllerUnBoundFromCharacter(oldCharacter);

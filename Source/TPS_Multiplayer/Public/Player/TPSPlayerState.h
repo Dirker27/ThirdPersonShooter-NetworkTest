@@ -22,6 +22,15 @@ class UTPSTeamInstance;
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerStateUpdate);
 
+/**
+ * The state of a player playing our game. Carries across matches and maps.
+ *   - Assignment Info
+ *   - Focused Actors & UI Elements
+ *   - Player-centric Ability Set (Activate system menus, Possessing new characters, etc)
+ *
+ * Acts as a "PlayerInstance" in our data model.
+ *   TODO: Consider  wrapping with UTPSPlayerInstance for internal consistency.
+ */
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSPlayerState : public APlayerState, public IAbilitySystemInterface
 {
@@ -82,6 +91,8 @@ public:
 
 	////////////////////////////////////////////////////////
 	// Army / Team Affiliations
+	//
+	// TODO: Elevate to Assignable Interfaces [PC-237] [PC-257]
 
 protected:
 	// Assigned Army

@@ -84,13 +84,53 @@ void ATPSGameMode::PostLogin(APlayerController* NewPlayer)
 		ps->ID.UEPlayerID = ps->GetPlayerId();
 		UE_LOG(LogTemp, Log, TEXT("Player[%s]-[%i] logged in."),
 			*ps->ID.ToString(), ps->GetPlayerId());
-	}
 
-	/*if (ATPSPlayerState* ps = NewPlayer->GetPlayerState<ATPSPlayerState>())
-	{
-		ps->AssignToTeam(GetRandomTeam());
-	}*/
+		State()->RegisterPlayer(ps);
+	}
 }
+
+
+void ATPSGameMode::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+
+	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::Logout()"));
+
+	if (auto pc = Cast<ATPSPlayerController>(Exiting))
+	{
+		if (auto ps = pc->BoundPlayer()) {
+			State()->UnRegisterPlayer(ps->ID);
+		}
+	}
+}
+
+
+
+
+void ATPSGameMode::AssignPlayerToAvailableArmy(ATPSPlayerState* player)
+{
+	if (auto army = GetFirstAvailableArmy())
+	{
+		player->AssignToArmy(army);
+		army->BindToPlayer(player);
+		UE_LOG(LogTemp, Log, TEXT("Player[%s] assigned to Army[%s]"), *player->ID.ToString(), *army->ArmyID.ToString());
+	}
+}
+
+
+UTPSArmyInstance* ATPSGameMode::GetFirstAvailableArmy() const
+{
+	for (auto army : State()->Armies)
+	{
+		if (!IsValid(army->GetOwningPlayer()))
+		{
+			return army;
+		}
+	}
+	return nullptr;
+}
+
+
 
 UTPSTeamInstance* ATPSGameMode::GetRandomTeam() const
 {

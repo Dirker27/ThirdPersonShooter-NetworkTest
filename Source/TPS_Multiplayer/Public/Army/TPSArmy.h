@@ -54,9 +54,12 @@ private:
     bool IsInitialized = false;
 
 protected:
+    // Top-Level unit of the army - the Root of the Hierarchy Trie.
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
     TObjectPtr<UTPSCommandUnit> RootUnit;
 
+    // The player who currently owns this army.
+    //   Armies will be exclusively owned by ONE[1] Player.
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
     TWeakObjectPtr<ATPSPlayerState> OwningPlayer;
 
@@ -67,9 +70,12 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
     TArray<TObjectPtr<UTPSCharacterInstance>> Members;
 
+    // Characters that are currently alive and interacting in the game world.
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
     TArray<TObjectPtr<UTPSCharacterInstance>> ActiveMembers;
 
+    // All command-able units under this army's jurisdiction.
+    //   (redundant index for access optimization)
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
     TArray<TObjectPtr<UTPSCommandUnit>> Units;
 
@@ -79,18 +85,23 @@ protected:
     ////////////////////////////////////////////////////////
     // Assignment Info (Team/Army/Unit)
     //
+    // TODO: Elevate to Assignable Interfaces [PC-237] [PC-236] [PC-257]
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
     TWeakObjectPtr<UTPSTeamInstance> AssignedTeam;
 
 public:
+    // Assigned Team Instance
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    UTPSTeamInstance* GetAssignedTeam() const;
+
     // Assigned Team ID
     UFUNCTION(BlueprintCallable, BlueprintPure)
     ETPSTeamID GetAssignedTeamID() const;
 
-    // Assigned Team ID
+    // Assigned Player
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    UTPSTeamInstance* GetAssignedTeam() const;
+    ATPSPlayerState* GetOwningPlayer() const { return OwningPlayer.Get(); }
 
 //~ ==================================================================== ~//
 //  OPERATIONS
@@ -113,6 +124,9 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void AddMember(UTPSCharacterInstance* instance);
+
+    UFUNCTION(BlueprintCallable)
+    TArray<UTPSCharacterInstance*> GetMembers() const { return Members;};
 
     UFUNCTION(BlueprintCallable)
     void BindToPlayer(ATPSPlayerState* player);

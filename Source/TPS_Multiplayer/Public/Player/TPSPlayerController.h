@@ -98,6 +98,8 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void BindControllerToPlayer(ATPSPlayerState* newPlayer);
+	// Race-safe listener for when this Controller is bound to its Player.
+	//   Set initialization values and bindings here.
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnControllerBoundToPlayer(ATPSPlayerState* newPlayer);
 
@@ -112,8 +114,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void BindControllerToCharacter(ATPSCharacter* newCharacter);
 	UFUNCTION(BlueprintImplementableEvent)
+	// Race-safe listener for when this Controller is bound to a new Character.
+	//   Set possession values and bindings here.
 	void OnControllerBoundToCharacter(ATPSCharacter* newCharacter);
 	UFUNCTION(BlueprintCallable)
+	// Race-safe listener for when this Controller is released from an old Character.
+	//   Release bindings and reset possession values here.
 	void UnBindControllerFromCharacter(ATPSCharacter* oldCharacter);
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnControllerUnBoundFromCharacter(ATPSCharacter* oldCharacter);
@@ -126,9 +132,13 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void BindControllerToPawn(ATPSPawn* newPawn);
+	// Race-safe listener for when this Controller is bound to a new Pawn.
+	//   Set possession values and bindings here.
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnControllerBoundToPawn(ATPSPawn* newPawn);
 	UFUNCTION(BlueprintCallable)
+	// Race-safe listener for when this Controller is released from an old Pawn.
+	//   Release bindings and reset possession values here.
 	void UnBindControllerFromPawn(ATPSPawn* oldPawn);
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnControllerUnBoundFromPawn(ATPSPawn* oldPawn);

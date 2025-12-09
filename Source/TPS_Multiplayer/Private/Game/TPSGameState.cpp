@@ -125,6 +125,8 @@ void ATPSGameState::IndexLocalTeamIds()
             TeamsById.Add(team->TeamID, team);
         }
     }
+
+    InstanceRegistryUpdate.Broadcast();
 }
 
 void ATPSGameState::OnRep_Armies()
@@ -144,6 +146,8 @@ void ATPSGameState::IndexLocalArmyIds()
             ArmiesById.Add(army->ArmyID, army);
         }
     }
+
+    InstanceRegistryUpdate.Broadcast();
 }
 
 
@@ -164,6 +168,8 @@ void ATPSGameState::IndexLocalUnitIds()
             UnitsById.Add(unit->UnitID, unit);
         }
     }
+
+    InstanceRegistryUpdate.Broadcast();
 }
 
 
@@ -185,6 +191,8 @@ void ATPSGameState::IndexLocalCharacterIds()
             CharactersById.Add(character->CharacterID, character);
         }
     }
+
+    InstanceRegistryUpdate.Broadcast();
 }
 
 void ATPSGameState::OnRep_Players()
@@ -202,9 +210,11 @@ void ATPSGameState::IndexLocalPlayerIds()
         if (IsValid(player))
         {
             // TODO: Use FTPSPlayerId?
-            PlayersById.Add(player->GetPlayerId(), player);
+            PlayersById.Add(player->ID, player);
         }
     }
+
+    InstanceRegistryUpdate.Broadcast();
 }
 
 
@@ -243,41 +253,42 @@ UTPSTeamInstance* ATPSGameState::GetTeam(const ETPSTeamID teamId)
         return *team;
     }
 
-    // perform slow fetch (fallback)
-    /*UE_LOG(LogTemp, Log, TEXT("WARNING: Using SLOW FETCH for TeamId[%s]"), *TPSTeamIdToString(teamId));
-    for (auto team : Teams)
-    {
-        if (IsValid(team) && team->TeamID == teamId)
-        {
-            return team;
-        }
-    }*/
     return nullptr;
 }
 
 int ATPSGameState::GetActiveTeamMemberCount(const ETPSTeamID teamId)
 {
     int count = 0;
-    /*if (auto team = GetTeam(teamId))
+    if (auto team = GetTeam(teamId))
     {
-        for (auto member : team->ActiveMembers)
+        count = team->GetMembers().Num();
+
+        for (auto army : team->GetArmies())
         {
-            if (member->IsAlive)
+            for (auto member : army->GetMembers())
             {
-                count++;
+                if (member->IsAlive)
+                {
+                    count++;
+                }
             }
         }
-    }*/
+    }
     return count;
 }
 
 int ATPSGameState::GetTotalTeamMemberCount(const ETPSTeamID teamId)
 {
-    /*if (auto team = GetTeam(teamId))
+    int count = 0;
+    if (auto team = GetTeam(teamId))
     {
-        return team->Members.Num();
-    }*/
-    return 0;
+        count = team->GetMembers().Num();
+        for (auto army : team->GetArmies())
+        {
+            count += army->GetMembers().Num();
+        }
+    }
+    return count;
 }
 
 
@@ -315,16 +326,6 @@ UTPSArmyInstance* ATPSGameState::GetArmy(const FTPSArmyID armyId)
     {
         return *team;
     }
-
-    // perform slow fetch (fallback)
-    /*UE_LOG(LogTemp, Log, TEXT("WARNING: Using SLOW FETCH for ArmyId[%s]"), *armyId.ToString());
-    for (auto army : Armies)
-    {
-        if (armyId.Guid == army->ArmyID.Guid)
-        {
-            return army;
-        }
-    }*/
     return nullptr;
 }
 
@@ -358,16 +359,6 @@ UTPSCommandUnit* ATPSGameState::GetUnit(const FTPSUnitID unitId)
     {
         return *unit;
     }
-
-    // perform slow fetch (fallback)
-    /*UE_LOG(LogTemp, Log, TEXT("WARNING: Using SLOW FETCH for UnitId[%s]"), *unitId.ToString());
-    for (auto unit : Units)
-    {
-        if (unit->UnitID == unitId)
-        {
-            return unit;
-        }
-    }*/
     return nullptr;
 }
 
@@ -414,17 +405,6 @@ UTPSCharacterInstance* ATPSGameState::GetCharacter(const FTPSCharacterID charact
     {
         return *character;
     }
-
-    // perform slow fetch (fallback)
-    /*UE_LOG(LogTemp, Log, TEXT("WARNING: Using SLOW FETCH for CharacterId[%s]"), *characterId.ToString());
-    for (auto character : Characters)
-    {
-        if (character->CharacterID == characterId)
-        {
-            return character;
-        }
-    }*/
-
     return nullptr;
 }
 
@@ -438,13 +418,13 @@ UTPSCharacterInstance* ATPSGameState::GetCharacter(const FTPSCharacterID charact
 void ATPSGameState::RegisterPlayer_Implementation(ATPSPlayerState* player)
 {
     Players.Add(player);
-    PlayersById.Add(player->GetPlayerId(), player);
+    PlayersById.Add(player->ID, player);
     AddReplicatedSubObject(player);
 
     InstanceRegistryUpdate.Broadcast();
 }
 
-void ATPSGameState::UnRegisterPlayer_Implementation(const int pId)
+void ATPSGameState::UnRegisterPlayer_Implementation(const FTPSPlayerID pId)
 {
     if (auto player = GetPlayer(pId))
     {
@@ -456,24 +436,13 @@ void ATPSGameState::UnRegisterPlayer_Implementation(const int pId)
     }
 }
 
-ATPSPlayerState* ATPSGameState::GetPlayer(const int pId)
+ATPSPlayerState* ATPSGameState::GetPlayer(const FTPSPlayerID pId)
 {
     // perform quick fetch (use indexes)
     if (auto player = PlayersById.Find(pId))
     {
         return *player;
     }
-
-    // perform slow fetch (fallback)
-    /*UE_LOG(LogTemp, Log, TEXT("WARNING: Using SLOW FETCH for PlayerId[%i]"), pId);
-    for (auto player : Players)
-    {
-        if (player->GetPlayerId() == pId)
-        {
-            return player;
-        }
-    }*/
-
     return nullptr;
 }
 
@@ -538,7 +507,6 @@ void ATPSGameState::UpdateBroadcastMessage_Implementation(FTPSBroadcastMessage m
     AddReplicatedSubObject(messageObj);
 
     MessageUpdate.Broadcast();
-    //BroadcastMessageUpdate();
 }
 
 void ATPSGameState::OnRep_BroadcastMessage()

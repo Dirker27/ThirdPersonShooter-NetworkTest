@@ -99,6 +99,43 @@ void UTPSCharacterInstance::AssignToUnit(UTPSCommandUnit* unit)
 	CharacterInstanceUpdate.Broadcast();
 }
 
+void UTPSCharacterInstance::AssignToArmy(UTPSArmyInstance* army)
+{
+	if (!IsValid(army)) { return; }
+
+	AssignedArmy = army;
+	AssignedTeam = army->GetAssignedTeam();
+
+	CharacterInstanceUpdate.Broadcast();
+}
+
+void UTPSCharacterInstance::AssignToTeam(UTPSTeamInstance* team)
+{
+	if (!IsValid(team)) { return; }
+
+	AssignedTeam = team;
+
+	CharacterInstanceUpdate.Broadcast();
+}
+
+void UTPSCharacterInstance::BindInstanceToPlayer(ATPSPlayerState* player)
+{
+	if (!IsValid(player)) { return; }
+
+	OwningPlayer = player;
+
+	CharacterInstanceUpdate.Broadcast();
+}
+
+void UTPSCharacterInstance::UnBindInstanceFromPlayer(ATPSPlayerState* player)
+{
+	OwningPlayer = nullptr;
+
+	CharacterInstanceUpdate.Broadcast();
+}
+
+
+
 void UTPSCharacterInstance::ClearAssignment()
 {
 	AssignedUnit = nullptr;

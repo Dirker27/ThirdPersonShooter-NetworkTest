@@ -65,6 +65,7 @@ UTPSTeamInstance* UTPSArmyInstance::GetAssignedTeam() const
 void UTPSArmyInstance::AssignRootUnit(UTPSCommandUnit* unit)
 {
     RootUnit = unit;
+    RootUnit->AssignToArmy(this);
     ArmyUpdate.Broadcast();
 }
 
@@ -79,6 +80,7 @@ void UTPSArmyInstance::AddUnit(UTPSCommandUnit* unit)
 void UTPSArmyInstance::AddMember(UTPSCharacterInstance* instance)
 {
     Members.Add(instance);
+    instance->AssignToArmy(this);
     ArmyUpdate.Broadcast();
 }
 

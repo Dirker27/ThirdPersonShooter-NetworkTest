@@ -45,5 +45,5 @@ class UTPSPlayerIdentifier : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FTPSPlayerID ArmyID;
+	FTPSPlayerID PlayerID;
 };
