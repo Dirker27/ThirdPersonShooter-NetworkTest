@@ -85,8 +85,11 @@ void ATPSGameMode::PostLogin(APlayerController* NewPlayer)
 		UE_LOG(LogTemp, Log, TEXT("Player[%s]-[%i] logged in."),
 			*ps->ID.ToString(), ps->GetPlayerId());
 
-		State()->RegisterPlayer(ps);
+		//State()->RegisterPlayer(ps);
 	}
+
+
+
 }
 
 
@@ -99,7 +102,7 @@ void ATPSGameMode::Logout(AController* Exiting)
 	if (auto pc = Cast<ATPSPlayerController>(Exiting))
 	{
 		if (auto ps = pc->BoundPlayer()) {
-			State()->UnRegisterPlayer(ps->ID);
+			//State()->UnRegisterPlayer(ps->ID);
 		}
 	}
 }

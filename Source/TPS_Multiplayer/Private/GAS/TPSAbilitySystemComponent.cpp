@@ -69,10 +69,10 @@ void UTPSAbilitySystemComponent::GrantPlayerBasedAbilities(UAbilitySet* abilityS
     PlayerBasedAbilitySpecHandles.Append(GrantAbilities(abilitySet));
 
     UE_LOG(LogTemp, Log, TEXT("ASC for Actor[%s] updated."), *GetOwnerActor()->GetName());
-    for (auto ability : GetActivatableAbilities())
+    /*for (auto ability : GetActivatableAbilities())
     {
         UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
-    }
+    }*/
 }
 
 void UTPSAbilitySystemComponent::RevokePlayerBasedAbilities()
@@ -82,10 +82,10 @@ void UTPSAbilitySystemComponent::RevokePlayerBasedAbilities()
     RevokeAbilities(PlayerBasedAbilitySpecHandles);
 
     UE_LOG(LogTemp, Log, TEXT("Abilities revoked from Actor[%s]."), *GetOwnerActor()->GetName());
-    for (auto ability : GetActivatableAbilities())
+    /*for (auto ability : GetActivatableAbilities())
     {
         UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
-    }
+    }*/
 }
 
 TArray<FGameplayAbilitySpecHandle> UTPSAbilitySystemComponent::GrantAbilities(UAbilitySet* abilitySet) {
