@@ -31,6 +31,8 @@ enum ETPSLogSource : int
 	PlayerController,
 	PlayerState,
 
+	AbilitySystem,
+
 	AIController,
 	Character,
 	Weapon,
