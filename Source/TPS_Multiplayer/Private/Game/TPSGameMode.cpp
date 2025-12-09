@@ -308,8 +308,11 @@ void ATPSGameMode::AssignToArmyAndPossess_Implementation(ATPSPlayerController* c
 
 void ATPSGameMode::AssignPlayerToArmy(ATPSPlayerState* player, UTPSArmyInstance* army) const
 {
-	player->AssignToArmy(army);
-	army->BindToPlayer(player);
+	if (!IsValid(player) || !IsValid(army))
+	{
+		player->AssignToArmy(army);
+		army->BindToPlayer(player);
+	}
 }
 
 void ATPSGameMode::AssignPlayerToTeam(ATPSPlayerState* player, UTPSTeamInstance* team) const
