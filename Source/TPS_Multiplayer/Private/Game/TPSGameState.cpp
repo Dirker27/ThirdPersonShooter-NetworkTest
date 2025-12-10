@@ -210,7 +210,7 @@ void ATPSGameState::IndexLocalPlayerIds()
         if (IsValid(player))
         {
             // TODO: Use FTPSPlayerId?
-            PlayersById.Add(player->ID, player);
+            PlayersById.Add(player->PlayerID, player);
         }
     }
 
@@ -417,9 +417,18 @@ UTPSCharacterInstance* ATPSGameState::GetCharacter(const FTPSCharacterID charact
 
 void ATPSGameState::RegisterPlayer_Implementation(ATPSPlayerState* player)
 {
-    Players.Add(player);
-    PlayersById.Add(player->ID, player);
-    AddReplicatedSubObject(player);
+    UTPSPlayerInstance* instance = NewObject<UTPSPlayerInstance>(this, UTPSPlayerInstance::StaticClass());
+    instance->State = player;
+
+    // Generate & Link IDs for consistent indexing
+    instance->PlayerID.Guid = FGuid::NewGuid();
+    instance->PlayerID.UEPlayerID = player->GetPlayerId();
+    player->ID = instance->PlayerID;
+
+    // Store
+    Players.Add(instance);
+    PlayersById.Add(instance->PlayerID, instance);
+    AddReplicatedSubObject(instance);
 
     InstanceRegistryUpdate.Broadcast();
 }
@@ -436,7 +445,7 @@ void ATPSGameState::UnRegisterPlayer_Implementation(const FTPSPlayerID pId)
     }
 }
 
-ATPSPlayerState* ATPSGameState::GetPlayer(const FTPSPlayerID pId)
+UTPSPlayerInstance* ATPSGameState::GetPlayer(const FTPSPlayerID pId)
 {
     // perform quick fetch (use indexes)
     if (auto player = PlayersById.Find(pId))

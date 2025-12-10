@@ -6,6 +6,7 @@
 
 #include "TPSMatchPhase.generated.h"
 
+// TODO: Integrate with GameMode.MatchState FString states and transitions
 UENUM(BlueprintType)
 enum ETPSMatchPhase : int
 {

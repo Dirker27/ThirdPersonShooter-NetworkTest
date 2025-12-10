@@ -51,8 +51,6 @@ public:
     // Broadcast Delegate
     UPROPERTY(BlueprintAssignable)
     FUpdateCharacterInstanceDisplay CharacterInstanceUpdate;
-private:
-    bool ShouldNotify = false;
 
 //~ ==================================================================== ~//
 //  STATE

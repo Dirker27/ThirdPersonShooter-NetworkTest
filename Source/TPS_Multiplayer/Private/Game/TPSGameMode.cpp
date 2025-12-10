@@ -80,12 +80,10 @@ void ATPSGameMode::PostLogin(APlayerController* NewPlayer)
 
 	if (auto ps = NewPlayer->GetPlayerState<ATPSPlayerState>())
 	{
-		ps->ID.Guid = FGuid::NewGuid();
-		ps->ID.UEPlayerID = ps->GetPlayerId();
-		UE_LOG(LogTemp, Log, TEXT("Player[%s]-[%i] logged in."),
-			*ps->ID.ToString(), ps->GetPlayerId());
+		State()->RegisterPlayer(ps);
 
-		//State()->RegisterPlayer(ps);
+		UE_LOG(LogTemp, Log, TEXT("[GameMode] Player[%s]-[%i] logged in."),
+			*ps->ID.ToString(), ps->GetPlayerId());
 	}
 
 
@@ -102,7 +100,7 @@ void ATPSGameMode::Logout(AController* Exiting)
 	if (auto pc = Cast<ATPSPlayerController>(Exiting))
 	{
 		if (auto ps = pc->BoundPlayer()) {
-			//State()->UnRegisterPlayer(ps->ID);
+			State()->UnRegisterPlayer(ps->ID);
 		}
 	}
 }
@@ -116,7 +114,7 @@ void ATPSGameMode::AssignPlayerToAvailableArmy(ATPSPlayerState* player)
 	{
 		player->AssignToArmy(army);
 		army->BindToPlayer(player);
-		UE_LOG(LogTemp, Log, TEXT("Player[%s] assigned to Army[%s]"), *player->ID.ToString(), *army->ArmyID.ToString());
+		UE_LOG(LogTemp, Log, TEXT("[GameMode] Player[%s] assigned to Army[%s]"), *player->ID.ToString(), *army->ArmyID.ToString());
 	}
 }
 
@@ -160,6 +158,8 @@ void ATPSGameMode::BroadcastMessage(FTPSBroadcastMessage message)
 
 void ATPSGameMode::UpdateMatchPhase(ETPSMatchPhase phase)
 {
+	SetMatchState()
+
 	State()->UpdateMatchPhase(phase);
 }
 
@@ -359,7 +359,7 @@ void ATPSGameMode::KillCharacter_Implementation(const FTPSCharacterID characterI
 
 	if (auto character = State()->GetCharacter(characterId))
 	{
-		UE_LOG(LogTemp, Log, TEXT("Eliminating Character[%s]..."), *characterId.ToString());
+		UE_LOG(LogTemp, Log, TEXT("[GameMode] Eliminating Character[%s]..."), *characterId.ToString());
 		character->Die();
 
 		auto report = GenerateEliminationReportForCharacterDeath(character);
@@ -367,7 +367,7 @@ void ATPSGameMode::KillCharacter_Implementation(const FTPSCharacterID characterI
 
 		// Broadcast Event -> BP GameMode handler
 		OnCharacterElimination(report);
-		UE_LOG(LogTemp, Log, TEXT("Character[%s] Eliminated."), *characterId.ToString());
+		UE_LOG(LogTemp, Log, TEXT("[GameMode] Character[%s] Eliminated."), *characterId.ToString());
 	}
 }
 

@@ -10,6 +10,7 @@
 #include "Player/TPSPlayerState.h"
 #include "Log/TPSCombatLog.h"
 #include "Army/Unit/TPSCommandUnit.h"
+#include "Player/TPSPlayerInstance.h"
 #include "Team/TPSTeamInstance.h"
 #include "Types/TPSBroadcastMessage.h"
 
@@ -170,11 +171,11 @@ private:
 public:
 	// All PlayerStates *ever* instantiated in the World
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_Players)
-	TArray<TObjectPtr<ATPSPlayerState>> Players;
+	TArray<TObjectPtr<UTPSPlayerInstance>> Players;
 protected:
 	// Local-Only Index
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TMap<FTPSPlayerID, TObjectPtr<ATPSPlayerState>> PlayersById;
+	TMap<FTPSPlayerID, TObjectPtr<UTPSPlayerInstance>> PlayersById;
 	UFUNCTION()
 	void OnRep_Players();
 private:
@@ -268,7 +269,7 @@ public:
 	void UnRegisterPlayer(const FTPSPlayerID pId);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ATPSPlayerState* GetPlayer(const FTPSPlayerID pId);
+	UTPSPlayerInstance* GetPlayer(const FTPSPlayerID pId);
 
 
 //~ ==================================================================== ~//
