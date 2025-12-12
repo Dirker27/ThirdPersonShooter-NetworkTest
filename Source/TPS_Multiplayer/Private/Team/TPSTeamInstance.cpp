@@ -49,3 +49,63 @@ void UTPSTeamInstance::AddPlayer(ATPSPlayerState* player)
         TeamUpdate.Broadcast();
     }
 }
+
+
+
+
+
+
+
+
+UTPSCharacterInstance* UTPSTeamInstance::GetRandomActiveMember() const
+{
+    int startIndex = FMath::RandRange(0, Members.Num() - 1);
+
+    if (Members[startIndex]->IsActive())
+    {
+        return Members[startIndex];
+    }
+
+    int i = startIndex + 1;
+    if (i >= Members.Num()) { i = 0; }
+    while (i != startIndex)
+    {
+        if (Members[i]->IsActive())
+        {
+            return Members[i];
+        }
+
+        i++;
+        if (i >= Members.Num()) { i = 0; }
+    }
+
+    return nullptr;
+}
+
+UTPSCharacterInstance* UTPSTeamInstance::GetRandomPossessableMember() const
+{
+    if (Members.IsEmpty()) { return nullptr; }
+
+
+    int startIndex = FMath::RandRange(0, Members.Num() - 1);
+
+    if (Members[startIndex]->CanBePossessed())
+    {
+        return Members[startIndex];
+    }
+
+    int i = startIndex + 1;
+    if (i >= Members.Num()) { i = 0; }
+    while (i != startIndex)
+    {
+        if (Members[i]->CanBePossessed())
+        {
+            return Members[i];
+        }
+
+        i++;
+        if (i >= Members.Num()) { i = 0; }
+    }
+
+    return nullptr;
+}

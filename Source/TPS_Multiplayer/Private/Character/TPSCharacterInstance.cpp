@@ -147,6 +147,27 @@ void UTPSCharacterInstance::ClearAssignment()
 
 
 
+bool UTPSCharacterInstance::IsActive() const
+{
+	return IsAlive && IsValid(GetSpawnedActor());
+}
+
+
+bool UTPSCharacterInstance::IsPossessedByPlayer() const
+{
+	return IsValid(GetOwningPlayer());
+}
+
+
+bool UTPSCharacterInstance::CanBePossessed() const
+{
+	return IsAlive
+		&& !IsValid(GetOwningPlayer())
+		&& IsValid(GetSpawnedActor())
+		&& GetSpawnedActor()->CanBePossessedByPlayer;
+}
+
+
 
 void UTPSCharacterInstance::Die()
 {

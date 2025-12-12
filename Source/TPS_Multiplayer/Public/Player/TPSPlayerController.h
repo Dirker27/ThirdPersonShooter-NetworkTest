@@ -89,12 +89,54 @@ public:
 
 
 //~ ==================================================================== ~//
-//  OPERATIONS
+//  GAMEPLAY BEHAVIOR
+//~ ==================================================================== ~//
+
+	////////////////////////////////////////////////////////
+	// Player Spawn
+public:
+	virtual bool CanRestartPlayer() override;
+
+
+	////////////////////////////////////////////////////////
+	// Targeting
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FVector GetCameraTargetLocation() const;
+
+	void NotifyPawnDeath();
+
+
+
+	////////////////////////////////////////////////////////
+	// UI States & Menu Selection
+	//
+	// TODO: [PC-254] Design UI Remote Activation System
+
+	UFUNCTION(BlueprintCallable)
+	void SetControllerState(const ETPSControllerState state);
+
+
+//~ ==================================================================== ~//
+//  POSSESSION && INSTANCE BINDINGS
 //~ ==================================================================== ~//
 protected:
 
+	// Fires on SERVER
+	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnUnPossess() override;
+	// Fires on CLIENT
+	virtual void OnRep_Pawn() override;
+	
+	// Called by both Server and Client when Pawn is changed to perform
+	//   possession logic and Bind/UnBind instances consistently.
+	// Mitigates Possess<->UnPossess race condition.
+	void OnPawnPossessionChanged();
+
+
+
 	////////////////////////////////////////////////////////
-	// Initialization & Lifecycle
+	// Bind to PlayerState
 
 	UFUNCTION(BlueprintCallable)
 	void BindControllerToPlayer(ATPSPlayerState* newPlayer);
@@ -102,6 +144,10 @@ protected:
 	//   Set initialization values and bindings here.
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnControllerBoundToPlayer(ATPSPlayerState* newPlayer);
+
+
+	////////////////////////////////////////////////////////
+	// Bind to Possessed Characters
 
 	// Character that Controller has been Bound to.
 	//   Used as a lingering reference to un-bind dependencies
@@ -124,6 +170,10 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnControllerUnBoundFromCharacter(ATPSCharacter* oldCharacter);
 
+
+	////////////////////////////////////////////////////////
+	// Bind to Possessed Pawns
+
 	// Pawn that Controller has been Bound to.
 	//   Used as a lingering reference to un-bind dependencies
 	//   and callbacks from Pawn after un-possessing.
@@ -144,38 +194,6 @@ protected:
 	void OnControllerUnBoundFromPawn(ATPSPawn* oldPawn);
 
 
-	////////////////////////////////////////////////////////
-	// Possession
-
-	// Fires on SERVER
-	virtual void OnPossess(APawn* InPawn) override;
-	virtual void OnUnPossess() override;
-
-	// Fires on CLIENT
-	virtual void OnRep_Pawn() override;
-
-	// Called when Pawn is changed (dropped OR acquired)
-	//UFUNCTION(BlueprintImplementableEvent)
-	void OnPawnPossessionChanged();
-
-
-
-	////////////////////////////////////////////////////////
-	// Targeting Behavior
-public:
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FVector GetCameraTargetLocation() const;
-
-	void NotifyPawnDeath();
-
-
-
-
-	////////////////////////////////////////////////////////
-	// UI States & Menu Selection
-
-	UFUNCTION(BlueprintCallable)
-	void SetControllerState(const ETPSControllerState state);
 
 //~ ==================================================================== ~//
 //  CONSOLE COMMANDS (Developer-only API)

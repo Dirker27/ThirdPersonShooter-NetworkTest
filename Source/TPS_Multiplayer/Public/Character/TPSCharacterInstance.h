@@ -150,6 +150,16 @@ public:
 
 
 
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool IsActive() const;
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool IsPossessedByPlayer() const;
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool CanBePossessed() const;
+
+
 //~ ======================================================================== ~//
 //  Instance -> Actor Operations
 //~ ======================================================================== ~//

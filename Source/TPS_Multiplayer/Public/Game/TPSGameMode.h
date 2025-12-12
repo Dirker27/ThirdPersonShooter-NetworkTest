@@ -74,6 +74,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
 	bool RequiresPlayerArmy;
 
+
+	// Whether Players are (currently) allowed to HotSwap after spawn.
+	//   Mutable property that can be toggled on/off depending on match conditions.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
+	bool AllowPlayerHotSwap;
+
+
+
 	// Points required for a team to win the round.
 	// TODO: Allow for differing win conditions and target values.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPS|GameType")
@@ -143,6 +151,9 @@ public:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 
+	virtual void RestartPlayer(AController* NewPlayer) override;
+	virtual bool PlayerCanRestart_Implementation(APlayerController* uePlayerController) override;
+
 	UFUNCTION(BlueprintCallable)
 	void AssignPlayerToAvailableArmy(ATPSPlayerState* player);
 
@@ -151,6 +162,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTPSArmyInstance* GetFirstAvailableArmy() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	APawn* GetActivePawnForPlayerSpawn(APlayerController* uePlayerController) const;
+
+
+	////////////////////////////////////////////////////////
+	// Server -> Player Messaging
 
 	UFUNCTION(BlueprintCallable)
 	void BroadcastMessage(FTPSBroadcastMessage message);
@@ -205,10 +223,9 @@ private:
 	////////////////////////////////////////////////////////
 	// Assignment Operations
 
+	//UE_DEPRECATED()
 	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Assign")
 	void AssignToArmyAndPossess(ATPSPlayerController* controller, UTPSArmyInstance* army);
-
-
 
 	UFUNCTION(BlueprintCallable)
 	void AssignPlayerToArmy(ATPSPlayerState* player, UTPSArmyInstance* army) const;

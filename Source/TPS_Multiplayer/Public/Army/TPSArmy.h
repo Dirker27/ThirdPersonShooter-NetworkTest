@@ -103,6 +103,18 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintPure)
     ATPSPlayerState* GetOwningPlayer() const { return OwningPlayer.Get(); }
 
+
+    ////////////////////////////////////////////////////////
+    // Member Info
+    //
+    // TODO: [PC-258] Elevate to ManagedCollection Interface
+public:
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    UTPSCharacterInstance* GetRandomActiveMember() const;
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    UTPSCharacterInstance* GetRandomPossessableMember() const;
+
 //~ ==================================================================== ~//
 //  OPERATIONS
 //~ ==================================================================== ~//

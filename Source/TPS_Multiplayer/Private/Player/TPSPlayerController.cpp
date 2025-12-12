@@ -39,6 +39,18 @@ void ATPSPlayerController::BeginPlay()
 	BindConsoleCallbacks();
 }
 
+
+// If the player's controller is READY for restart
+bool ATPSPlayerController::CanRestartPlayer()
+{
+	return true;
+	//return IsValid(BoundPlayer()->GetCandidateForPossess());
+}
+
+
+
+
+
 // Executes ON OWNING CLIENT when PlayerState is connected to Controller from Server
 void ATPSPlayerController::OnRep_PlayerState()
 {

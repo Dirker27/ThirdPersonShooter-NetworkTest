@@ -84,4 +84,18 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintPure)
     TArray<ATPSPlayerState*> GetActivePlayers() const { return Players; }
 
+
+
+
+
+    ////////////////////////////////////////////////////////
+    // Member Info
+    //
+    // TODO: [PC-258] Elevate to ManagedCollection Interface
+public:
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    UTPSCharacterInstance* GetRandomActiveMember() const;
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    UTPSCharacterInstance* GetRandomPossessableMember() const;
 };

@@ -47,7 +47,6 @@ void ATPSGameMode::StartMatch()
 {
 	Super::StartMatch();
 	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::StartMatch()"));
-
 	State()->MatchTimeLimitSeconds = TimeLimitSeconds;
 	State()->TimeMatchStarted = UGameplayStatics::GetTimeSeconds(this);
 }
@@ -90,7 +89,6 @@ void ATPSGameMode::PostLogin(APlayerController* NewPlayer)
 
 }
 
-
 void ATPSGameMode::Logout(AController* Exiting)
 {
 	Super::Logout(Exiting);
@@ -105,6 +103,62 @@ void ATPSGameMode::Logout(AController* Exiting)
 	}
 }
 
+
+
+
+APawn* ATPSGameMode::GetActivePawnForPlayerSpawn(APlayerController* uePlayerController) const
+{
+	auto pc = Cast<ATPSPlayerController>(uePlayerController);
+	if (!IsValid(pc)) { return nullptr; }
+
+	auto ps = pc->BoundPlayer();
+	if (!IsValid(ps)) { return nullptr; }
+
+	if (RequiresPlayerArmy)
+	{
+		if (auto army = ps->GetAssignedArmy())
+		{
+			return army->GetRandomPossessableMember()->GetSpawnedActor();
+		}
+	}
+	else if (RequiresPlayerTeam)
+	{
+		if (auto team = ps->GetAssignedTeam())
+		{
+			return team->GetRandomPossessableMember()->GetSpawnedActor();
+		}
+	}
+
+	return nullptr;
+}
+
+
+
+bool ATPSGameMode::PlayerCanRestart_Implementation(APlayerController* uePlayerController)
+{
+	return uePlayerController->CanRestartPlayer() && IsValid(GetActivePawnForPlayerSpawn(uePlayerController));
+}
+
+void ATPSGameMode::RestartPlayer(AController* NewPlayer)
+{
+	ATPSPlayerController* tpc = Cast<ATPSPlayerController>(NewPlayer);
+	if (PlayerCanRestart(tpc))
+	{
+		if (auto pawn = GetActivePawnForPlayerSpawn(tpc))
+		{
+			tpc->Possess(GetActivePawnForPlayerSpawn(tpc));
+			return;
+		}
+		else
+		{
+			// TODO: Spawn as DefaultPawn / Spectator
+		}
+	}
+
+
+	UE_LOG(LogTemp, Log, TEXT("[GameMode] FAILED to Spawn Player[%s] with instantiated Pawns."), *NewPlayer->GetName());
+	Super::RestartPlayer(NewPlayer);
+}
 
 
 
@@ -158,7 +212,7 @@ void ATPSGameMode::BroadcastMessage(FTPSBroadcastMessage message)
 
 void ATPSGameMode::UpdateMatchPhase(ETPSMatchPhase phase)
 {
-	SetMatchState()
+	//SetMatchState()
 
 	State()->UpdateMatchPhase(phase);
 }
@@ -505,10 +559,9 @@ bool ATPSGameMode::CanCharacterBePossessedByPlayer_Implementation(ATPSPlayerStat
 {
 	if (!IsValid(player) || !IsValid(character)) { return false; }
 
-	return player->GetAssignedTeamID() == character->GetAssignedTeamID()
-		&& character->IsAlive
-		&& IsValid(character->GetSpawnedActor())
-		&& character->GetSpawnedActor()->CanBePossessedByPlayer;
+	return character->CanBePossessed()
+		&& player->GetAssignedTeamID() == character->GetAssignedTeamID()
+		&& player->GetAssignedArmy() == character->GetAssignedArmy();
 }
 
 
