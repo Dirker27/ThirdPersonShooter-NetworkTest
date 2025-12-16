@@ -26,6 +26,9 @@ public:
 	TEnumAsByte<ETPSUnitLevel> UnitLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int UnitNumber;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<ETPSTeamID> AssignedTeamID;
 
 	// Filters Squads/Fireteams that can use this Spawn Point
