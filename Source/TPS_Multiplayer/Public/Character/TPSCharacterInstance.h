@@ -184,7 +184,7 @@ public:
 //~ ======================================================================== ~//
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
-    TObjectPtr<ATPSCharacter> SpawnedActor;
+    TWeakObjectPtr<ATPSCharacter> SpawnedActor;
 
 public:
     UFUNCTION(BlueprintCallable)
@@ -194,7 +194,7 @@ public:
     virtual void DestroyActor();
 
     UFUNCTION(BlueprintCallable)
-    ATPSCharacter* GetSpawnedActor() const { return SpawnedActor; }
+    ATPSCharacter* GetSpawnedActor() const { return SpawnedActor.Get(); }
 
 
 

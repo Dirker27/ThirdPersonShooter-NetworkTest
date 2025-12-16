@@ -118,14 +118,26 @@ APawn* ATPSGameMode::GetActivePawnForPlayerSpawn(APlayerController* uePlayerCont
 	{
 		if (auto army = ps->GetAssignedArmy())
 		{
-			return army->GetRandomPossessableMember()->GetSpawnedActor();
+			if (auto member = army->GetRandomPossessableMember())
+			{
+				if (IsValid(member->GetSpawnedActor()))
+				{
+					return member->GetSpawnedActor();
+				}
+			}
 		}
 	}
 	else if (RequiresPlayerTeam)
 	{
 		if (auto team = ps->GetAssignedTeam())
 		{
-			return team->GetRandomPossessableMember()->GetSpawnedActor();
+			if(auto member = team->GetRandomPossessableMember())
+			{
+				if (IsValid(member->GetSpawnedActor()))
+				{
+					return member->GetSpawnedActor();
+				}
+			}
 		}
 	}
 

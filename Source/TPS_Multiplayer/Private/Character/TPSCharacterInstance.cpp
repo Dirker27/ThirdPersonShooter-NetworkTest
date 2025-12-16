@@ -51,7 +51,7 @@ void UTPSCharacterInstance::OnRep_Assignment()
 
 void UTPSCharacterInstance::SpawnActor(TSubclassOf<ATPSCharacter> actorTemplate, AActor* spawnPoint)
 {
-	if (IsValid(SpawnedActor)) { return; }
+	if (IsValid(SpawnedActor.Get())) { return; }
 	if (!IsValid(spawnPoint)) { return; }
 
 	ATPSCharacter* characterActor = GetWorld()->SpawnActorDeferred<ATPSCharacter>(
@@ -69,7 +69,7 @@ void UTPSCharacterInstance::SpawnActor(TSubclassOf<ATPSCharacter> actorTemplate,
 
 void UTPSCharacterInstance::DestroyActor()
 {
-	if (IsValid(SpawnedActor))
+	if (IsValid(SpawnedActor.Get()))
 	{
 		SpawnedActor->Destroy();
 	}
@@ -175,7 +175,7 @@ void UTPSCharacterInstance::Die()
 
 	// Extend death to Actor
 	//   (may have already fired if Character-driven death)
-	if (IsValid(SpawnedActor))
+	if (IsValid(SpawnedActor.Get()))
 	{
 		SpawnedActor->Die();
 	}
@@ -186,7 +186,7 @@ void UTPSCharacterInstance::Die()
 
 void UTPSCharacterInstance::Focus()
 {
-	if (!IsValid(SpawnedActor)) { return; }
+	if (!IsValid(SpawnedActor.Get())) { return; }
 
 	SpawnedActor->IsFocused = true;
 
@@ -195,7 +195,7 @@ void UTPSCharacterInstance::Focus()
 
 void UTPSCharacterInstance::UnFocus()
 {
-	if (!IsValid(SpawnedActor)) { return; }
+	if (!IsValid(SpawnedActor.Get())) { return; }
 
 	SpawnedActor->IsFocused = false;
 
@@ -205,14 +205,14 @@ void UTPSCharacterInstance::UnFocus()
 
 void UTPSCharacterInstance::ShowDebug()
 {
-	if (!IsValid(SpawnedActor)) { return; }
+	if (!IsValid(SpawnedActor.Get())) { return; }
 
 	SpawnedActor->IsDebugEnabled = true;
 }
 
 void UTPSCharacterInstance::HideDebug()
 {
-	if (!IsValid(SpawnedActor)) { return; }
+	if (!IsValid(SpawnedActor.Get())) { return; }
 
 	SpawnedActor->IsDebugEnabled = false;
 }
