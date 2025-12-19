@@ -4,9 +4,13 @@ using UnrealBuildTool;
 
 public class TPS_Multiplayer : ModuleRules
 {
+
 	public TPS_Multiplayer(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+		bUsePrecompiled = true;
+		PrecompileForTargets = PrecompileTargetsType.Any;
+
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
 		PublicDependencyModuleNames.AddRange(new string[] { 
 			"AIModule",
