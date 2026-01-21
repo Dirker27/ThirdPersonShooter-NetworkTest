@@ -27,14 +27,14 @@ ATPSGameMode::~ATPSGameMode() { }
 void ATPSGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::BeginPlay()"));
+	UE_LOG(LogGameMode, Verbose, TEXT("[SERVER]-[GameMode] TPSGameMode::BeginPlay()"));
 
 	if (IsValid(TeamFactory)) {
 		TeamFactory->ArmyFactory = ArmyFactory;
 		TeamFactory->UnitFactory = UnitFactory;
 		TeamFactory->CharacterFactory = CharacterFactory;
 	} else {
-		UE_LOG(LogTemp, Log, TEXT("[GAME MODE] NO INSTANCE FACTORY PROVIDED!!!"));
+		UE_LOG(LogGameMode, Error, TEXT("[SERVER]-[GameMode] NO INSTANCE FACTORY PROVIDED!!!"));
 	}
 }
 
@@ -45,55 +45,52 @@ void ATPSGameMode::BeginPlay()
 
 void ATPSGameMode::StartMatch()
 {
+	UE_LOG(LogGameMode, Verbose, TEXT("[SERVER]-[GameMode] TPSGameMode::StartMatch()"));
 	Super::StartMatch();
-	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::StartMatch()"));
+
 	State()->MatchTimeLimitSeconds = TimeLimitSeconds;
 	State()->TimeMatchStarted = UGameplayStatics::GetTimeSeconds(this);
 }
 
 void ATPSGameMode::HandleMatchHasStarted()
 {
+	UE_LOG(LogGameMode, Verbose, TEXT("[SERVER]-[GameMode] TPSGameMode::HandleMatchHasStarted()"));
+
 	Super::HandleMatchHasStarted();
-	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::HandleMatchHasStarted()"));
 }
 
 
 void ATPSGameMode::EndMatch()
 {
 	Super::EndMatch();
-	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::EndMatch()"));
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] TPSGameMode::EndMatch()"));
 }
 
 void ATPSGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
-	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::HandleMatchHasEnded()"));
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] TPSGameMode::HandleMatchHasEnded()"));
 }
 
 
 void ATPSGameMode::PostLogin(APlayerController* NewPlayer)
 {
+	UE_LOG(LogGameMode, Verbose, TEXT("[SERVER]-[GameMode] TPSGameMode::PostLogin()"));
 	Super::PostLogin(NewPlayer);
-
-	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::PostLogin()"));
 
 	if (auto ps = NewPlayer->GetPlayerState<ATPSPlayerState>())
 	{
 		State()->RegisterPlayer(ps);
 
-		UE_LOG(LogTemp, Log, TEXT("[GameMode] Player[%s]-[%i] logged in."),
+		UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Player[%s]-[%i] logged in."),
 			*ps->ID.ToString(), ps->GetPlayerId());
 	}
-
-
-
 }
 
 void ATPSGameMode::Logout(AController* Exiting)
 {
+	UE_LOG(LogGameMode, Verbose, TEXT("[SERVER]-[GameMode] TPSGameMode::Logout()"));
 	Super::Logout(Exiting);
-
-	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::Logout()"));
 
 	if (auto pc = Cast<ATPSPlayerController>(Exiting))
 	{
@@ -153,11 +150,14 @@ bool ATPSGameMode::PlayerCanRestart_Implementation(APlayerController* uePlayerCo
 
 void ATPSGameMode::RestartPlayer(AController* NewPlayer)
 {
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] (Re)Starting Player with Controller[%s]..."), *NewPlayer->GetName());
+
 	ATPSPlayerController* tpc = Cast<ATPSPlayerController>(NewPlayer);
 	if (PlayerCanRestart(tpc))
 	{
 		if (auto pawn = GetActivePawnForPlayerSpawn(tpc))
 		{
+			UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Player[%s] starting in possession of Pawn[%s]."), *NewPlayer->GetName(), *pawn->GetName());
 			tpc->Possess(GetActivePawnForPlayerSpawn(tpc));
 			return;
 		}
@@ -168,7 +168,7 @@ void ATPSGameMode::RestartPlayer(AController* NewPlayer)
 	}
 
 
-	UE_LOG(LogTemp, Log, TEXT("[GameMode] FAILED to Spawn Player[%s] with instantiated Pawns."), *NewPlayer->GetName());
+	UE_LOG(LogGameMode, Warning, TEXT("[SERVER]-[GameMode] FAILED to Spawn Player[%s] with instantiated Pawns."), *NewPlayer->GetName());
 	Super::RestartPlayer(NewPlayer);
 }
 
@@ -180,7 +180,7 @@ void ATPSGameMode::AssignPlayerToAvailableArmy(ATPSPlayerState* player)
 	{
 		player->AssignToArmy(army);
 		army->BindToPlayer(player);
-		UE_LOG(LogTemp, Log, TEXT("[GameMode] Player[%s] assigned to Army[%s]"), *player->ID.ToString(), *army->ArmyID.ToString());
+		UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Player[%s] assigned to Army[%s]"), *player->ID.ToString(), *army->ArmyID.ToString());
 	}
 }
 
@@ -213,7 +213,7 @@ UTPSTeamInstance* ATPSGameMode::GetRandomTeam() const
 
 void ATPSGameMode::BroadcastMessage(FTPSBroadcastMessage message)
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::BroadcastMessage([%s]-[%s])"),
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] TPSGameMode::BroadcastMessage([%s]-[%s])"),
 		*message.Heading, *message.SubHeading);
 
 	State()->UpdateBroadcastMessage(message);
@@ -270,23 +270,23 @@ void ATPSGameMode::IndexSpawnPoints()
 
 bool ATPSGameMode::SpawnCharacter(FTPSCharacterID characterId)
 {
-	UE_LOG(LogTemp, Log, TEXT("Spawning Character[%s]..."), *characterId.ToString());
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Spawning Character[%s]..."), *characterId.ToString());
 
 	if (UTPSCharacterInstance* character = State()->GetCharacter(characterId))
 	{
 		if (auto team = character->GetAssignedTeam()) {
 			character->SpawnActor(DefaultCharacterTemplate, FindSpawnPointForCharacter(character));
-			UE_LOG(LogTemp, Log, TEXT("Character[%s] spawned."), *characterId.ToString());
+			UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Character[%s] spawned."), *characterId.ToString());
 			return true;
 		}
 	}
-	UE_LOG(LogTemp, Log, TEXT("FAILED to spawn Character[%s]!"), *characterId.ToString());
+	UE_LOG(LogGameMode, Warning, TEXT("FAILED to spawn Character[%s]!"), *characterId.ToString());
 	return false;
 }
 
 void ATPSGameMode::SpawnTeams()
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::InitializeTeams()"));
+	UE_LOG(LogGameMode, Verbose, TEXT("[SERVER]-[GameMode] TPSGameMode::InitializeTeams()"));
 
 	TArray<TObjectPtr<UTPSCharacterInstance>> roster;
 	for (auto team : State()->Teams)
@@ -297,45 +297,51 @@ void ATPSGameMode::SpawnTeams()
 
 bool ATPSGameMode::SpawnTeam(ETPSTeamID teamId)
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSGameMode::SpawnTeam([%s])"), *TPSTeamIdToString(teamId));
+	UE_LOG(LogGameMode, Verbose, TEXT("[SERVER]-[GameMode] TPSGameMode::SpawnTeam([%s])"), *TPSTeamIdToString(teamId));
 
 	bool success = true;
 	if (UTPSTeamInstance* t = State()->GetTeam(teamId))
 	{
+		UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Spawning Team[%s]..."), *TPSTeamIdToString(t->TeamID));
+
 		for (auto army : t->GetArmies()) {
 			success &= SpawnArmy(army->ArmyID);
 		}
+
+		// TODO: Spawn non-Army member units
+
+		UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Team[%s] spawned."), *TPSTeamIdToString(t->TeamID));
 	}
 	return success;
 }
 
 bool ATPSGameMode::SpawnArmy(FTPSArmyID armyId)
 {
-	UE_LOG(LogTemp, Log, TEXT("Spawning Army[%s]..."), *armyId.ToString());
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Spawning Army[%s]..."), *armyId.ToString());
 	if (UTPSArmyInstance* army = State()->GetArmy(armyId))
 	{
 		if (auto unit = army->GetRootUnit()) {
 			SpawnUnit(army->GetRootUnit()->UnitID);
-			UE_LOG(LogTemp, Log, TEXT("Army[%s] spawned."), *armyId.ToString());
+			UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Army[%s] spawned."), *armyId.ToString());
 			return true;
 		}
 	}
-	UE_LOG(LogTemp, Log, TEXT("FAILED to spawn Army[%s]!"), *armyId.ToString());
+	UE_LOG(LogGameMode, Warning, TEXT("[SERVER]-[GameMode] FAILED to spawn Army[%s]!"), *armyId.ToString());
 	return false;
 }
 
 bool ATPSGameMode::SpawnUnit(FTPSUnitID unitId)
 {
-	UE_LOG(LogTemp, Log, TEXT("Spawning Unit[%s]..."), *unitId.ToString());
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Spawning Unit[%s]..."), *unitId.ToString());
 	if (UTPSCommandUnit* unit = State()->GetUnit(unitId))
 	{
 		if (auto team = unit->GetAssignedTeam()) {
 			_SpawnUnit(unit, team->SpawnPool);
-			UE_LOG(LogTemp, Log, TEXT("Unit[%s] spawned."), *unitId.ToString());
+			UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Unit[%s] spawned."), *unitId.ToString());
 			return true;
 		}
 	}
-	UE_LOG(LogTemp, Log, TEXT("FAILED to spawn Unit[%s]!"), *unitId.ToString());
+	UE_LOG(LogGameMode, Warning, TEXT("[SERVER]-[GameMode] FAILED to spawn Unit[%s]!"), *unitId.ToString());
 	return false;
 }
 
@@ -377,17 +383,20 @@ void ATPSGameMode::AssignToArmyAndPossess_Implementation(ATPSPlayerController* c
 
 void ATPSGameMode::AssignPlayerToArmy(ATPSPlayerState* player, UTPSArmyInstance* army) const
 {
-	if (!IsValid(player) || !IsValid(army))
-	{
-		player->AssignToArmy(army);
-		army->BindToPlayer(player);
-	}
+	if (!IsValid(player) || !IsValid(army)) { return; }
+
+	player->AssignToArmy(army);
+	army->BindToPlayer(player);
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Player[%s] assigned to Army[%s]."), *player->ID.ToString(), *army->ArmyID.ToString());
 }
 
 void ATPSGameMode::AssignPlayerToTeam(ATPSPlayerState* player, UTPSTeamInstance* team) const
 {
+	if (!IsValid(player) || !IsValid(team)) { return; }
+
 	player->AssignToTeam(team);
 	team->AddPlayer(player);
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Player[%s] assigned to Team[%s]."), *player->ID.ToString(), *TPSTeamIdToString(team->TeamID));
 }
 
 
@@ -398,34 +407,34 @@ void ATPSGameMode::AssignPlayerToTeam(ATPSPlayerState* player, UTPSTeamInstance*
 
 void ATPSGameMode::InitializeTeams()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GameMode] Initializing Teams..."));
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Initializing Teams..."));
 	for (auto teamConfig : TeamDefinitionMap)
 	{
 		TeamFactory->CreateTeam(teamConfig.Key);
 		TeamFactory->ConfigureTeam(teamConfig.Key, teamConfig.Value->Definition);
 	}
-	UE_LOG(LogTemp, Log, TEXT("[GameMode] Teams Initialized."));
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Teams Initialized."));
 }
 
 
 void ATPSGameMode::PopulateTeams()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GameMode] Populating Teams..."));
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Populating Teams..."));
 	TArray<TObjectPtr<UTPSCharacterInstance>> roster;
 	for (auto team : State()->Teams)
 	{
 		TeamFactory->PopulateTeam(team->TeamID, roster);
 	}
-	UE_LOG(LogTemp, Log, TEXT("[GameMode] Teams Populated."));
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Teams Populated."));
 }
 
 void ATPSGameMode::KillCharacter_Implementation(const FTPSCharacterID characterId)
 {
-	UE_LOG(LogTemp, Log, TEXT("RECEIVED REQUEST - TPSGameMode::KillCharacter([%s])..."), *characterId.Guid.ToString());
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] RECEIVED REQUEST - KillCharacter([%s])."), *characterId.Guid.ToString());
 
 	if (auto character = State()->GetCharacter(characterId))
 	{
-		UE_LOG(LogTemp, Log, TEXT("[GameMode] Eliminating Character[%s]..."), *characterId.ToString());
+		UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Eliminating Character[%s]..."), *characterId.ToString());
 		character->Die();
 
 		auto report = GenerateEliminationReportForCharacterDeath(character);
@@ -433,7 +442,7 @@ void ATPSGameMode::KillCharacter_Implementation(const FTPSCharacterID characterI
 
 		// Broadcast Event -> BP GameMode handler
 		OnCharacterElimination(report);
-		UE_LOG(LogTemp, Log, TEXT("[GameMode] Character[%s] Eliminated."), *characterId.ToString());
+		UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Character[%s] Eliminated."), *characterId.ToString());
 	}
 }
 
@@ -534,20 +543,34 @@ void ATPSGameMode::DebugGlobal() {
 
 void ATPSGameMode::RequestPossessCharacterActor_Implementation(ATPSPlayerController* controller, ATPSCharacter* character)
 {
-	if (IsValid(controller) && IsValid(character) && character->CanBePossessedByPlayer)
+	if (!IsValid(controller) || !IsValid(character)) { return; }
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] RECEIVED REQUEST - PossessCharacterActor([%s])."), *character->GetName());
+
+	if (AllowPlayerHotSwap && character->CanBePossessedByPlayer)
 	{
 		controller->Possess(character);
+		UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Controller[%s] granted possession of Character[%s]."), *controller->GetName(), *character->GetName());
+	}
+	else
+	{
+		UE_LOG(LogGameMode, Warning, TEXT("[SERVER]-[GameMode] Possession REJECTED - Character[%s] cannot be possessed."), *character->GetName());
 	}
 }
 
 void ATPSGameMode::RequestPossessCharacterInstance_Implementation(ATPSPlayerController* controller, UTPSCharacterInstance* character)
 {
 	if (!IsValid(controller) || !IsValid(character)) { return; }
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] RECEIVED REQUEST - PossessCharacterInstance(Controller[%s], Character[%s])."), *controller->GetName(), *character->CharacterID.ToString());
 
 	if (ATPSPlayerState* player = controller->GetPlayerState<ATPSPlayerState>()) {
 		if (CanCharacterBePossessedByPlayer(player, character))
 		{
 			controller->Possess(character->GetSpawnedActor());
+			UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Controller[%s] granted possession of Character[%s]."), *controller->GetName(), *character->GetName());
+		}
+		else
+		{
+			UE_LOG(LogGameMode, Warning, TEXT("[SERVER]-[GameMode] Possession REJECTED - Character[%s] cannot be possessed."), *character->CharacterID.ToString());
 		}
 	}
 }
@@ -673,13 +696,13 @@ static TAutoConsoleVariable<int32> CVarGlobalFogDensity(
 
 
 void _OnGameConfiugrationConsoleInput(IConsoleVariable* Var) {
-	UE_LOG(LogTemp, Log, TEXT("Performing CONFIG Update..."));
+	UE_LOG(LogGameMode, Log, TEXT("[SERVER]-[GameMode] Performing CONFIG Update..."));
 
 	FTPSGameConfiguration configuration = {
 		CVarGlobalCharacterDebugMode->GetInt(),
 		CVarGlobalFogDensity->GetFloat()
 	};
-	UE_LOG(LogTemp, Log, TEXT("INPUT CharacterDEBUG: %i\nINPUT FogDensity: %f"),
+	UE_LOG(LogGameMode, Log, TEXT("|- INPUT CharacterDEBUG: %i\n|- INPUT FogDensity: %f"),
 		configuration.GlobalCharacterDebugMode, configuration.GlobalFogDensity);
 	ATPSGameMode::UpdateGameConfiguration(&configuration);
 }

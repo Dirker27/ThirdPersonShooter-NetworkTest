@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TPSPlayerState.h"
 #include "GameFramework/PlayerController.h"
 
+#include "TPSPlayerState.h"
 #include "Character/Types/TPSCharacterBehaviorState.h"
 #include "Character/TPSCharacter.h"
 #include "Pawn/TPSPawn.h"
@@ -25,6 +25,18 @@ enum ETPSControllerState : int
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FControllerStateUpdate);
 
+
+/**
+ * A Player Controller used to drive Pawns and Characters.
+ *
+ * Responsible for binding a player's HUD and Controls to their currently possessed player.
+ *
+ * Will exist on SERVER and player's CLIENT (only the owning player)
+ * 
+ * Binds to:
+ *  - Owner's PlayerState
+ *  - Active Character / Pawn
+ */
 UCLASS()
 class TPS_MULTIPLAYER_API ATPSPlayerController : public APlayerController
 {

@@ -824,60 +824,85 @@ void ATPSCharacter::FellOutOfWorld(const class UDamageType& dmgType)
 
 
 
-
-void ATPSCharacter::PossessedBy(AController* NewController) // server
+//--- SERVER ---//
+//
+//TODO: Migrate ASC update to Controller?
+void ATPSCharacter::PossessedBy(AController* NewController)
 { 
+	UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSCharacter] Character[%s]::PossessedBy(Controller[%s])"), *GetName(), *NewController->GetName());
 	Super::PossessedBy(NewController);
-
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character[%s]::PossessedBy(Controller[%s])"), *GetName(), *NewController->GetName());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character[%s]::PossessedBy(Controller[%s])"), *GetName(), *NewController->GetName());
-	}
 
 	if (ATPSPlayerState* ps = NewController->GetPlayerState<ATPSPlayerState>())
 	{
-		if (HasAuthority())
-		{
-			AbilitySystem->GrantPlayerBasedAbilities(ps->PlayerAbilitySet);
-		}
+		UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSCharacter] Character[%s] Granting player-based abilities to ASC..."), *GetName());
+		AbilitySystem->GrantPlayerBasedAbilities(ps->PlayerAbilitySet);
+		UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSCharacter] Character[%s] Player-based abilities granted."), *GetName());
 	}
 
 	ShouldNotify = true;
 }
 
-void ATPSCharacter::OnRep_PlayerState() // client
-{ 
-	Super::OnRep_PlayerState();
-
-	/*if (HasAuthority())
+//--- SERVER ---//
+//
+//TODO: Migrate ASC update to Controller?
+void ATPSCharacter::UnPossessed()
+{
+	if (auto currentController = GetController())
 	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] Character[%s]::OnRep_PlayerState()"), *GetName());
+		UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSCharacter] Character[%s]::UnPossessed() -||- CurrentController==[%s]"), *GetName(), *GetController()->GetName());
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] Character[%s]::OnRep_PlayerState()"), *GetName());
-	}*/
+		UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSCharacter] Character[%s]::UnPossessed() -||- CurrentController==[NONE]"), *GetName());
+	}
+	Super::UnPossessed();
+
+
+	UE_LOG(LogTemp, Verbose, TEXT("[SERVER]-[TPSCharacter] Character[%s] Revoking player-based abilities from ASC..."), *GetName());
+	AbilitySystem->RevokePlayerBasedAbilities();
+	UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSCharacter] Character[%s] Player-based abilities revoked."), *GetName());
+
+
+	UE_LOG(LogTemp, Verbose, TEXT("[SERVER]-[TPSCharacter] Character[%s] Re-starting..."), *GetName());
+	DispatchRestart(false);
+	UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSCharacter] Character[%s] Restarted."), *GetName());
+
 	ShouldNotify = true;
 }
 
-void ATPSCharacter::UnPossessed()
+//--- CLIENT ---//
+void ATPSCharacter::OnRep_PlayerState() // client
 {
-	Super::UnPossessed();
-
-	if (HasAuthority())
+	if (auto ps = GetPlayerState<ATPSPlayerState>())
 	{
-		AbilitySystem->RevokePlayerBasedAbilities();
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT]-[TPSCharacter] Character[%s]::OnRep_PlayerState() -||- PlayerState==[%s]"), *GetName(), *ps->ID.ToString());
 	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT]-[TPSCharacter] Character[%s]::OnRep_PlayerState() -||- PlayerState==[NONE]"), *GetName());
+	}
+	Super::OnRep_PlayerState();
+
+
+	UE_LOG(LogTemp, Verbose, TEXT("[CLIENT]-[TPSCharacter] Character[%s] Re-starting..."), *GetName());
+	DispatchRestart(true);
+	UE_LOG(LogTemp, Log, TEXT("[CLIENT]-[TPSCharacter] Character[%s] Restarted."), *GetName());
+
 	ShouldNotify = true;
 }
 
 void ATPSCharacter::NotifyControllerChanged()
 {
 	Super::NotifyControllerChanged();
+
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("[SERVER]-[TPSCharacter] Character[%s]::NotifyControllerChanged()"), *GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("[CLIENT]-[TPSCharacter] Character[%s]::NotifyControllerChanged()"), *GetName());
+	}
 }
 
 

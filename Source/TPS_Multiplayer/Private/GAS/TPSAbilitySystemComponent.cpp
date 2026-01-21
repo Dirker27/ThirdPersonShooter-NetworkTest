@@ -49,46 +49,39 @@ void UTPSAbilitySystemComponent::AbilityLocalInputPressed(int32 InputID)
 //  ABILITIES CRUD
 //~ ======================================================================== ~//
 
-
+static void _log_ability_list(TArray<FGameplayAbilitySpec> abilityList)
+{
+    for (auto ability : abilityList)
+    {
+        UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
+    }
+}
 
 
 void UTPSAbilitySystemComponent::GrantBaseAbilities(UAbilitySet* abilitySet)
 {
-    BaseAbilitySpecHandles.Append(GrantAbilities(abilitySet));
+    BaseAbilitySpecHandles.Append(GrantAbilitiesFromAbilitySet(abilitySet));
 }
 
 void UTPSAbilitySystemComponent::GrantPlayerBasedAbilities(UAbilitySet* abilitySet)
 {
-    UE_LOG(LogTemp, Log, TEXT("Granting player-based abilities to Actor[%s] ASC..."), *GetOwnerActor()->GetName());
-
     if (!PlayerBasedAbilitySpecHandles.IsEmpty())
     {
         RevokePlayerBasedAbilities();
     }
 
-    PlayerBasedAbilitySpecHandles.Append(GrantAbilities(abilitySet));
-
-    UE_LOG(LogTemp, Log, TEXT("ASC for Actor[%s] updated."), *GetOwnerActor()->GetName());
-    /*for (auto ability : GetActivatableAbilities())
-    {
-        UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
-    }*/
+    PlayerBasedAbilitySpecHandles.Append(GrantAbilitiesFromAbilitySet(abilitySet));
+    //_log_ability_list(GetActivatableAbilities());
 }
 
 void UTPSAbilitySystemComponent::RevokePlayerBasedAbilities()
 {
-    UE_LOG(LogTemp, Log, TEXT("Revoking player-based abilities from Actor[%s] ASC..."), *GetOwnerActor()->GetName());
-
     RevokeAbilities(PlayerBasedAbilitySpecHandles);
 
-    UE_LOG(LogTemp, Log, TEXT("Abilities revoked from Actor[%s]."), *GetOwnerActor()->GetName());
-    /*for (auto ability : GetActivatableAbilities())
-    {
-        UE_LOG(LogTemp, Log, TEXT("|--- [%s]::[%i]"), *ability.Ability->GetName(), ability.InputID);
-    }*/
+    //_log_ability_list(GetActivatableAbilities());
 }
 
-TArray<FGameplayAbilitySpecHandle> UTPSAbilitySystemComponent::GrantAbilities(UAbilitySet* abilitySet) {
+TArray<FGameplayAbilitySpecHandle> UTPSAbilitySystemComponent::GrantAbilitiesFromAbilitySet(UAbilitySet* abilitySet) {
     TArray<FGameplayAbilitySpecHandle> handles;
     if (!IsValid(abilitySet)) { return handles; }
 
@@ -148,10 +141,10 @@ void UTPSAbilitySystemComponent::ReleaseAbilityBindingsFromInputComponent(UEnhan
 
 // EnhancedInput -> GAS plumbing
 void UTPSAbilitySystemComponent::AbilityInputBindingPressedHandler(EAbilityInput abilityInput) {
-	UE_LOG(LogTemp, Log, TEXT("ASC[%s]::OnInputPressed[%i]"), *GetOwnerActor()->GetName(), abilityInput);
+	UE_LOG(LogTemp, Verbose, TEXT("ASC[%s]::OnInputPressed[%i]"), *GetOwnerActor()->GetName(), abilityInput);
 	AbilityLocalInputPressed(static_cast<uint32>(abilityInput));
 }
 void UTPSAbilitySystemComponent::AbilityInputBindingReleasedHandler(EAbilityInput abilityInput) {
-	UE_LOG(LogTemp, Log, TEXT("ASC[%s]::OnInputReleased[%i]"), *GetOwnerActor()->GetName(), abilityInput);
+	UE_LOG(LogTemp, Verbose, TEXT("ASC[%s]::OnInputReleased[%i]"), *GetOwnerActor()->GetName(), abilityInput);
 	AbilityLocalInputReleased(static_cast<uint32>(abilityInput));
 }

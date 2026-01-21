@@ -123,6 +123,10 @@ void UTPSTeamInstanceFactory::_PopulateUnit(UTPSCommandUnit* node)
 		{
 			army->AddMember(instance);
 		}
+		if (auto team = node->GetAssignedTeam())
+		{
+			team->AddMember(instance);
+		}
 		instance->AssignToUnit(node);
 		if (instance->Identity.SquadRole == Leader) {
 			node->SetLeader(instance);

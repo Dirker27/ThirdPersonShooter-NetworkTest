@@ -7,8 +7,8 @@ public class TPS_Multiplayer : ModuleRules
 
 	public TPS_Multiplayer(ReadOnlyTargetRules Target) : base(Target)
 	{
-		bUsePrecompiled = true;
-		PrecompileForTargets = PrecompileTargetsType.Any;
+		//bUsePrecompiled = true;
+		//PrecompileForTargets = PrecompileTargetsType.Any;
 
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	

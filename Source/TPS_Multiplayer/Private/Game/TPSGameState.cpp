@@ -115,7 +115,15 @@ void ATPSGameState::OnRep_Teams()
 }
 void ATPSGameState::IndexLocalTeamIds()
 {
-    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexLocalTeamIds()..."));
+    if (HasAuthority())
+    {
+        UE_LOG(LogGameState, Log, TEXT("[SERVER]-[GameState] TPSGameState::IndexLocalTeamIds()..."));
+    }
+    else
+    {
+        UE_LOG(LogGameState, Log, TEXT("[CLIENT]-[GameState] TPSGameState::IndexLocalTeamIds()..."));
+    }
+    
 
     TeamsById.Empty(Teams.Num());
 
@@ -135,7 +143,14 @@ void ATPSGameState::OnRep_Armies()
 }
 void ATPSGameState::IndexLocalArmyIds()
 {
-    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexLocalArmyIds()..."));
+    if (HasAuthority())
+    {
+        UE_LOG(LogGameState, Log, TEXT("[SERVER]-[GameState] TPSGameState::IndexLocalArmyIds()..."));
+    }
+    else
+    {
+        UE_LOG(LogGameState, Log, TEXT("[CLIENT]-[GameState] TPSGameState::IndexLocalArmyIds()..."));
+    }
 
     ArmiesById.Empty(Armies.Num());
 
@@ -157,7 +172,14 @@ void ATPSGameState::OnRep_Units()
 }
 void ATPSGameState::IndexLocalUnitIds()
 {
-    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexLocalUnitIds()..."));
+    if (HasAuthority())
+    {
+        UE_LOG(LogGameState, Log, TEXT("[SERVER]-[GameState] TPSGameState::IndexLocalUnitIds()..."));
+    }
+    else
+    {
+        UE_LOG(LogGameState, Log, TEXT("[CLIENT]-[GameState] TPSGameState::IndexLocalUnitIds()..."));
+    }
 
     UnitsById.Empty(Units.Num());
 
@@ -179,7 +201,14 @@ void ATPSGameState::OnRep_Characters()
 }
 void ATPSGameState::IndexLocalCharacterIds()
 {
-    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexLocalCharacterIds()..."));
+    if (HasAuthority())
+    {
+        UE_LOG(LogGameState, Log, TEXT("[SERVER]-[GameState] TPSGameState::IndexLocalCharacterIds()..."));
+    }
+    else
+    {
+        UE_LOG(LogGameState, Log, TEXT("[CLIENT]-[GameState] TPSGameState::IndexLocalCharacterIds()..."));
+    }
 
     CharactersById.Empty(Characters.Num());
 
@@ -187,7 +216,6 @@ void ATPSGameState::IndexLocalCharacterIds()
     {
         if (IsValid(character))
         {
-            // TODO: Use FTPSCharacterId
             CharactersById.Add(character->CharacterID, character);
         }
     }
@@ -201,7 +229,14 @@ void ATPSGameState::OnRep_Players()
 }
 void ATPSGameState::IndexLocalPlayerIds()
 {
-    UE_LOG(LogTemp, Log, TEXT("TPSGameState::IndexLocalPlayerIds()..."));
+    if (HasAuthority())
+    {
+        UE_LOG(LogGameState, Log, TEXT("[SERVER]-[GameState] TPSGameState::IndexLocalPlayerIds()..."));
+    }
+    else
+    {
+        UE_LOG(LogGameState, Log, TEXT("[CLIENT]-[GameState] TPSGameState::IndexLocalPlayerIds()..."));
+    }
 
     PlayersById.Empty(Players.Num());
 
@@ -209,7 +244,6 @@ void ATPSGameState::IndexLocalPlayerIds()
     {
         if (IsValid(player))
         {
-            // TODO: Use FTPSPlayerId?
             PlayersById.Add(player->PlayerID, player);
         }
     }

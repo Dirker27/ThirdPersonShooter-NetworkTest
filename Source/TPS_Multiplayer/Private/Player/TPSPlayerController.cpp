@@ -33,8 +33,8 @@ void ATPSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 void ATPSPlayerController::BeginPlay()
 {
+	UE_LOG(LogTemp, Verbose, TEXT("TPSPlayerController::BeginPlay()"));
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BeginPlay()"));
 
 	BindConsoleCallbacks();
 }
@@ -51,11 +51,39 @@ bool ATPSPlayerController::CanRestartPlayer()
 
 
 
+
+//~ ====================================================================== ~//
+//- Pawn Possession
+//~ ====================================================================== ~//
+
+
+//--- SERVER ---//
+// AController::OnPossess()
+void ATPSPlayerController::OnPossess(APawn* InPawn)
+{
+	UE_LOG(LogTemp, Verbose, TEXT("[SERVER]-[TPSPlayerController] PlayerController[%s]::OnPossess()"), *GetName());
+	Super::OnPossess(InPawn);
+
+	OnPawnPossessionChanged();
+}
+
+//--- CLIENT ---//
+// AController::OnUnPossess()
+void ATPSPlayerController::OnUnPossess()
+{
+	UE_LOG(LogTemp, Verbose, TEXT("[SERVER]-[TPSPlayerController] TPSPlayerController[%s]::OnUnPossess()"), *GetName());
+	Super::OnUnPossess();
+
+	OnPawnPossessionChanged();
+}
+
+
+
 // Executes ON OWNING CLIENT when PlayerState is connected to Controller from Server
 void ATPSPlayerController::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::OnRep_PlayerState()"));
+	UE_LOG(LogTemp, Verbose, TEXT("[CLIENT] TPSPlayerController::OnRep_PlayerState()"));
 
 	if (auto p = BoundPlayer())
 	{
@@ -66,7 +94,7 @@ void ATPSPlayerController::OnRep_PlayerState()
 // Executes ON OWNING CLIENT when Pawn is connected to Controller from Server
 void ATPSPlayerController::OnRep_Pawn()
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::OnRep_Pawn()"));
+	UE_LOG(LogTemp, Verbose, TEXT("[CLIENT] TPSPlayerController::OnRep_Pawn()"));
 	Super::OnRep_Pawn();
 
 	OnPawnPossessionChanged();
@@ -76,11 +104,11 @@ void ATPSPlayerController::OnPawnPossessionChanged()
 {
 	if (HasAuthority())
 	{
-		UE_LOG(LogTemp, Log, TEXT("[SERVER] TPSPlayerController::OnPawnPossessionChanged()"));
+		UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSPlayerController] PlayerController[%s]::OnPawnPossessionChanged()"), *GetName());
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("[CLIENT] TPSPlayerController::OnPawnPossessionChanged()"));
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT]-[TPSPlayerController] PlayerController[%s]::OnPawnPossessionChanged()"), *GetName());
 	}
 
 
@@ -109,8 +137,9 @@ void ATPSPlayerController::OnPawnPossessionChanged()
 
 void ATPSPlayerController::SetupInputComponent()
 {
+	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController[%s]::SetupInputComponent()"), *GetName());
+
 	Super::SetupInputComponent();
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::SetupInputComponent()"));
 }
 
 void ATPSPlayerController::SetControllerState(const ETPSControllerState state)
@@ -126,13 +155,28 @@ void ATPSPlayerController::OnRep_ControllerState()
 
 void ATPSPlayerController::BindControllerToPlayer(ATPSPlayerState* newPlayer)
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BindControllerToPlayer([%s])"), *newPlayer->GetName());
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("[SERVER]-[TPSPlayerController] PlayerController[%s]::BindControllerToPlayer([%s])"), *GetName(), *newPlayer->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("[CLIENT]-[TPSPlayerController] PlayerController[%s]::BindControllerToPlayer([%s])"), *GetName(), *newPlayer->GetName());
+	}
+
 	OnControllerBoundToPlayer(newPlayer);
 }
 
 void ATPSPlayerController::BindControllerToCharacter(ATPSCharacter* newCharacter)
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BindControllerToCharacter([%s])"), *newCharacter->GetName());
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("[SERVER]-[TPSPlayerController] PlayerController[%s]::BindControllerToCharacter([%s])"), *GetName(), *newCharacter->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("[CLIENT]-[TPSPlayerController] PlayerController[%s]::BindControllerToCharacter([%s])"), *GetName(), *newCharacter->GetName());
+	}
 
 	if (auto instance = newCharacter->GetCharacterInstance())
 	{
@@ -144,7 +188,14 @@ void ATPSPlayerController::BindControllerToCharacter(ATPSCharacter* newCharacter
 }
 void ATPSPlayerController::UnBindControllerFromCharacter(ATPSCharacter* oldCharacter)
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::UnBindControllerFromCharacter([%s])"), *oldCharacter->GetName());
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("[SERVER]-[TPSPlayerController] PlayerController[%s]::UnBindControllerFromCharacter([%s])"), *GetName(), *oldCharacter->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("[CLIENT]-[TPSPlayerController] PlayerController[%s]::UnBindControllerFromCharacter([%s])"), *GetName(), *oldCharacter->GetName());
+	}
 
 	if (auto instance = oldCharacter->GetCharacterInstance())
 	{
@@ -157,14 +208,28 @@ void ATPSPlayerController::UnBindControllerFromCharacter(ATPSCharacter* oldChara
 
 void ATPSPlayerController::BindControllerToPawn(ATPSPawn* newPawn)
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::BindControllerToPawn([%s])"), *newPawn->GetName());
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("[SERVER]-[TPSPlayerController] PlayerController[%s]::BindControllerToPawn([%s])"), *GetName(), *newPawn->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("[CLIENT]-[TPSPlayerController] PlayerController[%s]::BindControllerToPawn([%s])"), *GetName(), *newPawn->GetName());
+	}
 
 	OnControllerBoundToPawn(newPawn);
 	BoundPawn = newPawn; // Set after to avoid un-binding callbacks on a bad ref if BP binding fails
 }
 void ATPSPlayerController::UnBindControllerFromPawn(ATPSPawn* oldPawn)
 {
-	UE_LOG(LogTemp, Log, TEXT("TPSPlayerController::UnBindControllerFromPawn([%s])"), *oldPawn->GetName());
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("[SERVER]-[TPSPlayerController] PlayerController[%s]::UnBindControllerFromPawn([%s])"), *GetName(), *oldPawn->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("[CLIENT]-[TPSPlayerController] PlayerController[%s]::UnBindControllerFromPawn([%s])"), *GetName(), *oldPawn->GetName());
+	}
 
 	BoundPawn = nullptr;
 	OnControllerUnBoundFromPawn(oldPawn);
@@ -212,16 +277,6 @@ FVector ATPSPlayerController::GetCameraTargetLocation() const
 		: cameraTargetLoc;
 }
 
-
-void ATPSPlayerController::RequestRespawn_Implementation()
-{
-	ATPSGameMode* mode = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this));
-	if (IsValid(mode))
-	{
-		UE_LOG(LogTemp, Log, TEXT("Requesting RESPAWN for PlayerController[%s]..."), *GetName());
-		mode->RequestRespawn(this);
-	}
-}
 
 void ATPSPlayerController::NotifyPawnDeath()
 {
@@ -331,28 +386,58 @@ void ATPSPlayerController::ToggleCrouch() {
 }
 
 
+
 //~ ====================================================================== ~//
-//- Pawn Possession
+//- UTILITY / CONSOLE COMMANDS
 //~ ====================================================================== ~//
+
+
+
 
 //~ RESPAWN ~//
 
 void ATPSPlayerController::Respawn()
 {
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSPlayerController] CMD::Respawn()"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT]-[TPSPlayerController] CMD::Respawn()"));
+	}
+
 	RequestRespawn();
 }
 
-//~ POSSESS ~//
 
-// AController::OnPossess()
-void ATPSPlayerController::OnPossess(APawn* InPawn)
+void ATPSPlayerController::RequestRespawn_Implementation()
 {
-	Super::OnPossess(InPawn);
-
-	OnPawnPossessionChanged();
+	ATPSGameMode* mode = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this));
+	if (IsValid(mode))
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSPlayerController] Requesting RESPAWN for TPSPlayerController[%s]..."), *GetName());
+		mode->RequestRespawn(this);
+	}
 }
 
 
+
+//~ POSSESS ~//
+
+void ATPSPlayerController::PossessPawn()
+{
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSPlayerController] CMD::PossessPawn()"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT]-[TPSPlayerController] CMD::PossessPawn()"));
+	}
+
+	PossessNearestPlayablePawn();
+}
 
 void ATPSPlayerController::PossessNearestPlayablePawn_Implementation()
 {
@@ -376,30 +461,33 @@ void ATPSPlayerController::PossessNearestPlayablePawn_Implementation()
 
 	ATPSGameMode* mode = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this));
 	if (IsValid(mode)) {
-		UE_LOG(LogTemp, Log, TEXT("Requesting POSSESS for PlayerController[%s]-Character[%s]..."),
-		*GetName(), *character->GetName());
+		UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSPlayerController] Requesting POSSESS for PlayerController[%s]-Character[%s]..."),
+			*GetName(), *character->GetName());
+
 		mode->RequestPossessCharacterActor(this, character);
 	}
 }
-void ATPSPlayerController::PossessPawn()
-{
-	PossessNearestPlayablePawn();
-}
+
+
 
 //~ UN-POSSESS ~//
 
-// AController::OnUnPossess()
-void ATPSPlayerController::OnUnPossess()
-{
-	Super::OnUnPossess();
+void ATPSPlayerController::UnPossessPawn() {
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSPlayerController] CMD::UnPossessPawn()"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("[CLIENT]-[TPSPlayerController] CMD::UnPossessPawn()"));
+	}
 
-	OnPawnPossessionChanged();
+	UnPossessCurrentPawn();
 }
 
 void ATPSPlayerController::UnPossessCurrentPawn_Implementation()
 {
+	UE_LOG(LogTemp, Log, TEXT("[SERVER]-[TPSPlayerController] Performing UNPOSSESS for PlayerController[%s]..."), *GetName());
+
 	UnPossess();
-}
-void ATPSPlayerController::UnPossessPawn() {
-	UnPossessCurrentPawn();
 }

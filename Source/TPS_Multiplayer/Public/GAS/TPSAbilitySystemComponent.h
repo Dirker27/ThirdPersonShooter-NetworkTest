@@ -78,10 +78,7 @@ protected:
 	TArray<FGameplayAbilitySpecHandle> PlayerBasedAbilitySpecHandles {};
 
 private:
-	UFUNCTION(BlueprintCallable)
-	TArray<FGameplayAbilitySpecHandle> GrantAbilities(UAbilitySet* abilitySet);
-
-	UFUNCTION(BlueprintCallable)
+	TArray<FGameplayAbilitySpecHandle> GrantAbilitiesFromAbilitySet(UAbilitySet* abilitySet);
 	void RevokeAbilities(TArray<FGameplayAbilitySpecHandle> abilitySpecHandles);
 
 
