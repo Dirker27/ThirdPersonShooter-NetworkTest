@@ -145,7 +145,7 @@ APawn* ATPSGameMode::GetActivePawnForPlayerSpawn(APlayerController* uePlayerCont
 
 bool ATPSGameMode::PlayerCanRestart_Implementation(APlayerController* uePlayerController)
 {
-	return uePlayerController->CanRestartPlayer() && IsValid(GetActivePawnForPlayerSpawn(uePlayerController));
+	return uePlayerController->CanRestartPlayer();// && IsValid(GetActivePawnForPlayerSpawn(uePlayerController));
 }
 
 void ATPSGameMode::RestartPlayer(AController* NewPlayer)
