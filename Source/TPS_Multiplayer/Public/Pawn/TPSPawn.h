@@ -40,27 +40,40 @@ protected:
 //~ ======================================================================== ~//
 //  STATE
 //~ ======================================================================== ~//
-protected:
-	// Should Target Location drive Target Rotation?
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
-	bool IsTargetingLocation;
-	// Target Location - Provided by LOCAL Controller (Not Replicated)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
-	FVector TargetLookLocation;
-	// Current Look Location - Iterps to TargetLocation
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input")
-	FVector CurrentLookLocation;
+public:
 	// Target Rotation - Derived from Target Location (Replicated to peer clients)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|State|Input", Replicated)
+	// TODO: DELETE
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn|State|Input", Replicated)
 	FRotator TargetLookRotation;
 
+	//////////////////////////////////////////////////////
+	// Targeting
+	//
+	// TODO: Migrate to "Targeting" struct
 
-//~ ======================================================================== ~//
-//  PUBLIC OPERATIONS
-//~ ======================================================================== ~//
-public:
-	UFUNCTION(BlueprintCallable)
-	void SetTargetLocation(FVector targetLocation) { TargetLookLocation = targetLocation; }
+	// Should Target Location drive Target Rotation?
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSPawn|State|Targeting")
+	bool IsTargetingLocation;
+	//
+	// Target Location - Provided by LOCAL Controller (Not Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSPawn|State|Targeting", Replicated)
+	FVector TargetLookLocation;
+	//
+	// Current Look Location - Iterps to TargetLookLocation
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSPawn|State|Targeting", Replicated)
+	FVector CurrentLookLocation;
+	//
+	// Interpolation rate for CurrentLookLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSPawn|State|Targeting")
+	float LookTargetInterpRate = 0.8f;
+
+	// Provided by Controller (AI or Player) - Will drive "look" location if set.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSPawn|State|Targeting", Replicated)
+	TWeakObjectPtr<AActor> TargetActor;
+
+	// Target Lock
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSPawn|State|Targeting")
+	bool IsLockedToTarget = false;
 
 
 //~ ======================================================================== ~//

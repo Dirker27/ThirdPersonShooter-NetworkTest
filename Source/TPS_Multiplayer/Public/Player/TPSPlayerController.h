@@ -73,9 +73,16 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_ControllerState)
 	TEnumAsByte<ETPSControllerState> ControllerState = Initializing;
-
 	UFUNCTION()
 	void OnRep_ControllerState();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+	FVector TargetLookLocation = FVector::Zero();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing=OnRep_TargetActor)
+	TWeakObjectPtr<AActor> TargetActor;
+	UFUNCTION()
+	void OnRep_TargetActor();
 
 
 	// Disables Camera->Character Rotation
@@ -113,8 +120,9 @@ public:
 	////////////////////////////////////////////////////////
 	// Targeting
 public:
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FVector GetCameraTargetLocation() const;
+
+	UFUNCTION()
+	void ScanTargetInfo();
 
 	void NotifyPawnDeath();
 

@@ -36,6 +36,20 @@ public:
 	//~ End AController Interface
 
 
+public:
+	//////////////////////////////////////////////////////
+	// Targeting
+	//
+	// TODO: Move to "Targeting" struct
+
+	// Provided by Controller (AI or Player) - Will drive "look" location if set.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input|Targeting")
+	TWeakObjectPtr<AActor> TargetActor;
+
+	// Target Location - Provided by LOCAL Controller (NOT replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input|Targeting")
+	FVector TargetLookLocation;
+
 	//~ Begin AIController Behavior
 public:
 	virtual void SetPawn(APawn* InPawn) override;

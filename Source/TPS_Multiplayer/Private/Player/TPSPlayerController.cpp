@@ -29,6 +29,8 @@ void ATPSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, ControllerState);
+	DOREPLIFETIME(ThisClass, TargetLookLocation);
+	DOREPLIFETIME(ThisClass, TargetActor);
 }
 
 void ATPSPlayerController::BeginPlay()
@@ -77,6 +79,11 @@ void ATPSPlayerController::OnUnPossess()
 	OnPawnPossessionChanged();
 }
 
+void ATPSPlayerController::OnRep_TargetActor()
+{
+	ControllerStateUpdate.Broadcast();
+}
+
 
 
 // Executes ON OWNING CLIENT when PlayerState is connected to Controller from Server
@@ -121,8 +128,6 @@ void ATPSPlayerController::OnPawnPossessionChanged()
 	{
 		UnBindControllerFromPawn(p);
 	}
-
-
 
 	// Bind to New (if present)
 	if (auto c = PossessedCharacter())
@@ -239,13 +244,19 @@ void ATPSPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (!HasAuthority()) { return; }
+
+	ScanTargetInfo();
+
 	if (auto character  = PossessedCharacter())
 	{
-		character->SetTargetLocation(GetCameraTargetLocation());
+		character->TargetLookLocation = TargetLookLocation;
+		character->TargetActor = TargetActor.Get();
 	}
-	else if (auto p = PossessedPawn())
+	else if (auto pawn = PossessedPawn())
 	{
-		p->SetTargetLocation(GetCameraTargetLocation());
+		pawn->TargetLookLocation = TargetLookLocation;
+		pawn->TargetActor = TargetActor.Get();
 	}
 }
 
@@ -254,7 +265,7 @@ void ATPSPlayerController::Tick(float DeltaSeconds)
 //- BEHAVIOR OPERATIONS
 //~ ====================================================================== ~//
 
-FVector ATPSPlayerController::GetCameraTargetLocation() const
+void ATPSPlayerController::ScanTargetInfo()
 {
 	FVector playerLoc;
 	FRotator cameraRot;
@@ -272,9 +283,10 @@ FVector ATPSPlayerController::GetCameraTargetLocation() const
 		true,
 		FLinearColor::Red, FLinearColor::Green, 5.f);
 
-	return hitResult.IsValidBlockingHit()
+	TargetLookLocation = hitResult.IsValidBlockingHit()
 		? hitResult.ImpactPoint
 		: cameraTargetLoc;
+	TargetActor = hitResult.GetActor();
 }
 
 

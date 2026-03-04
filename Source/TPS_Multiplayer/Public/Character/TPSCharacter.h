@@ -237,25 +237,40 @@ public:
 
 	//////////////////////////////////////////////////////
 	// Targeting
+	//
+	// TODO: Migrate to "Targeting" struct
 
 	// Target Rotation - Derived from Target Location (Replicated to peer clients)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting", Replicated)
-	FRotator TargetLookRotation;
-	//
-	// Should Target Location drive Target Rotation?
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
-	bool IsTargetingLocation;
-	//
-	// Target Location - Provided by LOCAL Controller (Not Replicated)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
-	FVector TargetLookLocation;
-	// Current Look Location - Iterps to TargetLocation
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
-	FVector CurrentLookLocation;
-	// Interp rate for CurrentLookLocation;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
-	float LookTargetInterpRate = 0.8f;
+	// TODO: DELETE
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting", Replicated)
+	//FRotator TargetLookRotation;
 
+
+
+	// Provided by Controller (AI or Player) - Will drive "look" location if set.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting", Replicated)
+	TWeakObjectPtr<AActor> TargetActor;
+	//
+	// Target Location - Provided by LOCAL Controller (NOT replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting", Replicated)
+	FVector TargetLookLocation;
+	// Current Look Location - Interpolates to TargetLookLocation
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting", Replicated)
+	FVector CurrentLookLocation;
+
+	// Interpolation rate for CurrentLookLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
+	float LookTargetInterpRateFar = 0.5f;
+	// Interpolation speed for CurrentLookLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
+	float LookTargetInterpRateClose = .95f;
+	// How close Current->Target can be before using the "close" interpolation.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
+	float TargetingInterpThreshold = 100;
+
+	// Target Lock
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
+	bool IsLockedToTarget = false;
 
 	////////////////////////////////////////////////////////
 	// Equipment State
@@ -346,10 +361,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void InterruptIdle();
-
-	UFUNCTION(BlueprintCallable)
-	void SetTargetLocation(FVector targetLocation);
-
 
 	////////////////////////////////////////////////////////
 	// Business Logic

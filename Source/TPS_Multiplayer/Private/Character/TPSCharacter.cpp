@@ -2,6 +2,7 @@
 
 #include "Character/TPSCharacter.h"
 
+#include "AI/TPSAIController.h"
 #include "Game/TPSGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GAS/TPSAbilitySystemComponent.h"
@@ -66,7 +67,6 @@ ATPSCharacter::ATPSCharacter()
 	IsFiring = false;
 	IsInteracting = false;
 	IsInMenu = false;
-	TargetLookRotation = FRotator::ZeroRotator;
 
 	CanDie = true;
 	HasDeathTriggered = false;
@@ -97,8 +97,9 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ATPSCharacter, IsTransitioning);
 	DOREPLIFETIME(ATPSCharacter, IsInMenu);
 
-	//DOREPLIFETIME(ATPSCharacter, TargetLookLocation);
-	DOREPLIFETIME(ATPSCharacter, TargetLookRotation);
+	DOREPLIFETIME(ATPSCharacter, TargetActor);
+	DOREPLIFETIME(ATPSCharacter, TargetLookLocation);
+	DOREPLIFETIME(ATPSCharacter, CurrentLookLocation);
 	DOREPLIFETIME(ATPSCharacter, HasDeathTriggered);
 }
 
@@ -209,29 +210,25 @@ void ATPSCharacter::Tick(float deltaTime)
 	}
 
 
-	//- Sync Character direction from Controller --------------------------=
+	//- Sync Targeting State from Controller --------------------------=
 	//
-	if (IsLocallyControlled())
-	{
-		IsTargetingLocation = true;
-	}
-	else
-	{
-		IsTargetingLocation = false;
-	}
-	CurrentLookLocation = FMath::Lerp(CurrentLookLocation, TargetLookLocation, LookTargetInterpRate);
-	//CurrentLookLocation = FMath::FInterpTo(CurrentLookLocation, TargetLookLocation, deltaTime, LookTargetInterpRate);
-	if (IsTargetingLocation) {
-		//FVector delta = CurrentLookLocation - GetActorLocation();
-		//TargetLookRotation = delta.Rotation();
-	}
-	else {
-		FRotator vr = GetViewRotation();
-		if (vr != GetActorRotation()) // Guards against "noise" where remote client only sees controller value when input is active
+	//if (HasAuthority()) {
+		if (auto pc = GetController<ATPSPlayerController>())
 		{
-			TargetLookRotation = vr;
+			TargetLookLocation = pc->TargetLookLocation;
+			TargetActor = pc->TargetActor;
 		}
-	}
+		else if (auto bc = GetController<ATPSAIController>())
+		{
+			TargetLookLocation = bc->TargetLookLocation;
+			TargetActor = bc->TargetActor;
+		}
+	//}
+	FVector currentTargetDelta = TargetLookLocation - CurrentLookLocation;
+	float interpRate = (currentTargetDelta.Size() > TargetingInterpThreshold)
+		? LookTargetInterpRateFar
+		: LookTargetInterpRateClose;
+	CurrentLookLocation = FMath::Lerp(CurrentLookLocation, TargetLookLocation, interpRate);
 
 
 	//- Extend Input to Weapons -------------------------=
@@ -411,15 +408,6 @@ bool ATPSCharacter::IsDeathConditionMet()
 	}
 	return false;
 }
-
-
-
-void ATPSCharacter::SetTargetLocation(FVector targetLocation)
-{
-	TargetLookLocation = targetLocation;
-}
-
-
 
 void ATPSCharacter::ApplyLocomotionState(const ETPSCharacterLocomotionState LocomotionState)
 {
