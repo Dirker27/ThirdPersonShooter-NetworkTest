@@ -61,6 +61,15 @@ void ATPSWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+	// 2-stage LERP CurrentLookLocation -> TargetLookLocation
+	FVector currentTargetDelta = TargetInfo.Location + CurrentPointOfAim;
+	float interpRate = (currentTargetDelta.Size() > TargetingInterpThreshold)
+		? TargetInterpRateFar
+		: TargetInterpRateClose;
+	CurrentPointOfAim = FMath::Lerp(CurrentPointOfAim, TargetInfo.Location, interpRate);
+
+
 	// Performed in GameplayAbility
 	//
 	/*if (IsFiring)

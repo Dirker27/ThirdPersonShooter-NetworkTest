@@ -6,6 +6,7 @@
 
 #include "Equipment/TPSEquipableItem.h"
 #include "Reticle/TPSReticle.h"
+#include "Types/TPSTargetInfo.h"
 #include "Weapon/Types/TPSWeaponSlot.h"
 #include "Weapon/Types/TPSWeaponType.h"
 #include "Weapon/TPSWeaponConfiguration.h"
@@ -102,29 +103,58 @@ public:
     //
     // Should highlight / render display frame to Player.
     UFUNCTION(BlueprintCallable)
-    bool ShouldRenderUnitFrame() { return IsOwned; }
+    bool ShouldRenderUnitFrame() { return !IsOwned; }
+
+
 
     //////////////////////////////////////////////////////
-    // Fire Control States
+    // Fire Control / Trigger Behavior
 
-    // Targeting
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", Replicated);
-    FVector TargetLocation;
-    // Accuracy (Degrees of freedom in Pitch/Yaw)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State");
-    FVector2D TargetAccuracyTolerance;
-    //
+
     // Meter fire rate
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State|Fire Control")
     float TimeLastFired;
     //
     // Consume the trigger (single/burst mode)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State|Fire Control")
     bool HasTriggerCompleted;
     //
     // For burst-fire count
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State|Fire Control")
     int SuccessiveFireCount;
+
+
+    //////////////////////////////////////////////////////
+    // Targeting
+
+    // Targeted Location(s) / Actor(s)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State|Targeting")
+    FTPSTargetInfo TargetInfo;
+
+    // Where the muzzle is CURRENTLY pointed (lerps to Target)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State|Targeting", Replicated);
+    FVector CurrentPointOfAim;
+    // Interpolation rate for CurrentLookLocation - gross adjustment (turning around)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration|Targeting")
+    float TargetInterpRateFar = 0.5f;
+    // Interpolation speed for CurrentLookLocation - fine adjustment (aiming / jitter)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration|Targeting")
+    float TargetInterpRateClose = .8f;
+    // How close Current->Target can be before using the "close" interpolation.
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration|Targeting")
+    float TargetingInterpThreshold = 100;
+
+
+    //////////////////////////////////////////////////////
+    // Accuracy
+
+    // Accuracy (Degrees of freedom in Pitch/Yaw)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State|Targeting");
+    FVector2D TargetAccuracyTolerance;
+
+
+
+
 
 //~ ======================================================================== ~//
 //  BEHAVIOR

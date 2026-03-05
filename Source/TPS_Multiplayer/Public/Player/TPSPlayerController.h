@@ -77,14 +77,13 @@ public:
 	void OnRep_ControllerState();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
-	FVector TargetLookLocation = FVector::Zero();
+	FTPSTargetInfo TargetInfo;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing=OnRep_TargetActor)
-	TWeakObjectPtr<AActor> TargetActor;
-	UFUNCTION()
-	void OnRep_TargetActor();
+private:
+	FHitResult TargetCacheHit;
+	bool IsTargetCacheValid = false;
 
-
+public:
 	// Disables Camera->Character Rotation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool IsFreeCam;
@@ -121,11 +120,18 @@ public:
 	// Targeting
 public:
 
+	// How far the controller will scan ahead for target locations/actors.
+	//   Used for Raycast performed EVERY FRAME for player/character target sweeps.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="TPSPlayerController|Configuration")
+	float TargetingScanRange = 10000; // 100 meters
+
 	UFUNCTION()
 	void ScanTargetInfo();
 
-	void NotifyPawnDeath();
+	UFUNCTION()
+	FHitResult ScanViewTargetInRange(const float range);
 
+	void NotifyPawnDeath();
 
 
 	////////////////////////////////////////////////////////

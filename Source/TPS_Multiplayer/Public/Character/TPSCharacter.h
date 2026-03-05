@@ -22,6 +22,7 @@
 #include "GAS/Attributes/StandardAttributeSet.h"
 #include "GAS/Attributes/WeaponAttributeSet.h"
 #include "Team/TPSTeamID.h"
+#include "Types/TPSTargetInfo.h"
 #include "Weapon/TPSWeapon.h"
 
 #include "TPSCharacter.generated.h"
@@ -141,6 +142,20 @@ public:
 	bool CanDie = false;
 
 
+	// Interpolation rate for CurrentLookLocation - gross adjustment (turning around)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration|Targeting")
+	float LookTargetInterpRateFar = 0.5f;
+	// Interpolation speed for CurrentLookLocation - fine adjustment (aiming / jitter)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration|Targeting")
+	float LookTargetInterpRateClose = .95f;
+	// How close Current->Target can be before using the "close" interpolation.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration|Targeting")
+	float TargetingInterpThreshold = 100;
+	// How far out to place a character's artificial TargetLocation
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Configuration|Targeting")
+	float TargetingRange = 10000;
+
+
 	//////////////////////////////////////////////////////
 	// Assignment Info
 
@@ -236,41 +251,34 @@ public:
 
 
 	//////////////////////////////////////////////////////
-	// Targeting
+	// Targeting State
 	//
-	// TODO: Migrate to "Targeting" struct
+	// Accessed via Synthetic Getters to avoid replication races and cache Target detection.
+	//   (Local Player needs more accurate info than Server/Peers)
 
-	// Target Rotation - Derived from Target Location (Replicated to peer clients)
-	// TODO: DELETE
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting", Replicated)
-	//FRotator TargetLookRotation;
+protected:
+	// Targeted Location(s) / Actor(s)
+	UPROPERTY(VisibleAnywhere, Category = "TPSCharacter|Input|Targeting", Replicated)
+	FTPSTargetInfo TargetInfo;
 
-
-
-	// Provided by Controller (AI or Player) - Will drive "look" location if set.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting", Replicated)
-	TWeakObjectPtr<AActor> TargetActor;
-	//
-	// Target Location - Provided by LOCAL Controller (NOT replicated)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting", Replicated)
-	FVector TargetLookLocation;
 	// Current Look Location - Interpolates to TargetLookLocation
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting", Replicated)
+	UPROPERTY(VisibleAnywhere, Category = "TPSCharacter|Input|Targeting")
 	FVector CurrentLookLocation;
 
-	// Interpolation rate for CurrentLookLocation;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
-	float LookTargetInterpRateFar = 0.5f;
-	// Interpolation speed for CurrentLookLocation;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
-	float LookTargetInterpRateClose = .95f;
-	// How close Current->Target can be before using the "close" interpolation.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
-	float TargetingInterpThreshold = 100;
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FVector GetTargetLookLocation();
 
-	// Target Lock
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FVector GetCurrentLookLocation() { return CurrentLookLocation; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	AActor* GetTargetActor() { return TargetInfo.Actor; };
+
+	// Target Lock (implementation pending)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TPSCharacter|Input|Targeting")
 	bool IsLockedToTarget = false;
+
 
 	////////////////////////////////////////////////////////
 	// Equipment State
@@ -341,6 +349,9 @@ private:
 	// Called every frame.
 	//  Set state-driven values in subcomponents.
 	void SyncComponentsFromState();
+
+	// Sync's character's targeting info from its Controller (Bot or Player)
+	void SyncTargetInfo();
 
 public:
 

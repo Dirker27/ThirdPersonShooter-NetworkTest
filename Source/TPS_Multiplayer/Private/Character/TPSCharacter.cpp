@@ -97,9 +97,7 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ATPSCharacter, IsTransitioning);
 	DOREPLIFETIME(ATPSCharacter, IsInMenu);
 
-	DOREPLIFETIME(ATPSCharacter, TargetActor);
-	DOREPLIFETIME(ATPSCharacter, TargetLookLocation);
-	DOREPLIFETIME(ATPSCharacter, CurrentLookLocation);
+	DOREPLIFETIME(ATPSCharacter, TargetInfo);
 	DOREPLIFETIME(ATPSCharacter, HasDeathTriggered);
 }
 
@@ -132,13 +130,12 @@ void ATPSCharacter::BeginPlay()
 
 
 	SyncAttributesFromGAS();
-	CurrentLookLocation = TargetLookLocation;
 
 
-	/*if (IsValid(CharacterInstance))
+	if (IsValid(CharacterInstance))
 	{
 		Initialize();
-	}*/
+	}
 }
 
 void ATPSCharacter::Initialize()
@@ -193,7 +190,7 @@ void ATPSCharacter::Tick(float deltaTime)
 	Super::Tick(deltaTime);
 
 
-	//- Sync state from AbilitySystem ----------------------------=
+	//- Sync state from AbilitySystem -----------------------=
 	//
 	SyncAttributesFromGAS();
 
@@ -210,25 +207,18 @@ void ATPSCharacter::Tick(float deltaTime)
 	}
 
 
-	//- Sync Targeting State from Controller --------------------------=
+	//- Sync Targeting State from Controller ----------------=
 	//
-	//if (HasAuthority()) {
-		if (auto pc = GetController<ATPSPlayerController>())
-		{
-			TargetLookLocation = pc->TargetLookLocation;
-			TargetActor = pc->TargetActor;
-		}
-		else if (auto bc = GetController<ATPSAIController>())
-		{
-			TargetLookLocation = bc->TargetLookLocation;
-			TargetActor = bc->TargetActor;
-		}
-	//}
-	FVector currentTargetDelta = TargetLookLocation - CurrentLookLocation;
+	SyncTargetInfo();
+	FVector tLoc = GetTargetLookLocation();
+	AActor* tAct = GetTargetActor();
+	//
+	// 2-stage LERP CurrentLookLocation -> TargetLookLocation
+	FVector currentTargetDelta = tLoc + CurrentLookLocation;
 	float interpRate = (currentTargetDelta.Size() > TargetingInterpThreshold)
 		? LookTargetInterpRateFar
 		: LookTargetInterpRateClose;
-	CurrentLookLocation = FMath::Lerp(CurrentLookLocation, TargetLookLocation, interpRate);
+	CurrentLookLocation = FMath::Lerp(CurrentLookLocation, tLoc, interpRate);
 
 
 	//- Extend Input to Weapons -------------------------=
@@ -237,7 +227,7 @@ void ATPSCharacter::Tick(float deltaTime)
 	ATPSWeapon* weapon = GetEquippedWeapon();
 	if (IsValid(weapon) && CurrentBehaviorState == Combat)
 	{
-		weapon->TargetLocation = CurrentLookLocation;
+		weapon->TargetInfo.Location = CurrentLookLocation;
 		weapon->TargetAccuracyTolerance = GetCurrentAccuracyTolerance();
 
 		if (IsFiring)
@@ -280,9 +270,41 @@ void ATPSCharacter::Tick(float deltaTime)
 	}
 }
 
+void ATPSCharacter::SyncTargetInfo()
+{
+	// Server && Peer Client - use Rep'd value from Controller
+	if (HasAuthority()) {
+		if (auto pc = GetController<ATPSPlayerController>())
+		{
+			TargetInfo = pc->TargetInfo;
+		}
+		else if (auto bc = GetController<ATPSAIController>())
+		{
+			TargetInfo = bc->TargetInfo;
+		}
+	}
+}
+
+
 void ATPSCharacter::SyncComponentsFromState()
 {
 	UpdateCharacterSpeedForCurrentState();
+}
+
+
+FVector ATPSCharacter::GetTargetLookLocation()
+{
+	if (IsLocallyControlled())
+	{
+		if (auto pc = GetController<ATPSPlayerController>())
+		{
+			pc->ScanTargetInfo();
+			return pc->TargetInfo.Location;
+		}
+	}
+
+	// Server && Peer Client - use rep'd value.
+	return TargetInfo.Location;
 }
 
 

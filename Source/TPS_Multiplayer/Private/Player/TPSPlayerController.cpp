@@ -29,8 +29,7 @@ void ATPSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, ControllerState);
-	DOREPLIFETIME(ThisClass, TargetLookLocation);
-	DOREPLIFETIME(ThisClass, TargetActor);
+	DOREPLIFETIME(ThisClass, TargetInfo);
 }
 
 void ATPSPlayerController::BeginPlay()
@@ -40,6 +39,19 @@ void ATPSPlayerController::BeginPlay()
 
 	BindConsoleCallbacks();
 }
+
+void ATPSPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	IsTargetCacheValid = false;
+
+	if (HasAuthority()) 
+	{
+		ScanTargetInfo();
+	}
+}
+
 
 
 // If the player's controller is READY for restart
@@ -78,12 +90,6 @@ void ATPSPlayerController::OnUnPossess()
 
 	OnPawnPossessionChanged();
 }
-
-void ATPSPlayerController::OnRep_TargetActor()
-{
-	ControllerStateUpdate.Broadcast();
-}
-
 
 
 // Executes ON OWNING CLIENT when PlayerState is connected to Controller from Server
@@ -240,38 +246,20 @@ void ATPSPlayerController::UnBindControllerFromPawn(ATPSPawn* oldPawn)
 	OnControllerUnBoundFromPawn(oldPawn);
 }
 
-void ATPSPlayerController::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	if (!HasAuthority()) { return; }
-
-	ScanTargetInfo();
-
-	if (auto character  = PossessedCharacter())
-	{
-		character->TargetLookLocation = TargetLookLocation;
-		character->TargetActor = TargetActor.Get();
-	}
-	else if (auto pawn = PossessedPawn())
-	{
-		pawn->TargetLookLocation = TargetLookLocation;
-		pawn->TargetActor = TargetActor.Get();
-	}
-}
-
 
 //~ ====================================================================== ~//
 //- BEHAVIOR OPERATIONS
 //~ ====================================================================== ~//
 
-void ATPSPlayerController::ScanTargetInfo()
+FHitResult ATPSPlayerController::ScanViewTargetInRange(const float range)
 {
+	if (IsTargetCacheValid) { return TargetCacheHit; }
+
 	FVector playerLoc;
 	FRotator cameraRot;
 	GetPlayerViewPoint(playerLoc, cameraRot);
 
-	FVector cameraTargetLoc = playerLoc + (cameraRot.Vector() * 10000);
+	FVector cameraTargetLoc = playerLoc + (cameraRot.Vector() * range);
 
 	TArray<AActor*> actorsToIgnore;
 	actorsToIgnore.Add(GetPawn());
@@ -283,10 +271,34 @@ void ATPSPlayerController::ScanTargetInfo()
 		true,
 		FLinearColor::Red, FLinearColor::Green, 5.f);
 
-	TargetLookLocation = hitResult.IsValidBlockingHit()
-		? hitResult.ImpactPoint
-		: cameraTargetLoc;
-	TargetActor = hitResult.GetActor();
+	TargetCacheHit = hitResult;
+	return TargetCacheHit;
+}
+
+
+void ATPSPlayerController::ScanTargetInfo()
+{
+	FHitResult hitResult = ScanViewTargetInRange(TargetingScanRange);
+
+	TargetInfo.Actor = hitResult.GetActor();
+
+	if (hitResult.IsValidBlockingHit())
+	{
+		TargetInfo.Location =  hitResult.ImpactPoint;
+		
+	}
+	else // Fallback - TargetLocation is at max range of ray
+	{
+		FVector playerLoc;
+		FRotator cameraRot;
+		GetPlayerViewPoint(playerLoc, cameraRot);
+		FVector cameraTargetLoc = playerLoc + (cameraRot.Vector() * TargetingScanRange);
+
+		TargetInfo.Location = hitResult.IsValidBlockingHit()
+			? hitResult.ImpactPoint
+			: cameraTargetLoc;
+		TargetInfo.Actor = hitResult.GetActor();
+	}
 }
 
 

@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 
+#include "Types/TPSTargetInfo.h"
+
 #include "TPSAIController.generated.h"
 
 class ATPSPawn;
@@ -42,13 +44,9 @@ public:
 	//
 	// TODO: Move to "Targeting" struct
 
-	// Provided by Controller (AI or Player) - Will drive "look" location if set.
+	// Targeted Location(s) / Actor(s)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input|Targeting")
-	TWeakObjectPtr<AActor> TargetActor;
-
-	// Target Location - Provided by LOCAL Controller (NOT replicated)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input|Targeting")
-	FVector TargetLookLocation;
+	FTPSTargetInfo TargetInfo;
 
 	//~ Begin AIController Behavior
 public:
