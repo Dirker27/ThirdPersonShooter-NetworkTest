@@ -36,11 +36,6 @@
 			]
 		},
 		{
-			"Name": "MultiplayerShooterPlugin",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/061176d2d7b34d289510d98672dddc2a"
-		},
-		{
 			"Name": "MeshTool",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/7289f8ad4b6c43b289affc9870db344a"
