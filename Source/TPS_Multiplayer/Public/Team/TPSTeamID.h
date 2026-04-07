@@ -26,7 +26,7 @@ static FColor TPSTeamIdToColor(ETPSTeamID id)
 	switch (id)
 	{
 	case ETPSTeamID::RED_TEAM:
-		return FColor(239, 56, 56);
+		return FColor(239, 72, 72);
 	case ETPSTeamID::BLUE_TEAM:
 		return FColor(0, 255, 255);
 	case ETPSTeamID::GREEN_TEAM:
