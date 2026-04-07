@@ -70,6 +70,7 @@ void ATPSEquipableItem::Pickup()
 	DisableWorldCollision();
 
 	PerformPickup();
+	OnPickup();
 }
 void ATPSEquipableItem::Drop()
 {
@@ -87,6 +88,7 @@ void ATPSEquipableItem::Drop()
 	EnableWorldCollision();
 
 	PerformDrop();
+	OnDrop();
 }
 
 //- Equip --//

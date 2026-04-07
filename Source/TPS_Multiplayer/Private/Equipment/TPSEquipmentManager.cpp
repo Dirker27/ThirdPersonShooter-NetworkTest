@@ -166,10 +166,11 @@ void UTPSEquipmentManager::PickUpWeapon(ATPSWeapon* weapon, const ETPSWeaponSlot
 
     WeaponItems[slot] = weapon;
 
-    weapon->Pickup();
+    // TODO: Manage ownership info from INSIDE item.
     weapon->OwnerAsc = OwnerAsc;
     weapon->SetOwner(GetOwner());
     weapon->SetInstigator(Cast<APawn>(GetOwner()));
+    weapon->Pickup();
     ApplyPassiveItemEffectsToOwner(weapon);
 
     if (slot == ActiveEquipmentSlot)
@@ -194,10 +195,11 @@ void UTPSEquipmentManager::PickUpGearItem(ATPSGearItem* gearItem, const ETPSGear
 
     GearItems[slot] = gearItem;
 
-    gearItem->Pickup();
+    // TODO: Manage ownership info from INSIDE item.
     gearItem->OwnerAsc = OwnerAsc;
     gearItem->SetOwner(GetOwner());
     gearItem->SetInstigator(Cast<APawn>(GetOwner()));
+    gearItem->Pickup();
     ApplyPassiveItemEffectsToOwner(gearItem);
 
     gearItem->Mount(GetHarnessMountPointForGearSlot(slot));
